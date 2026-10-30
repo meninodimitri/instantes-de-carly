@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dev Mobile Preview — Instantes de Carly</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-studio: #111820;
+      --bg-panel: #1B2733;
+      --gold: #E7C378;
+      --blue: #3B7293;
+      --text-light: #FFFDF3;
+      --text-muted: #9BA7B4;
+      --border: rgba(231, 195, 120, 0.22);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-studio);
+      color: var(--text-light);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Barra de Controle do Desenvolvedor */
+    .dev-toolbar {
+      background-color: var(--bg-panel);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .dev-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .dev-badge {
+      background-color: rgba(231, 195, 120, 0.16);
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 4px;
+    }
+
+    .dev-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: #FFFFFF;
+    }
+
+    .dev-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .device-btn {
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: var(--text-light);
+      padding: 8px 14px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .device-btn:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .device-btn.active {
+      background-color: var(--gold);
+      border-color: var(--gold);
+      color: #16202A;
+    }
+
+    .dev-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .back-link {
+      color: var(--gold);
+      text-decoration: none;
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 8px 14px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .back-link:hover {
+      background-color: rgba(231, 195, 120, 0.12);
+    }
+
+    /* Barra de Atalhos para Pular de Seção no Celular */
+    .section-jumper {
+      background-color: rgba(27, 39, 51, 0.65);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      padding: 8px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .section-jumper span {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-right: 6px;
+    }
+
+    .jump-btn {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #D6DEE6;
+      padding: 5px 11px;
+      font-size: 0.72rem;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .jump-btn:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    /* Palco Central do Simulador */
+    .studio-stage {
+      flex: 1;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 36px;
+      padding: 28px 24px 48px;
+      flex-wrap: wrap;
+    }
+
+    /* Moldura de Smartphone Realista */
+    .phone-chassis {
+      background-color: #0B0F14;
+      border: 12px solid #26323F;
+      border-radius: 46px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(231, 195, 120, 0.28);
+      position: relative;
+      overflow: hidden;
+      transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1), height 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Notch / Dynamic Island sutil */
+    .phone-StatusBar {
+      height: 28px;
+      background-color: #16202A;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 22px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: rgba(255, 253, 243, 0.8);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      flex-shrink: 0;
+    }
+
+    .phone-notch {
+      width: 76px;
+      height: 14px;
+      background-color: #080B0E;
+      border-radius: 999px;
+    }
+
+    .phone-iframe {
+      width: 100%;
+      flex: 1;
+      border: none;
+      background-color: #FFFDF3;
+    }
+
+    /* Moldura Desktop (Visível apenas no modo Lado a Lado) */
+    .desktop-chassis {
+      display: none;
+      flex-direction: column;
+      width: 960px;
+      max-width: calc(100vw - 480px);
+      min-width: 600px;
+      height: 852px;
+      background-color: #0B0F14;
+      border: 8px solid #26323F;
+      border-radius: 16px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(231, 195, 120, 0.22);
+      overflow: hidden;
+    }
+
+    .studio-stage.side-by-side .desktop-chassis {
+      display: flex;
+    }
+
+    .desktop-bar {
+      height: 32px;
+      background-color: #16202A;
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      gap: 8px;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .dot.r { background: #EF4444; }
+    .dot.y { background: #F59E0B; }
+    .dot.g { background: #10B981; }
+
+    .device-info-footer {
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      padding-bottom: 24px;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="dev-toolbar">
+    <div class="dev-brand">
+      <span class="dev-badge">Visão do Desenvolvedor (Yan)</span>
+      <h1 class="dev-title">Simulador Mobile — Instantes de Carly</h1>
+    </div>
+
+    <div class="dev-controls" role="group" aria-label="Escolher resolução do aparelho">
+      <button type="button" class="device-btn" data-w="375" data-h="667" data-mode="single">
+        iPhone SE (375px)
+      </button>
+      <button type="button" class="device-btn active" data-w="393" data-h="852" data-mode="single">
+        iPhone 15 Pro (393px)
+      </button>
+      <button type="button" class="device-btn" data-w="430" data-h="932" data-mode="single">
+        iPhone Pro Max (430px)
+      </button>
+      <button type="button" class="device-btn" data-w="768" data-h="1024" data-mode="single">
+        Tablet / iPad (768px)
+      </button>
+      <button type="button" class="device-btn" data-w="393" data-h="852" data-mode="split">
+        Lado a Lado (Mobile + PC)
+      </button>
+    </div>
+
+    <div class="dev-actions" style="display: flex; gap: 10px; align-items: center;">
+      <a href="admin.html" class="back-link" style="background: rgba(231, 195, 120, 0.16); border-color: var(--gold); color: var(--gold);">✏️ Painel Admin</a>
+      <a href="index.html" class="back-link">← Voltar ao Site Normal</a>
+    </div>
+  </header>
+
+  <nav class="section-jumper" aria-label="Ir direto para seção no simulador">
+    <span>Ir para etapa:</span>
+    <button type="button" class="jump-btn" data-hash="#inicio">00. Capa</button>
+    <button type="button" class="jump-btn" data-hash="#proposta">01. Proposta</button>
+    <button type="button" class="jump-btn" data-hash="#portfolio">02. Portfólio</button>
+    <button type="button" class="jump-btn" data-hash="#humanizada">03. Abordagem</button>
+    <button type="button" class="jump-btn" data-hash="#servicos">04. Formatos e Valores</button>
+    <button type="button" class="jump-btn" data-hash="#sobre">05. Sobre Carly</button>
+    <button type="button" class="jump-btn" data-hash="#avaliacoes">06. Avaliações</button>
+    <button type="button" class="jump-btn" data-hash="#contato">07. Contato</button>
+  </nav>
+
+  <main class="studio-stage" id="studio-stage">
+    <!-- Aparelho Mobile -->
+    <div class="phone-chassis" id="phone-chassis" style="width: 417px; height: 876px;">
+      <div class="phone-StatusBar">
+        <span>9:41</span>
+        <div class="phone-notch"></div>
+        <span>5G • 100%</span>
+      </div>
+      <iframe src="index.html" class="phone-iframe" id="mobile-iframe" title="Visualização Mobile Instantes de Carly"></iframe>
+    </div>
+
+    <!-- Aparelho Desktop (Exibido no modo Lado a Lado) -->
+    <div class="desktop-chassis" id="desktop-chassis">
+      <div class="desktop-bar">
+        <span class="dot r"></span>
+        <span class="dot y"></span>
+        <span class="dot g"></span>
+        <span style="margin-left: 8px;">instantesdecarly.com.br — Visão Desktop</span>
+      </div>
+      <iframe src="index.html" class="phone-iframe" id="desktop-iframe" title="Visualização Desktop Instantes de Carly"></iframe>
+    </div>
+  </main>
+
+  <footer class="device-info-footer">
+    💡 <strong>Nota para Yan:</strong> Esta página (<code>/mobile-preview.html</code>) é exclusiva para você testar como desenvolvedor. Para os clientes no link principal (<code>/</code>), o site já abre automaticamente na versão Mobile pelo celular e na versão Desktop pelo PC.
+  </footer>
+
+  <script>
+    const buttons = document.querySelectorAll('.device-btn');
+    const phoneChassis = document.getElementById('phone-chassis');
+    const studioStage = document.getElementById('studio-stage');
+    const mobileIframe = document.getElementById('mobile-iframe');
+    const desktopIframe = document.getElementById('desktop-iframe');
+    const jumpBtns = document.querySelectorAll('.jump-btn');
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        buttons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const w = parseInt(btn.getAttribute('data-w'), 10);
+        const h = parseInt(btn.getAttribute('data-h'), 10);
+        const mode = btn.getAttribute('data-mode');
+
+        // Soma 24px das bordas laterais do chassi
+        phoneChassis.style.width = (w + 24) + 'px';
+        phoneChassis.style.height = (h + 24) + 'px';
+        phoneChassis.style.borderRadius = w >= 700 ? '24px' : '46px';
+
+        if (mode === 'split') {
+          studioStage.classList.add('side-by-side');
+        } else {
+          studioStage.classList.remove('side-by-side');
+        }
+      });
+    });
+
+    jumpBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const hash = btn.getAttribute('data-hash');
+        if (mobileIframe && mobileIframe.contentWindow) {
+          const target = mobileIframe.contentWindow.document.querySelector(hash);
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth' });
+          } else {
+            mobileIframe.src = 'index.html' + hash;
+          }
+        }
+        if (studioStage.classList.contains('side-by-side') && desktopIframe && desktopIframe.contentWindow) {
+          const targetDesk = desktopIframe.contentWindow.document.querySelector(hash);
+          if (targetDesk) {
+            targetDesk.scrollIntoView({ behavior: 'smooth' });
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+

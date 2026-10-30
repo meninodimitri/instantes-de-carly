@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Painel do Estúdio (Editor Visual) — Instantes de Carly</title>
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%233B7293%22 stroke-width=%221.8%22><rect x=%222%22 y=%225%22 width=%2220%22 height=%2214%22 rx=%223%22/><circle cx=%2212%22 cy=%2212%22 r=%223.5%22/><circle cx=%2217%22 cy=%228%22 r=%221%22 fill=%22%23E7C378%22/></svg>" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="assets/css/admin.css" />
+</head>
+<body>
+
+  <!-- ======================================================================
+       1. PORTÃO DE ACESSO DO ESTÚDIO (LOGIN SEGURO / MODO LOCALHOST)
+       ====================================================================== -->
+  <section id="auth-gate" class="auth-gate" aria-labelledby="auth-title">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-logo-box">
+          <img src="assets/images/logo-light.png" alt="Instantes de Carly" />
+        </div>
+        <span class="auth-kicker">Painel Administrativo &amp; Editor Visual</span>
+        <h1 id="auth-title" class="auth-title">Estúdio Instantes de Carly</h1>
+        <p class="auth-subtitle">
+          Envie novas fotografias, organize categorias, ajuste preços e edite textos do site com visualização ao vivo.
+        </p>
+      </div>
+
+      <!-- Acesso rápido habilitado apenas em ambiente de desenvolvimento local (localhost) -->
+      <div id="auth-local-box" class="auth-local-box" hidden>
+        <p>
+          <strong>Ambiente de Teste Local detectado (localhost):</strong><br />
+          Você pode entrar agora para testar uploads, categorias, textos e preview Mobile/PC imediatamente.
+        </p>
+        <button type="button" id="btn-enter-local" class="cms-btn cms-btn-primary" style="width: 100%; padding: 12px 18px;">
+          <span>Entrar no Editor Visual (Modo Local) →</span>
+        </button>
+      </div>
+
+      <div id="auth-divider" class="auth-divider" hidden>ou conectar publicação oficial</div>
+
+      <!-- Autenticação Oficial via GitHub API (Produção) -->
+      <form id="auth-gh-form" novalidate>
+        <div class="field-group">
+          <label for="auth-repo" class="field-label">Repositório do Site (GitHub)</label>
+          <input type="text" id="auth-repo" class="cms-input" placeholder="Ex: yancarvalho/instantes-de-carly" autocomplete="username" />
+        </div>
+
+        <div class="field-grid">
+          <div class="field-group">
+            <label for="auth-branch" class="field-label">Branch Principal</label>
+            <input type="text" id="auth-branch" class="cms-input" value="main" />
+          </div>
+          <div class="field-group" style="justify-content: flex-end;">
+            <label class="toggle-check-row" style="padding-bottom: 10px;">
+              <input type="checkbox" id="auth-remember" checked />
+              <span>Lembrar neste aparelho</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="auth-token" class="field-label">Chave de Acesso (GitHub Token)</label>
+          <input type="password" id="auth-token" class="cms-input" placeholder="github_pat_... ou ghp_..." autocomplete="current-password" />
+          <span class="field-hint">Sua chave fica salva apenas no seu navegador e nunca aparece no código público do site.</span>
+        </div>
+
+        <div id="auth-error-msg" class="alert-banner" style="display: none; color: var(--cms-danger); background: var(--cms-danger-bg); margin-top: 12px;"></div>
+
+        <button type="submit" id="btn-auth-gh" class="cms-btn cms-btn-gold" style="width: 100%; margin-top: 14px; padding: 12px 18px;">
+          <span>Validar Acesso &amp; Abrir Estúdio</span>
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ======================================================================
+       2. INTERFACE PRINCIPAL DO EDITOR VISUAL (SPLIT-SCREEN)
+       ====================================================================== -->
+  <div id="cms-app" class="cms-app">
+
+    <!-- Barra Superior -->
+    <header class="cms-topbar">
+      <div class="topbar-left">
+        <img src="assets/images/logo-light.png" alt="Instantes de Carly" class="topbar-logo" />
+        <div class="topbar-brand-text">
+          <span class="topbar-badge">Editor Visual • Sem Código</span>
+          <strong class="topbar-title">Instantes de Carly</strong>
+        </div>
+
+        <div id="cms-status-pill" class="status-pill" title="Status atual das alterações">
+          <span class="status-dot"></span>
+          <span id="cms-status-text">Sincronizado</span>
+        </div>
+      </div>
+
+      <!-- Alternador de Preview ao Vivo (PC / Mobile iPhone / Tela Cheia do Editor) -->
+      <div class="topbar-center" role="group" aria-label="Modo de visualização ao vivo">
+        <button type="button" class="preview-mode-btn active" data-preview-mode="desktop">
+          <span>🖥️ Preview PC</span>
+        </button>
+        <button type="button" class="preview-mode-btn" data-preview-mode="mobile">
+          <span>📱 Preview Celular</span>
+        </button>
+        <button type="button" class="preview-mode-btn" data-preview-mode="hidden">
+          <span>📐 Expandir Editor</span>
+        </button>
+      </div>
+
+      <!-- Botões de Ação e Publicação -->
+      <div class="topbar-right">
+        <a href="index.html" target="_blank" rel="noopener" class="cms-btn cms-btn-ghost-light cms-btn-sm">
+          <span>Ver Site ↗</span>
+        </a>
+        <button type="button" id="btn-publish-main" class="cms-btn cms-btn-gold">
+          <span id="btn-publish-label">Salvar &amp; Publicar</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Área de Trabalho (Menu + Editor + Preview Vivo) -->
+    <div id="cms-workspace" class="cms-workspace">
+
+      <!-- Menu Lateral -->
+      <aside class="cms-sidebar" aria-label="Áreas editáveis do site">
+        <div>
+          <div class="sidebar-group-label">Fotografias &amp; Acervo</div>
+          <nav class="sidebar-nav">
+            <button type="button" class="sidebar-tab active" data-tab="portfolio">
+              <span class="sidebar-tab-left"><span>📸</span> <span>Portfólio &amp; Fotos</span></span>
+              <span class="sidebar-count" id="count-portfolio">17</span>
+            </button>
+            <button type="button" class="sidebar-tab" data-tab="hero">
+              <span class="sidebar-tab-left"><span>🖼️</span> <span>Capa do Site (Hero)</span></span>
+              <span class="sidebar-count" id="count-hero">7</span>
+            </button>
+            <button type="button" class="sidebar-tab" data-tab="categories">
+              <span class="sidebar-tab-left"><span>🗂️</span> <span>Categorias &amp; Filtros</span></span>
+              <span class="sidebar-count" id="count-categories">7</span>
+            </button>
+          </nav>
+
+          <div class="sidebar-group-label">Conteúdo &amp; Comercial</div>
+          <nav class="sidebar-nav">
+            <button type="button" class="sidebar-tab" data-tab="packages">
+              <span class="sidebar-tab-left"><span>✨</span> <span>Formatos &amp; Valores</span></span>
+              <span class="sidebar-count" id="count-packages">5</span>
+            </button>
+            <button type="button" class="sidebar-tab" data-tab="sections">
+              <span class="sidebar-tab-left"><span>✍️</span> <span>Textos &amp; Seções</span></span>
+            </button>
+            <button type="button" class="sidebar-tab" data-tab="publish">
+              <span class="sidebar-tab-left"><span>🚀</span> <span>Publicação &amp; Nuvem</span></span>
+            </button>
+          </nav>
+        </div>
+
+        <div class="sidebar-footer">
+          <a href="mobile-preview.html" target="_blank" rel="noopener" class="sidebar-ext-link">
+            <span>Simulador Mobile + PC</span>
+            <span>↗</span>
+          </a>
+          <a href="brand/index.html" target="_blank" rel="noopener" class="sidebar-ext-link">
+            <span>Manual da Marca (Brandbook)</span>
+            <span>↗</span>
+          </a>
+          <button type="button" id="btn-logout-studio" class="sidebar-ext-link" style="background: none; border: none; cursor: pointer; width: 100%; text-align: left;">
+            <span>Bloquear / Sair do Painel</span>
+            <span>🔒</span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- Painel Central de Edição -->
+      <main class="cms-editor-pane">
+
+        <!-- ABA 1: PORTFÓLIO & UPLOAD DE FOTOS -->
+        <section id="panel-portfolio" class="cms-panel active">
+          <div class="panel-header">
+            <div>
+              <span class="panel-kicker">Seção 02 • Galeria Curatorial</span>
+              <h2 class="panel-title">Portfólio &amp; Categorização de Fotos</h2>
+              <p class="panel-desc">
+                Envie novas fotos (o painel otimiza automaticamente o peso para carregamento rápido), escolha a categoria para cair no filtro certo e ajuste o enquadramento sem cortes indesejados.
+              </p>
+            </div>
+          </div>
+
+          <!-- Zona de Upload Inteligente com Categoria Pré-Selecionada -->
+          <div id="portfolio-upload-box" class="upload-box">
+            <div class="upload-defaults-bar">
+              <div class="field-group" style="margin-bottom: 0;">
+                <label for="upload-default-category" class="field-label">Enviar novas fotos direto na categoria:</label>
+                <select id="upload-default-category" class="cms-select"></select>
+              </div>
+              <div class="field-group" style="margin-bottom: 0;">
+                <label for="upload-default-location" class="field-label">Local padrão das fotos enviadas:</label>
+                <input type="text" id="upload-default-location" class="cms-input" value="Fortaleza, Ceará" placeholder="Ex: Ponte dos Ingleses, Praia de Iracema..." />
+              </div>
+            </div>
+
+            <input type="file" id="portfolio-file-input" accept="image/jpeg,image/png,image/webp" multiple hidden />
+            <div id="portfolio-drop-trigger" class="upload-drop-area" role="button" tabindex="0">
+              <div class="upload-icon-circle">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+              </div>
+              <h3 class="upload-drop-title">Arraste suas fotos aqui ou clique para escolher</h3>
+              <p class="upload-drop-sub">Aceita várias fotos de uma vez (JPG, PNG, WebP). Redimensionamento e detecção Horizontal/Vertical automáticos.</p>
+              <span class="cms-btn cms-btn-primary">Selecionar Fotografias do Dispositivo</span>
+            </div>
+          </div>
+
+          <!-- Barra de Filtro e Busca dentro do Admin -->
+          <div class="admin-filter-toolbar">
+            <div id="admin-portfolio-cat-pills" class="admin-cat-pills"></div>
+            <input type="search" id="admin-portfolio-search" class="cms-input" placeholder="Buscar por título ou local..." style="max-width: 240px;" />
+          </div>
+
+          <!-- Lista de Cartões das Fotos -->
+          <div id="portfolio-cards-list" class="cms-cards-stack"></div>
+        </section>
+
+        <!-- ABA 2: CAPA DO SITE (HERO FULL-BLEED) -->
+        <section id="panel-hero" class="cms-panel">
+          <div class="panel-header">
+            <div>
+              <span class="panel-kicker">Seção 00 • Abertura de Tela Cheia</span>
+              <h2 class="panel-title">Fotos da Capa (Hero)</h2>
+              <p class="panel-desc">
+                Gerencie as fotos que preenchem a tela inicial do site e os botões da barra inferior. Recomendamos fotos horizontais para melhor preenchimento em computadores.
+              </p>
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <input type="file" id="hero-add-file-input" accept="image/jpeg,image/png,image/webp" hidden />
+              <button type="button" id="btn-hero-upload-new" class="cms-btn cms-btn-primary">
+                <span>+ Enviar Nova Foto de Capa</span>
+              </button>
+              <button type="button" id="btn-hero-pick-existing" class="cms-btn cms-btn-outline">
+                <span>Escolher Foto do Portfólio</span>
+              </button>
+            </div>
+          </div>
+
+          <div id="hero-cards-list" class="cms-cards-stack"></div>
+        </section>
+
+        <!-- ABA 3: CATEGORIAS & FILTROS -->
+        <section id="panel-categories" class="cms-panel">
+          <div class="panel-header">
+            <div>
+              <span class="panel-kicker">Organização Automática</span>
+              <h2 class="panel-title">Categorias &amp; Filtros do Portfólio</h2>
+              <p class="panel-desc">
+                Todas as categorias abaixo aparecem automaticamente como botões de filtro no Portfólio e como opções no formulário de Pré-Agendamento do site.
+              </p>
+            </div>
+          </div>
+
+          <div class="cms-section-card">
+            <div class="cms-section-card-head">
+              <h3 class="cms-section-card-title">Criar Nova Categoria</h3>
+            </div>
+            <div class="field-grid" style="align-items: end;">
+              <div class="field-group" style="margin-bottom: 0;">
+                <label for="new-cat-name" class="field-label">Nome Visível no Botão de Filtro</label>
+                <input type="text" id="new-cat-name" class="cms-input" placeholder="Ex: Newborn & Bebês, Ensaio Corporativo..." />
+              </div>
+              <div>
+                <button type="button" id="btn-add-category" class="cms-btn cms-btn-primary">
+                  <span>+ Adicionar Categoria</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div id="categories-list" class="cms-cards-stack"></div>
+        </section>
+
+        <!-- ABA 4: FORMATOS & VALORES -->
+        <section id="panel-packages" class="cms-panel">
+          <div class="panel-header">
+            <div>
+              <span class="panel-kicker">Seção 04 • Tabela de Investimento</span>
+              <h2 class="panel-title">Formatos &amp; Valores</h2>
+              <p class="panel-desc">
+                Atualize valores (ex: R$ 350, R$ 550, R$ 850), duração, quantidade de fotos, itens inclusos e mensagens diretas do WhatsApp. Deixe o campo Preço vazio para formatos sob consulta.
+              </p>
+            </div>
+            <button type="button" id="btn-add-package" class="cms-btn cms-btn-primary">
+              <span>+ Novo Formato</span>
+            </button>
+          </div>
+
+          <div id="packages-cards-list" class="cms-cards-stack"></div>
+        </section>
+
+        <!-- ABA 5: TEXTOS, FOTOS DAS SEÇÕES & CONTATOS -->
+        <section id="panel-sections" class="cms-panel">
+          <div class="panel-header">
+            <div>
+              <span class="panel-kicker">Edição Editorial Completa</span>
+              <h2 class="panel-title">Textos, Seções &amp; Contatos</h2>
+              <p class="panel-desc">
+                Escolha abaixo qual parte do site deseja editar. O preview ao lado rola automaticamente até a seção selecionada para você ver a mudança na hora.
+              </p>
+            </div>
+          </div>
+
+          <div id="sections-subtabs" class="subtabs-bar" role="tablist">
+            <button type="button" class="subtab-btn active" data-subtab="sec-hero">00. Capa &amp; Topo</button>
+            <button type="button" class="subtab-btn" data-subtab="sec-proposta">01. Proposta</button>
+            <button type="button" class="subtab-btn" data-subtab="sec-portfolio">02. Portfólio</button>
+            <button type="button" class="subtab-btn" data-subtab="sec-abordagem">03. Abordagem</button>
+            <button type="button" class="subtab-btn" data-subtab="sec-experiencias">04. Formatos e Valores</button>
+            <button type="button" class="subtab-btn" data-subtab="sec-sobre">05. Sobre Carly</button>
+            <button type="button" class="subtab-btn" data-subtab="sec-avaliacoes">06. Avaliações Google</button>
+            <button type="button" class="subtab-btn" data-subtab="sec-contato">07. Contato &amp; Redes</button>
+          </div>
+
+          <div id="sections-form-container"></div>
+        </section>
+
+        <!-- ABA 6: PUBLICAÇÃO NA NUVEM (GITHUB + VERCEL/NETLIFY) & BACKUPS -->
+        <section id="panel-publish" class="cms-panel">
+          <div class="panel-header">
+            <div>
+              <span class="panel-kicker">Nuvem 100% Gratuita &amp; Backups</span>
+              <h2 class="panel-title">Publicação Oficial &amp; Segurança</h2>
+              <p class="panel-desc">
+                Conecte o repositório GitHub do site para que cada clique em “Publicar” envie as fotos otimizadas e atualize o site no ar automaticamente em cerca de 15 segundos.
+              </p>
+            </div>
+          </div>
+
+          <div class="cms-section-card">
+            <div class="cms-section-card-head">
+              <h3 class="cms-section-card-title">Conexão Direta com GitHub (Deploy Automático)</h3>
+              <span id="gh-connection-badge" class="admin-cat-pill">Não conectado</span>
+            </div>
+
+            <div class="field-grid">
+              <div class="field-group">
+                <label for="cfg-gh-repo" class="field-label">Repositório (`usuario/nome-do-repo`)</label>
+                <input type="text" id="cfg-gh-repo" class="cms-input" placeholder="Ex: yancarvalho/instantes-de-carly" />
+              </div>
+              <div class="field-group">
+                <label for="cfg-gh-branch" class="field-label">Branch de Produção</label>
+                <input type="text" id="cfg-gh-branch" class="cms-input" value="main" />
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label for="cfg-gh-token" class="field-label">GitHub Personal Access Token (Permissão `Contents: Read & Write`)</label>
+              <input type="password" id="cfg-gh-token" class="cms-input" placeholder="github_pat_..." />
+              <span class="field-hint">
+                Salvo exclusivamente no armazenamento privado deste navegador. Nunca é enviado para `data.js`.
+              </span>
+            </div>
+
+            <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px;">
+              <button type="button" id="btn-save-test-gh" class="cms-btn cms-btn-primary">
+                <span>Salvar &amp; Testar Conexão com GitHub</span>
+              </button>
+              <button type="button" id="btn-clear-gh" class="cms-btn cms-btn-outline">
+                <span>Desconectar deste navegador</span>
+              </button>
+            </div>
+
+            <div id="gh-test-result" class="alert-banner" style="display: none; margin-top: 16px; margin-bottom: 0;"></div>
+          </div>
+
+          <div class="cms-section-card">
+            <div class="cms-section-card-head">
+              <h3 class="cms-section-card-title">Backup Manual &amp; Restauração</h3>
+            </div>
+            <p class="field-hint" style="margin-bottom: 16px;">
+              Você também pode baixar o arquivo <code>data.js</code> pronto para substituir na pasta do projeto, exportar um backup completo em JSON ou restaurar a versão original do servidor.
+            </p>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+              <button type="button" id="btn-export-datajs" class="cms-btn cms-btn-outline">
+                <span>⬇️ Baixar arquivo `data.js` atualizado</span>
+              </button>
+              <button type="button" id="btn-export-json" class="cms-btn cms-btn-outline">
+                <span>📦 Exportar Backup (`.json`)</span>
+              </button>
+              <input type="file" id="import-json-input" accept=".json,application/json" hidden />
+              <button type="button" id="btn-import-json" class="cms-btn cms-btn-outline">
+                <span>📂 Importar Backup (`.json`)</span>
+              </button>
+              <button type="button" id="btn-reset-factory" class="cms-btn cms-btn-danger">
+                <span>↺ Descartar Rascunho Local</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+      </main>
+
+      <!-- Painel Direito: Preview Vivo Interativo (Desktop / Mobile iPhone) -->
+      <aside id="cms-preview-pane" class="cms-preview-pane" aria-label="Pré-visualização do site em tempo real">
+        <div class="preview-pane-header">
+          <span>🟢 PREVIEW AO VIVO (ATUALIZA ENQUANTO VOCÊ EDITA)</span>
+          <button type="button" id="btn-reload-preview" style="background: none; border: none; color: var(--cms-gold); cursor: pointer; font-size: 0.74rem; font-weight: 600;">
+            ↻ Recarregar Preview
+          </button>
+        </div>
+        <div id="preview-stage" class="preview-stage">
+          <div class="preview-frame-shell">
+            <iframe id="cms-preview-iframe" class="preview-iframe" src="index.html?cmsPreview=1" title="Preview ao vivo do site Instantes de Carly"></iframe>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       3. DIALOG NATIVO PARA REUTILIZAR FOTO EXISTENTE DA GALERIA
+       ====================================================================== -->
+  <dialog id="gallery-picker-dialog" class="cms-dialog" closedby="any">
+    <div class="cms-dialog-header">
+      <h3>Escolher Fotografia do Acervo</h3>
+      <button type="button" id="btn-close-picker" class="cms-btn cms-btn-ghost-light cms-btn-sm">Fechar ✕</button>
+    </div>
+    <div class="cms-dialog-body">
+      <div id="gallery-picker-grid" class="gallery-picker-grid"></div>
+    </div>
+  </dialog>
+
+  <!-- Container de Notificações Toast -->
+  <div id="cms-toast-container" class="cms-toast-container" aria-live="polite"></div>
+
+  <!-- Dados Base do Site + Motor do Editor Visual -->
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/admin.js"></script>
+</body>
+</html>
+

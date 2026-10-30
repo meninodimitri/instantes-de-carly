@@ -1,0 +1,19 @@
+# IDE e agentes internos
+.agents/
+.gemini/
+scripts/
+
+# Vercel & Node
+.vercel
+node_modules/
+package-lock.json
+
+# Sistema e logs
+*.log
+.DS_Store
+Thumbs.db
+
+# Backups e rascunhos locais
+*.bak
+*.tmp
+

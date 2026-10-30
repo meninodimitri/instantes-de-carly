@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manual de Identidade da Marca — Instantes de Carly</title>
+  
+  <!-- Fontes Editoriais -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      /* Paleta Autoral Oficial — Diálogo entre Amarelinho Bebê, Luz Dourada e Azul Iracema */
+      --amarelinho-bebe: #FFFDF3;
+      --creme-solar: #FDF6DF;
+      --papel-card: #FFFFFF;
+      --papel-borda: #EFE6CA;
+      --papel-sombra: rgba(27, 39, 51, 0.05);
+
+      --tinta-texto: #22262A;
+      --tinta-suave: #4E565E;
+      --tinta-apagada: #7C848C;
+
+      --azul-iracema: #3B7293;
+      --azul-maresia: #1B2733;
+      --azul-suave: #EBF2F6;
+      --luz-dourada: #E7C378;
+      --ouro-editorial: #B58324;
+      --luz-clara: #FBF2D6;
+      --rosa-bebe-ysla: #F3C1C6;
+      --rosa-bebe-suave: #FDF4F5;
+      --madeira-pier: #5A4D41;
+
+      --serif: 'Cormorant Garamond', Garamond, 'Times New Roman', serif;
+      --sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --script: 'Alex Brush', cursive;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--sans);
+      background-color: var(--amarelinho-bebe);
+      color: var(--tinta-texto);
+      line-height: 1.7;
+      padding: 40px 20px 100px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 1040px;
+      margin: 0 auto;
+    }
+
+    /* Cabeçalho Editorial */
+    .brand-header {
+      text-align: center;
+      padding: 50px 20px 48px;
+      border-bottom: 1px solid var(--papel-borda);
+      margin-bottom: 60px;
+      position: relative;
+    }
+
+    .logo-container {
+      max-width: 220px;
+      margin: 0 auto 24px;
+    }
+
+    .logo-container img {
+      width: 100%;
+      height: auto;
+      display: block;
+      filter: drop-shadow(0 4px 12px rgba(38, 36, 34, 0.08));
+    }
+
+    .badge-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--ouro-editorial);
+      background: var(--luz-clara);
+      padding: 6px 14px;
+      border-radius: 999px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(231, 195, 120, 0.55);
+    }
+
+    .badge-status::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background-color: var(--luz-dourada);
+      display: inline-block;
+    }
+
+    .brand-title {
+      font-family: var(--serif);
+      font-size: clamp(2.8rem, 5.5vw, 4.4rem);
+      font-weight: 500;
+      line-height: 1.05;
+      margin-bottom: 12px;
+      color: var(--tinta-texto);
+    }
+
+    .brand-subtitle {
+      font-family: var(--serif);
+      font-size: 1.35rem;
+      font-style: italic;
+      color: var(--tinta-suave);
+      max-width: 620px;
+      margin: 0 auto 20px;
+      line-height: 1.4;
+    }
+
+    .brand-meta {
+      font-size: 0.88rem;
+      color: var(--tinta-apagada);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    /* Seções */
+    .brand-section {
+      margin-bottom: 70px;
+    }
+
+    .section-label {
+      font-family: var(--serif);
+      font-size: 2.2rem;
+      color: var(--azul-iracema);
+      margin-bottom: 12px;
+      font-weight: 500;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+
+    .section-label .num {
+      font-size: 1.1rem;
+      font-family: var(--sans);
+      color: var(--ouro-editorial);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .section-intro {
+      font-size: 1.05rem;
+      color: var(--tinta-suave);
+      margin-bottom: 28px;
+      max-width: 760px;
+      line-height: 1.65;
+    }
+
+    /* Cartões Editoriais */
+    .editorial-box {
+      background: var(--papel-card);
+      border: 1px solid var(--papel-borda);
+      border-radius: 8px;
+      padding: 36px;
+      box-shadow: 0 4px 24px var(--papel-sombra);
+      margin-bottom: 30px;
+    }
+
+    /* Destaque do Logo */
+    .logo-showcase {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin-top: 20px;
+    }
+
+    .logo-card {
+      border: 1px solid var(--papel-borda);
+      border-radius: 8px;
+      padding: 32px 24px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-card.light-mode {
+      background-color: var(--amarelinho-bebe);
+    }
+
+    .logo-card.dark-mode {
+      background-color: var(--azul-maresia);
+      color: #fff;
+    }
+
+    .logo-card img {
+      max-width: 220px;
+      height: auto;
+      margin-bottom: 16px;
+    }
+
+    .logo-card-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--tinta-apagada);
+    }
+
+    .logo-card.dark-mode .logo-card-label {
+      color: rgba(255,255,255,0.6);
+    }
+
+    /* Paleta de Cores */
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 18px;
+      margin-top: 20px;
+    }
+
+    .color-card {
+      background: var(--papel-card);
+      border: 1px solid var(--papel-borda);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+    }
+
+    .color-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.07);
+    }
+
+    .color-swatch {
+      height: 110px;
+      width: 100%;
+    }
+
+    .color-info {
+      padding: 14px;
+    }
+
+    .color-name {
+      font-weight: 600;
+      font-size: 0.92rem;
+      color: var(--tinta-texto);
+      margin-bottom: 2px;
+    }
+
+    .color-hex {
+      font-family: monospace;
+      font-size: 0.82rem;
+      color: var(--tinta-apagada);
+      margin-bottom: 6px;
+      display: inline-block;
+      background: var(--creme-solar);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .color-desc {
+      font-size: 0.8rem;
+      color: var(--tinta-suave);
+      line-height: 1.45;
+    }
+
+    .color-origin {
+      font-size: 0.72rem;
+      color: var(--azul-iracema);
+      font-weight: 600;
+      margin-top: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Galeria Curada Passe-partout */
+    .photo-grid-curated {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 28px;
+      margin-top: 24px;
+    }
+
+    .passe-partout-card {
+      background: var(--papel-card);
+      padding: 18px 18px 24px;
+      border: 1px solid var(--papel-borda);
+      border-radius: 6px;
+      box-shadow: 0 4px 18px rgba(38, 36, 34, 0.06);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .passe-partout-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px rgba(38, 36, 34, 0.1);
+    }
+
+    .passe-partout-img-wrap {
+      width: 100%;
+      aspect-ratio: 4/3;
+      overflow: hidden;
+      border-radius: 3px;
+      border: 1px solid rgba(0,0,0,0.06);
+      margin-bottom: 16px;
+      background-color: #EDE8DD;
+    }
+
+    .passe-partout-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.5s ease;
+    }
+
+    .passe-partout-card:hover .passe-partout-img-wrap img {
+      transform: scale(1.03);
+    }
+
+    .passe-partout-tag {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--ouro-editorial);
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .passe-partout-title {
+      font-family: var(--serif);
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: var(--tinta-texto);
+      line-height: 1.25;
+      margin-bottom: 8px;
+    }
+
+    .passe-partout-quote {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 0.98rem;
+      color: var(--tinta-suave);
+      line-height: 1.5;
+      margin-top: auto;
+    }
+
+    /* Manifesto Box */
+    .manifesto-quote {
+      font-family: var(--serif);
+      font-size: 1.55rem;
+      line-height: 1.5;
+      color: var(--azul-iracema);
+      margin-bottom: 24px;
+      border-left: 3px solid var(--luz-dourada);
+      padding-left: 24px;
+      font-style: italic;
+    }
+
+    /* Rodapé */
+    .manual-footer {
+      text-align: center;
+      padding-top: 50px;
+      border-top: 1px solid var(--papel-borda);
+      font-size: 0.9rem;
+      color: var(--tinta-apagada);
+    }
+
+    .btn-return {
+      display: inline-block;
+      margin-top: 24px;
+      padding: 14px 28px;
+      background-color: var(--azul-iracema);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 999px;
+      font-size: 0.92rem;
+      font-weight: 500;
+      box-shadow: 0 4px 14px rgba(59, 114, 147, 0.25);
+      transition: background-color 0.2s, transform 0.2s;
+    }
+
+    .btn-return:hover {
+      background-color: #2F5C77;
+      transform: translateY(-2px);
+    }
+
+    /* Toast de cópia de cor */
+    #copy-toast {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: var(--tinta-texto);
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      transform: translateY(10px);
+      z-index: 1000;
+    }
+
+    #copy-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- Cabeçalho com Logotipo Oficial -->
+    <header class="brand-header">
+      <div class="logo-container">
+        <img src="../assets/images/logo-dark.png" alt="Logotipo Oficial Instantes de Carly" />
+      </div>
+      <div class="badge-status">Manual de Marca Oficial • Versão 2.1</div>
+      <h1 class="brand-title">Instantes de Carly</h1>
+      <p class="brand-subtitle">"A vida acontece. Os instantes ficam."</p>
+      <div class="brand-meta">
+        <span>📍 Fortaleza, Ceará</span>
+        <span>•</span>
+        <span>📸 Carliane Carvalho (@instantesdecarly)</span>
+        <span>•</span>
+        <span>🧠 Fotografia Humanizada & Psicologia</span>
+      </div>
+    </header>
+
+    <!-- 1. O Logotipo Oficial -->
+    <section class="brand-section">
+      <h2 class="section-label"><span class="num">01</span> A Identidade Gráfica & Logotipo</h2>
+      <p class="section-intro">
+        O logotipo oficial de <em>Instantes de Carly</em> reúne o ícone minimalista da câmera com o monograma <strong>IC</strong>, a promessa de afeto <em>"instantes meus, seus momentos eternizados"</em> e a assinatura caligráfica autoral.
+      </p>
+
+      <div class="logo-showcase">
+        <div class="logo-card light-mode">
+          <img src="../assets/images/logo-dark.png" alt="Logo Instantes de Carly - Aplicação Escura" />
+          <span class="logo-card-label">Aplicação Primária (Fundo Amarelinho Bebê #FFFDF3)</span>
+        </div>
+        <div class="logo-card dark-mode">
+          <img src="../assets/images/logo-light.png" alt="Logo Instantes de Carly - Aplicação Clara" />
+          <span class="logo-card-label">Aplicação Invertida (Azul Maresia #1B2733 / Fotos)</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Paleta Autoral -->
+    <section class="brand-section">
+      <h2 class="section-label"><span class="num">02</span> Paleta Autoral das Sessões Reais</h2>
+      <p class="section-intro">
+        Harmonia serena inspirada na conversa entre o <strong>Azul Iracema</strong>, a <strong>Luz Dourada</strong> do fim de tarde e o fundo <strong>Amarelinho Bebê</strong> bem leve. <em>(Clique no card para copiar o código HEX)</em>:
+      </p>
+
+      <div class="color-grid">
+        
+        <div class="color-card" onclick="copyHex('#FFFDF3')">
+          <div class="color-swatch" style="background-color: #FFFDF3; border-bottom: 1px solid var(--papel-borda);"></div>
+          <div class="color-info">
+            <div class="color-name">Amarelinho Bebê</div>
+            <div class="color-hex">#FFFDF3</div>
+            <div class="color-desc">Fundo principal do site: leve, solar, acolhedor e delicado.</div>
+            <div class="color-origin">Fundo Oficial</div>
+          </div>
+        </div>
+
+        <div class="color-card" onclick="copyHex('#FDF6DF')">
+          <div class="color-swatch" style="background-color: #FDF6DF; border-bottom: 1px solid var(--papel-borda);"></div>
+          <div class="color-info">
+            <div class="color-name">Creme Solar</div>
+            <div class="color-hex">#FDF6DF</div>
+            <div class="color-desc">Variação suave do amarelinho bebê para ritmo de seções e galerias.</div>
+            <div class="color-origin"> Contraste Suave</div>
+          </div>
+        </div>
+
+        <div class="color-card" onclick="copyHex('#E7C378')">
+          <div class="color-swatch" style="background-color: #E7C378;"></div>
+          <div class="color-info">
+            <div class="color-name">Luz Dourada</div>
+            <div class="color-hex">#E7C378</div>
+            <div class="color-desc">A luz solar de fim de tarde cearense que abraça a pele, os botões e os detalhes.</div>
+            <div class="color-origin">Golden Hour</div>
+          </div>
+        </div>
+
+        <div class="color-card" onclick="copyHex('#3B7293')">
+          <div class="color-swatch" style="background-color: #3B7293;"></div>
+          <div class="color-info">
+            <div class="color-name">Azul Iracema</div>
+            <div class="color-hex">#3B7293</div>
+            <div class="color-desc">O mar e o céu límpido da Ponte dos Ingleses. Serenidade e escuta.</div>
+            <div class="color-origin">Ponte dos Ingleses</div>
+          </div>
+        </div>
+
+        <div class="color-card" onclick="copyHex('#1B2733')">
+          <div class="color-swatch" style="background-color: #1B2733;"></div>
+          <div class="color-info">
+            <div class="color-name">Azul Maresia Noturno</div>
+            <div class="color-hex">#1B2733</div>
+            <div class="color-desc">Fundo profundo da seção Sobre Carly & Manifesto em diálogo com a Luz Dourada.</div>
+            <div class="color-origin">Sobre Carly & Manifesto</div>
+          </div>
+        </div>
+
+        <div class="color-card" onclick="copyHex('#F3C1C6')">
+          <div class="color-swatch" style="background-color: #F3C1C6;"></div>
+          <div class="color-info">
+            <div class="color-name">Rosa Bebê Ysla</div>
+            <div class="color-hex">#F3C1C6</div>
+            <div class="color-desc">Leve, feminino e infantil. O vestido e os docinhos do chá da Ysla.</div>
+            <div class="color-origin">Chá da Ysla</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 3. Curadoria Real de Fotografias em Passe-partout -->
+    <section class="brand-section">
+      <h2 class="section-label"><span class="num">03</span> Curadoria do Acervo Real (Passe-partout)</h2>
+      <p class="section-intro">
+        Fotografias reais de Carliane emolduradas com passe-partout de papel algodão, respiro generoso e as histórias de cada momento:
+      </p>
+
+      <div class="photo-grid-curated">
+        
+        <!-- Foto 1: Chá de Fraldas da Ysla (Rosa Bebê) -->
+        <article class="passe-partout-card" style="border-top: 3px solid var(--rosa-bebe-ysla);">
+          <div class="passe-partout-img-wrap">
+            <img src="../assets/images/real/23-IMG_7341.jpg" alt="A mãe no Chá de Fraldas da Ysla com vestido rosa bebê" loading="lazy" />
+          </div>
+          <div class="passe-partout-tag" style="color: #C26372;">Gestantes & Maternidade • Rosa Bebê Ysla</div>
+          <h3 class="passe-partout-title">A Chegada da Ysla</h3>
+          <p class="passe-partout-quote">
+            "Antes de conhecer o rosto, a voz e o jeitinho, já existe amor. Pequenos detalhes contam grandes histórias... já existe uma história sendo construída no amor de cada escolha."
+          </p>
+        </article>
+
+        <!-- Foto 2: 15 Anos na Ponte dos Ingleses -->
+        <article class="passe-partout-card" style="border-top: 3px solid var(--azul-iracema);">
+          <div class="passe-partout-img-wrap">
+            <img src="../assets/images/real/206-IMG_7814.jpg" alt="15 anos da Eduarda na Ponte dos Ingleses" loading="lazy" />
+          </div>
+          <div class="passe-partout-tag">15 Anos & Fases • Ponte dos Ingleses</div>
+          <h3 class="passe-partout-title">Eduarda</h3>
+          <p class="passe-partout-quote">
+            "Uma fase nova, muitas descobertas e registros para guardar com carinho. Um ensaio para celebrar quem ela é."
+          </p>
+        </article>
+
+        <!-- Foto 3: Casal na Golden Hour -->
+        <article class="passe-partout-card" style="border-top: 3px solid var(--luz-dourada);">
+          <div class="passe-partout-img-wrap">
+            <img src="../assets/images/real/IMG_1186.jpg" alt="Casal abraçado no pôr do sol na praia" loading="lazy" />
+          </div>
+          <div class="passe-partout-tag">Casais & Afetos • Golden Hour</div>
+          <h3 class="passe-partout-title">Abraço ao Entardecer</h3>
+          <p class="passe-partout-quote">
+            "Com calma e no nosso tempo, fomos encontrando o ritmo e deixando tudo mais natural. As fotos foram acontecendo."
+          </p>
+        </article>
+
+        <!-- Foto 4: Memórias em Família -->
+        <article class="passe-partout-card" style="border-top: 3px solid var(--luz-dourada);">
+          <div class="passe-partout-img-wrap">
+            <img src="../assets/images/real/25-IMG_7633.jpg" alt="Pais beijando a filha na bochecha no mar" loading="lazy" />
+          </div>
+          <div class="passe-partout-tag">Famílias & Encontros • Afeto Puro</div>
+          <h3 class="passe-partout-title">Memórias em Família</h3>
+          <p class="passe-partout-quote">
+            "Toda família merece ter seus instantes guardados com afeto e risos soltos."
+          </p>
+        </article>
+
+        <!-- Foto 5: Sessão com Pets -->
+        <article class="passe-partout-card">
+          <div class="passe-partout-img-wrap">
+            <img src="../assets/images/real/IMG_6111_Original.jpg" alt="Cachorrinho dócil em ensaio pet" loading="lazy" />
+          </div>
+          <div class="passe-partout-tag">Pets & Família • Fortaleza</div>
+          <h3 class="passe-partout-title">Afeto Sem Palavras</h3>
+          <p class="passe-partout-quote">
+            "A presença leve e sincera de quem faz parte da família em cada detalhe."
+          </p>
+        </article>
+
+        <!-- Foto 6: Casamento Espontâneo -->
+        <article class="passe-partout-card">
+          <div class="passe-partout-img-wrap">
+            <img src="../assets/images/real/IMG_2811.jpg" alt="Noiva com buquê rindo com felicidade genuína" loading="lazy" />
+          </div>
+          <div class="passe-partout-tag">Casamentos & Festas • Riso Real</div>
+          <h3 class="passe-partout-title">Riso Compartilhado</h3>
+          <p class="passe-partout-quote">
+            "Transformar momentos que passam tão rápido em memórias que permanecem com a gente."
+          </p>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- Rodapé -->
+    <footer class="manual-footer">
+      <p><strong>Manual de Identidade da Marca — Instantes de Carly</strong></p>
+      <p style="margin-top: 4px;">Fortaleza, Ceará • 2026</p>
+      <a href="../index.html" class="btn-return">← Ver o Site Atualizado</a>
+    </footer>
+
+  </div>
+
+  <div id="copy-toast">Código HEX copiado!</div>
+
+  <script>
+    function copyHex(hex) {
+      navigator.clipboard.writeText(hex).then(() => {
+        const toast = document.getElementById('copy-toast');
+        toast.innerText = 'Cor ' + hex + ' copiada para a área de transferência!';
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2400);
+      }).catch(err => {
+        console.error('Erro ao copiar: ', err);
+      });
+    }
+  </script>
+
+</body>
+</html>
