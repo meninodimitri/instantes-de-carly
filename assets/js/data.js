@@ -5,7 +5,7 @@
  */
 
 const SITE_DATA = {
-  "cmsVersion": "2026-10-30T19:54:33.602Z",
+  "cmsVersion": "2026-10-30T20:05:41.559Z",
   "brand": {
     "name": "Instantes de Carly",
     "founder": "Carliane Carvalho (Carly)",
@@ -350,17 +350,6 @@ const SITE_DATA = {
     }
   ],
   "portfolio": [
-    {
-      "id": 1793390051257,
-      "title": "Gordinho",
-      "category": "pets",
-      "categoryName": "Pets",
-      "aspect": "portrait",
-      "image": "assets/images/uploads/foto-20261030195433-01.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza."
-    },
     {
       "id": 1,
       "title": "Abraço na Golden Hour",
