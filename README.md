@@ -47,3 +47,4 @@ Portfólio online oficial e sistema de gestão editorial para fotografia de casa
 
 Hospedado na [Vercel](https://vercel.com) com sincronização contínua via GitHub.
 Todas as alterações salvas pelo `/admin.html` geram um commit seguro no GitHub, acionando a atualização automática do site no ar em segundos.
+

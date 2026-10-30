@@ -1083,7 +1083,8 @@ function updateLightboxContent() {
       const isAct = i === currentLightboxIndex;
       thumb.classList.toggle('active', isAct);
       if (isAct) {
-        thumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        const targetScroll = thumb.offsetLeft - (strip.clientWidth / 2) + (thumb.clientWidth / 2);
+        strip.scrollTo({ left: Math.max(0, targetScroll), behavior: 'smooth' });
       }
     });
   }

@@ -2598,8 +2598,8 @@ a.channel-row:hover {
   border: none;
   background: transparent;
   padding: 0;
-  max-width: 94vw;
-  max-height: 92vh;
+  max-width: 96vw;
+  max-height: 94vh;
   margin: auto;
 }
 
@@ -2613,12 +2613,33 @@ a.channel-row:hover {
   box-shadow: var(--shadow-modal);
   overflow: hidden;
   display: grid;
-  grid-template-columns: 1.55fr 0.75fr;
-  width: 1180px;
-  max-width: 94vw;
-  height: 86vh;
-  max-height: 820px;
+  grid-template-columns: minmax(0, 1fr) 350px;
+  width: 1400px;
+  max-width: 96vw;
+  height: 90vh;
+  max-height: 880px;
+  min-width: 0;
   position: relative;
+}
+
+@media (min-width: 1500px) {
+  .lightbox-wrapper {
+    width: 1680px;
+    max-width: 95vw;
+    height: 92vh;
+    max-height: 960px;
+    grid-template-columns: minmax(0, 1fr) 380px;
+  }
+  .lightbox-media {
+    padding: 24px;
+  }
+  .lightbox-filmstrip {
+    height: 72px;
+  }
+  .filmstrip-thumb {
+    width: 50px;
+    height: 50px;
+  }
 }
 
 .lightbox-stage-col {
@@ -2627,16 +2648,21 @@ a.channel-row:hover {
   flex-direction: column;
   height: 100%;
   min-height: 0;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .lightbox-media {
   position: relative;
   flex: 1;
   min-height: 0;
+  min-width: 0;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  padding: 18px;
+  overflow: hidden;
 }
 
 .lightbox-media img {
@@ -2645,18 +2671,24 @@ a.channel-row:hover {
   width: auto;
   height: auto;
   object-fit: contain;
+  display: block;
+  user-select: none;
+  transition: opacity 0.2s ease;
 }
 
 .lightbox-filmstrip {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 20px;
+  padding: 10px 16px;
   background-color: #0B0A09;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   overflow-x: auto;
-  height: 68px;
+  height: 66px;
   flex-shrink: 0;
+  min-width: 0;
+  max-width: 100%;
+  scrollbar-width: thin;
 }
 
 .filmstrip-thumb {
@@ -2957,14 +2989,101 @@ a.channel-row:hover {
   .hero-scroll-cue {
     display: none;
   }
+  .lightbox-dialog {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    margin: 0;
+  }
   .lightbox-wrapper {
-    grid-template-columns: 1fr;
-    height: 92vh;
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+    max-width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
     overflow-y: auto;
+    overflow-x: hidden;
+    min-width: 0;
   }
   .lightbox-stage-col {
-    height: 56vh;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    height: 48vh;
+    min-height: 250px;
+    max-height: 420px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
   }
+  .lightbox-media {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    flex: 1;
+    min-height: 0;
+    padding: 8px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .lightbox-media img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
+  .lightbox-filmstrip {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    height: 56px;
+    padding: 6px 10px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-shrink: 0;
+  }
+  .filmstrip-thumb {
+    width: 40px;
+    height: 40px;
+  }
+  .lightbox-sidebar {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    padding: 20px 18px 28px;
+    overflow-y: visible;
+    flex: 1;
+  }
+  .lightbox-title {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+  }
+  .lightbox-caption {
+    font-size: 1.05rem;
+    line-height: 1.5;
+  }
+  .lightbox-close-btn {
+    top: 10px;
+    right: 10px;
+    z-index: 50;
+    width: 36px;
+    height: 36px;
+    background-color: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+  .lightbox-nav-btn {
+    width: 36px;
+    height: 36px;
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+  .lightbox-nav-btn.prev { left: 8px; }
+  .lightbox-nav-btn.next { right: 8px; }
 }
 
 @media (max-width: 680px) {
