@@ -174,11 +174,13 @@ ul, ol {
 .section {
   padding: 112px 0;
   position: relative;
+  scroll-margin-top: calc(var(--header-height) + 16px);
 }
 
 @media (max-width: 768px) {
   .section {
     padding: 72px 0;
+    scroll-margin-top: calc(var(--header-height) + 8px);
   }
 }
 
@@ -232,11 +234,20 @@ ul, ol {
 }
 
 /* --- Tipografia Editorial --- */
-h1, h2, h3, h4, .font-serif {
+h1, h2, h3, h4, .font-serif, .section-title, .hero-cinema-title, .package-name, .lightbox-title {
   font-family: var(--font-serif);
   font-weight: 500;
   line-height: 1.12;
   letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+p, .lead-editorial, .proposta-text, .sobre-text {
+  text-wrap: pretty;
+}
+
+.package-price-val, .lightbox-counter, .hero-kicker-index, .editorial-kicker-num {
+  font-variant-numeric: tabular-nums;
 }
 
 .section-tag {
@@ -310,6 +321,10 @@ h1, h2, h3, h4, .font-serif {
   border-radius: var(--radius-xs);
   transition: all var(--transition-fast);
   text-align: center;
+}
+
+.btn:active {
+  transform: scale(0.98);
 }
 
 .btn-primary {

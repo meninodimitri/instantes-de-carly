@@ -167,3 +167,4 @@ Substitua as variáveis `--bg-primary`, `--color-gold`, `--color-blue` e `--text
 
 ### Passo 5: Conectar o Painel Admin do Novo Cliente
 Acesse `https://novo-site.vercel.app/admin`, vá na aba **Publicação & GitHub**, insira o repositório do novo cliente e o token. O novo cliente já pode gerenciar 100% do site sozinho!
+

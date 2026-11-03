@@ -1,6 +1,9 @@
 # IDE e agentes internos
 .agents/
 .gemini/
+.claude/
+.playwright-cli/
+skills-lock.json
 scripts/
 
 # Vercel & Node
