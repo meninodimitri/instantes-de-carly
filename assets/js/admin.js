@@ -17,6 +17,9 @@ let adminPortfolioFilter = 'todos';
 let adminPortfolioSearch = '';
 let previewDebounceTimer = null;
 let galleryPickerCallback = null;
+const expandedPortfolioKeys = new Set();
+const expandedHeroKeys = new Set();
+const expandedPackageKeys = new Set();
 
 const GH_STORAGE_KEY = 'instantes_carly_gh_config';
 const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
@@ -534,56 +537,45 @@ function renderPortfolioAdmin() {
     const isUploadedNew = String(photo.image || '').startsWith('data:image/');
     const numStr = (realIdx + 1).toString().padStart(2, '0');
     const isAcervoCover = isEffectiveAcervoCover(photo, cmsData.portfolio);
+    const cardKey = String(photo.id ?? realIdx);
+    const isOpen = expandedPortfolioKeys.has(cardKey);
 
     return `
-      <article class="photo-editor-card" data-real-idx="${realIdx}">
-        <div class="photo-preview-col">
-          <div class="photo-thumb-frame" data-aspect="${escapeAttr(photo.aspect || 'landscape')}">
-            <span class="photo-num-tag">Nº ${numStr}</span>
-            ${isAcervoCover ? '<span class="photo-badge-acervo-cover">★ Capa Acervo</span>' : ''}
-            ${isUploadedNew ? '<span class="photo-badge-uploaded">Nova Foto</span>' : ''}
-            <img src="${escapeAttr(photo.image)}" alt="${escapeAttr(photo.title)}" style="object-position: center ${focalPct}%;" />
-          </div>
-
-          <div class="focal-slider-box">
-            <div class="focal-slider-top">
-              <span>Enquadramento Vertical</span>
-              <strong class="focal-val-label">${focalPct}%</strong>
+      <article class="cms-compact-card photo-editor-card-v3 ${isOpen ? 'is-open' : ''}" data-real-idx="${realIdx}" data-card-key="${escapeAttr(cardKey)}">
+        <div class="cms-compact-summary">
+          <div class="cms-compact-left">
+            <div class="cms-compact-thumb" data-aspect="${escapeAttr(photo.aspect || 'landscape')}">
+              <span class="cms-compact-num">#${numStr}</span>
+              <img src="${escapeAttr(photo.image)}" alt="${escapeAttr(photo.title)}" style="object-position: center ${focalPct}%;" />
             </div>
-            <input type="range" min="0" max="100" value="${focalPct}" class="js-port-focal" />
+
+            <div class="cms-compact-main">
+              <input type="text" class="cms-inline-title-input js-port-title" value="${escapeAttr(photo.title || '')}" placeholder="Título da fotografia…" aria-label="Título da fotografia" />
+              <div class="cms-compact-subrow">
+                <select class="cms-select-compact js-port-category" aria-label="Categoria da fotografia">
+                  ${editableCats.map((c) => `
+                    <option value="${escapeAttr(c.id)}" ${c.id === photo.category ? 'selected' : ''}>${escapeAttr(c.name)}</option>
+                  `).join('')}
+                </select>
+                ${isUploadedNew ? '<span class="admin-cat-pill" style="padding: 2px 8px; font-size: 0.68rem;">Nova</span>' : ''}
+              </div>
+            </div>
           </div>
 
-          <div class="photo-thumb-actions">
-            <input type="file" accept="image/jpeg,image/png,image/webp" class="js-port-replace-input" hidden />
-            <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-port-replace-btn" style="flex: 1;">
-              Trocar Foto
-            </button>
-            <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-port-send-hero" title="Adicionar esta foto na Capa Principal (topo do site)">
-              + Capa
-            </button>
-            <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-port-acervo-cover ${isAcervoCover ? 'is-active-cover' : ''}" style="flex: 1 1 100%;" title="Definir como foto representante desta categoria na aba Acervo Completo">
-              ${isAcervoCover ? '★ Capa do Acervo Completo' : '☆ Usar na Capa do Acervo'}
+          <div class="cms-compact-right">
+            <label class="cms-switch" title="Usar esta foto como capa desta categoria no filtro Acervo Completo">
+              <input type="checkbox" class="js-port-acervo-switch" ${isAcervoCover ? 'checked' : ''} />
+              <span class="cms-switch-track"></span>
+              <span>Capa da Categoria</span>
+            </label>
+
+            <button type="button" class="cms-drawer-btn js-toggle-port-drawer" aria-expanded="${isOpen ? 'true' : 'false'}">
+              ${isOpen ? 'Fechar ▲' : 'Editar ▾'}
             </button>
           </div>
         </div>
 
-        <div class="photo-fields-col">
-          <div class="field-grid">
-            <div class="field-group">
-              <label class="field-label">Título da Fotografia</label>
-              <input type="text" class="cms-input js-port-title" value="${escapeAttr(photo.title || '')}" placeholder="Ex: Abraço na Golden Hour" />
-            </div>
-
-            <div class="field-group">
-              <label class="field-label">Categoria (Filtro do Site)</label>
-              <select class="cms-select js-port-category">
-                ${editableCats.map((c) => `
-                  <option value="${escapeAttr(c.id)}" ${c.id === photo.category ? 'selected' : ''}>${escapeAttr(c.name)}</option>
-                `).join('')}
-              </select>
-            </div>
-          </div>
-
+        <div class="cms-compact-drawer" ${isOpen ? '' : 'hidden'}>
           <div class="field-grid">
             <div class="field-group">
               <label class="field-label">Local do Ensaio</label>
@@ -599,9 +591,25 @@ function renderPortfolioAdmin() {
             </div>
           </div>
 
+          <div class="field-grid" style="align-items: center;">
+            <div class="field-group" style="margin-bottom: 10px;">
+              <label class="field-label" style="display: flex; justify-content: space-between;">
+                <span>Enquadramento Vertical</span>
+                <strong class="focal-val-label">${focalPct}%</strong>
+              </label>
+              <input type="range" min="0" max="100" value="${focalPct}" class="js-port-focal" style="width: 100%;" />
+            </div>
+
+            <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px;">
+              <input type="file" accept="image/jpeg,image/png,image/webp" class="js-port-replace-input" hidden />
+              <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-port-replace-btn">Trocar Foto</button>
+              <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-port-send-hero" title="Enviar também para o topo do site">+ Enviar p/ Capa do Site</button>
+            </div>
+          </div>
+
           <div class="field-group">
-            <label class="field-label">História / Legenda Afetiva (aparece ao passar o mouse e ampliar)</label>
-            <textarea class="cms-textarea js-port-caption" style="min-height: 66px;">${escapeAttr(photo.caption || '')}</textarea>
+            <label class="field-label">História / Legenda Afetiva</label>
+            <textarea class="cms-textarea js-port-caption" style="min-height: 60px;">${escapeAttr(photo.caption || '')}</textarea>
           </div>
 
           <div class="photo-card-toolbar">
@@ -616,15 +624,28 @@ function renderPortfolioAdmin() {
     `;
   }).join('');
 
-  // Bind eventos dos cartões do portfólio
-  listEl.querySelectorAll('.photo-editor-card').forEach((card) => {
+  // Bind eventos dos cartões compactos do portfólio
+  listEl.querySelectorAll('.photo-editor-card-v3').forEach((card) => {
     const idx = parseInt(card.getAttribute('data-real-idx'), 10);
+    const cardKey = card.getAttribute('data-card-key');
     const item = cmsData.portfolio[idx];
     if (!item) return;
 
-    const thumbImg = card.querySelector('.photo-thumb-frame img');
-    const thumbFrame = card.querySelector('.photo-thumb-frame');
+    const thumbImg = card.querySelector('.cms-compact-thumb img');
+    const thumbFrame = card.querySelector('.cms-compact-thumb');
     const focalLabel = card.querySelector('.focal-val-label');
+    const drawer = card.querySelector('.cms-compact-drawer');
+    const toggleBtn = card.querySelector('.js-toggle-port-drawer');
+
+    toggleBtn?.addEventListener('click', () => {
+      const willOpen = drawer.hidden;
+      drawer.hidden = !willOpen;
+      card.classList.toggle('is-open', willOpen);
+      toggleBtn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+      toggleBtn.textContent = willOpen ? 'Fechar ▲' : 'Editar ▾';
+      if (willOpen) expandedPortfolioKeys.add(cardKey);
+      else expandedPortfolioKeys.delete(cardKey);
+    });
 
     card.querySelector('.js-port-title')?.addEventListener('input', (e) => {
       item.title = e.target.value;
@@ -704,8 +725,14 @@ function renderPortfolioAdmin() {
       showToast(`"${item.title}" adicionada à Capa do Site!`, 'success');
     });
 
-    // Definir como Capa da Categoria no Acervo Completo
-    card.querySelector('.js-port-acervo-cover')?.addEventListener('click', () => {
+    // Chave ON/OFF: Definir como Capa da Categoria no Acervo Completo
+    card.querySelector('.js-port-acervo-switch')?.addEventListener('change', (e) => {
+      if (!e.target.checked) {
+        // Toda categoria tem 1 capa; mantém ligada caso já seja a única/atual
+        e.target.checked = true;
+        showToast('Escolha outra foto desta categoria caso queira trocar a capa do Acervo.', 'info');
+        return;
+      }
       (cmsData.portfolio || []).forEach((p) => {
         if (p.category === item.category) {
           p.isAcervoCover = (p === item);
@@ -715,7 +742,7 @@ function renderPortfolioAdmin() {
       const catLabel = catObj ? catObj.name : (item.categoryName || item.category);
       markDirtyAndSync(true);
       renderPortfolioAdmin();
-      showToast(`"${item.title || 'Fotografia'}" definida como capa de "${catLabel}" no Acervo Completo!`, 'success');
+      showToast(`"${item.title || 'Fotografia'}" definida como capa de "${catLabel}" no Acervo!`, 'success');
     });
 
     // Subir / Descer / Excluir
@@ -847,58 +874,69 @@ function renderHeroAdmin() {
   listEl.innerHTML = slides.map((slide, idx) => {
     const numStr = (idx + 1).toString().padStart(2, '0');
     const focalPct = parseFocalPercent(slide.objectPosition);
+    const heroKey = String(slide.id || idx);
+    const isOpen = expandedHeroKeys.has(heroKey);
 
     return `
-      <article class="photo-editor-card" data-hero-idx="${idx}">
-        <div class="photo-preview-col">
-          <div class="photo-thumb-frame" data-aspect="hero">
-            <span class="photo-num-tag">CAPA ${numStr}</span>
-            <img src="${escapeAttr(slide.image)}" alt="${escapeAttr(slide.shortLabel || slide.category)}" style="object-position: center ${focalPct}%;" />
-          </div>
-
-          <div class="focal-slider-box">
-            <div class="focal-slider-top">
-              <span>Enquadramento Vertical</span>
-              <strong class="focal-val-label">${focalPct}%</strong>
+      <article class="cms-compact-card hero-card-v3 ${isOpen ? 'is-open' : ''}" data-hero-idx="${idx}" data-hero-key="${escapeAttr(heroKey)}">
+        <div class="cms-compact-summary">
+          <div class="cms-compact-left">
+            <div class="cms-compact-thumb" style="width: 100px; aspect-ratio: 16 / 10;">
+              <span class="cms-compact-num">CAPA ${numStr}</span>
+              <img src="${escapeAttr(slide.image)}" alt="${escapeAttr(slide.shortLabel || slide.category)}" style="object-position: center ${focalPct}%;" />
             </div>
-            <input type="range" min="0" max="100" value="${focalPct}" class="js-hero-focal" />
+
+            <div class="cms-compact-main">
+              <input type="text" class="cms-inline-title-input js-hero-short" value="${escapeAttr(slide.shortLabel || slide.category || '')}" placeholder="Nome no botão da capa…" aria-label="Nome do botão da capa" />
+              <span class="field-hint" style="margin: 0;">${escapeAttr(slide.location || 'Fortaleza, Ceará')}</span>
+            </div>
           </div>
 
-          <div class="photo-thumb-actions">
-            <input type="file" accept="image/jpeg,image/png,image/webp" class="js-hero-replace-input" hidden />
-            <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-hero-replace-btn" style="flex: 1;">Enviar Foto</button>
-            <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-hero-pick-btn">Da Galeria</button>
+          <div class="cms-compact-right">
+            <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-hero-preview-this">👁️ Ver</button>
+            <button type="button" class="cms-drawer-btn js-toggle-hero-drawer" aria-expanded="${isOpen ? 'true' : 'false'}">
+              ${isOpen ? 'Fechar ▲' : 'Editar ▾'}
+            </button>
           </div>
         </div>
 
-        <div class="photo-fields-col">
+        <div class="cms-compact-drawer" ${isOpen ? '' : 'hidden'}>
           <div class="field-grid">
-            <div class="field-group">
-              <label class="field-label">Nome no Botão da Barra Inferior</label>
-              <input type="text" class="cms-input js-hero-short" value="${escapeAttr(slide.shortLabel || slide.category || '')}" placeholder="Ex: Casais, Gestantes, 15 Anos..." />
-            </div>
-
             <div class="field-group">
               <label class="field-label">Título da Categoria no Cartão</label>
               <input type="text" class="cms-input js-hero-cat" value="${escapeAttr(slide.category || '')}" placeholder="Ex: Gestantes & Maternidade" />
             </div>
+            <div class="field-group">
+              <label class="field-label">Localização Exibida no Cartão</label>
+              <input type="text" class="cms-input js-hero-loc" value="${escapeAttr(slide.location || '')}" placeholder="Ex: Píer da Praia de Iracema" />
+            </div>
           </div>
 
-          <div class="field-group">
-            <label class="field-label">Localização Exibida no Cartão</label>
-            <input type="text" class="cms-input js-hero-loc" value="${escapeAttr(slide.location || '')}" placeholder="Ex: Píer da Praia de Iracema, Fortaleza" />
+          <div class="field-grid" style="align-items: center;">
+            <div class="field-group" style="margin-bottom: 10px;">
+              <label class="field-label" style="display: flex; justify-content: space-between;">
+                <span>Enquadramento Vertical</span>
+                <strong class="focal-val-label">${focalPct}%</strong>
+              </label>
+              <input type="range" min="0" max="100" value="${focalPct}" class="js-hero-focal" style="width: 100%;" />
+            </div>
+
+            <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px;">
+              <input type="file" accept="image/jpeg,image/png,image/webp" class="js-hero-replace-input" hidden />
+              <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-hero-replace-btn">Enviar Foto</button>
+              <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-hero-pick-btn">Escolher do Portfólio</button>
+            </div>
           </div>
 
           <div class="field-group">
             <label class="field-label">Frase / Citação do Cartão Lateral</label>
-            <textarea class="cms-textarea js-hero-quote" style="min-height: 64px;">${escapeAttr(slide.quote || '')}</textarea>
+            <textarea class="cms-textarea js-hero-quote" style="min-height: 58px;">${escapeAttr(slide.quote || '')}</textarea>
           </div>
 
           <div class="photo-card-toolbar">
             <div class="order-btns">
-              <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-hero-preview-this">👁️ Ver no Preview</button>
-              <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-hero-up" ${idx === 0 ? 'disabled' : ''}>↑</button>
-              <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-hero-down" ${idx === slides.length - 1 ? 'disabled' : ''}>↓</button>
+              <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-hero-up" ${idx === 0 ? 'disabled' : ''}>↑ Subir</button>
+              <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-hero-down" ${idx === slides.length - 1 ? 'disabled' : ''}>↓ Descer</button>
             </div>
             <button type="button" class="cms-btn cms-btn-danger cms-btn-sm js-hero-delete" ${slides.length <= 1 ? 'disabled' : ''}>Remover da Capa</button>
           </div>
@@ -907,13 +945,26 @@ function renderHeroAdmin() {
     `;
   }).join('');
 
-  listEl.querySelectorAll('.photo-editor-card').forEach((card) => {
+  listEl.querySelectorAll('.hero-card-v3').forEach((card) => {
     const idx = parseInt(card.getAttribute('data-hero-idx'), 10);
+    const heroKey = card.getAttribute('data-hero-key');
     const slide = cmsData.heroSlides[idx];
     if (!slide) return;
 
-    const thumbImg = card.querySelector('.photo-thumb-frame img');
+    const thumbImg = card.querySelector('.cms-compact-thumb img');
     const focalLabel = card.querySelector('.focal-val-label');
+    const drawer = card.querySelector('.cms-compact-drawer');
+    const toggleBtn = card.querySelector('.js-toggle-hero-drawer');
+
+    toggleBtn?.addEventListener('click', () => {
+      const willOpen = drawer.hidden;
+      drawer.hidden = !willOpen;
+      card.classList.toggle('is-open', willOpen);
+      toggleBtn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+      toggleBtn.textContent = willOpen ? 'Fechar ▲' : 'Editar ▾';
+      if (willOpen) expandedHeroKeys.add(heroKey);
+      else expandedHeroKeys.delete(heroKey);
+    });
 
     const focusThisSlideInPreview = () => {
       sendToPreviewIframe({ type: 'CMS_HERO_SELECT_SLIDE', slideIndex: idx });
@@ -1187,79 +1238,113 @@ function renderPackagesAdmin() {
 
   const pkgs = cmsData.packages || [];
 
-  listEl.innerHTML = pkgs.map((pkg, idx) => `
-    <article class="cms-section-card" data-pkg-idx="${idx}" style="margin-bottom: 0;">
-      <div class="cms-section-card-head">
-        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-          <h3 class="cms-section-card-title">${escapeAttr(pkg.index || 'I')}. ${escapeAttr(pkg.name || 'Formato')}</h3>
-          <label class="toggle-check-row">
-            <input type="checkbox" class="js-pkg-popular" ${pkg.popular ? 'checked' : ''} />
-            <span>Destacar como “Mais Escolhido”</span>
-          </label>
+  listEl.innerHTML = pkgs.map((pkg, idx) => {
+    const pkgKey = String(pkg.id || idx);
+    const isOpen = expandedPackageKeys.has(pkgKey);
+    const priceTag = (pkg.price && String(pkg.price).trim()) ? pkg.price : 'Sob consulta';
+
+    return `
+      <article class="cms-compact-card pkg-card-v3 ${isOpen ? 'is-open' : ''}" data-pkg-idx="${idx}" data-pkg-key="${escapeAttr(pkgKey)}">
+        <div class="cms-compact-summary">
+          <div class="cms-compact-left">
+            <div class="cms-compact-main">
+              <strong class="cms-section-card-title" style="font-size: 1.2rem;">${escapeAttr(pkg.index || 'I')}. ${escapeAttr(pkg.name || 'Formato')}</strong>
+              <span class="field-hint" style="margin: 0;"><strong style="color: var(--cms-blue);">${escapeAttr(priceTag)}</strong> · ${escapeAttr(pkg.photosCount || '')} · ${escapeAttr(pkg.duration || '')}</span>
+            </div>
+          </div>
+
+          <div class="cms-compact-right">
+            <label class="cms-switch">
+              <input type="checkbox" class="js-pkg-popular" ${pkg.popular ? 'checked' : ''} />
+              <span class="cms-switch-track"></span>
+              <span>Mais Escolhido</span>
+            </label>
+
+            <button type="button" class="cms-drawer-btn js-toggle-pkg-drawer" aria-expanded="${isOpen ? 'true' : 'false'}">
+              ${isOpen ? 'Fechar ▲' : 'Editar ▾'}
+            </button>
+          </div>
         </div>
 
-        <div class="order-btns">
-          <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-pkg-up" ${idx === 0 ? 'disabled' : ''}>↑</button>
-          <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-pkg-down" ${idx === pkgs.length - 1 ? 'disabled' : ''}>↓</button>
-          <button type="button" class="cms-btn cms-btn-danger cms-btn-sm js-pkg-delete" ${pkgs.length <= 1 ? 'disabled' : ''}>Excluir</button>
-        </div>
-      </div>
+        <div class="cms-compact-drawer" ${isOpen ? '' : 'hidden'}>
+          <div class="field-grid-3">
+            <div class="field-group">
+              <label class="field-label">Nome do Formato</label>
+              <input type="text" class="cms-input js-pkg-name" value="${escapeAttr(pkg.name || '')}" placeholder="Ex: Ensaio Simples" />
+            </div>
+            <div class="field-group">
+              <label class="field-label">Valor / Preço (Opcional)</label>
+              <input type="text" class="cms-input js-pkg-price" value="${escapeAttr(pkg.price || '')}" placeholder="Ex: R$ 550 (ou vazio)" />
+            </div>
+            <div class="field-group">
+              <label class="field-label">Selo / Subtítulo Curto</label>
+              <input type="text" class="cms-input js-pkg-badge" value="${escapeAttr(pkg.badge || '')}" placeholder="Ex: O Mais Escolhido" />
+            </div>
+          </div>
 
-      <div class="field-grid-3">
-        <div class="field-group">
-          <label class="field-label">Nome do Formato</label>
-          <input type="text" class="cms-input js-pkg-name" value="${escapeAttr(pkg.name || '')}" placeholder="Ex: Ensaio Simples" />
-        </div>
-        <div class="field-group">
-          <label class="field-label">Valor / Preço (Opcional)</label>
-          <input type="text" class="cms-input js-pkg-price" value="${escapeAttr(pkg.price || '')}" placeholder="Ex: R$ 550 (ou vazio)" />
-        </div>
-        <div class="field-group">
-          <label class="field-label">Selo / Subtítulo Curto</label>
-          <input type="text" class="cms-input js-pkg-badge" value="${escapeAttr(pkg.badge || '')}" placeholder="Ex: O Mais Escolhido" />
-        </div>
-      </div>
+          <div class="field-group">
+            <label class="field-label">Descrição Resumida</label>
+            <input type="text" class="cms-input js-pkg-summary" value="${escapeAttr(pkg.summary || '')}" />
+          </div>
 
-      <div class="field-group">
-        <label class="field-label">Descrição Resumida</label>
-        <input type="text" class="cms-input js-pkg-summary" value="${escapeAttr(pkg.summary || '')}" />
-      </div>
+          <div class="field-grid-3">
+            <div class="field-group">
+              <label class="field-label">Duração</label>
+              <input type="text" class="cms-input js-pkg-duration" value="${escapeAttr(pkg.duration || '')}" placeholder="Ex: 1h – 1h30" />
+            </div>
+            <div class="field-group">
+              <label class="field-label">Quantidade de Fotos</label>
+              <input type="text" class="cms-input js-pkg-photos" value="${escapeAttr(pkg.photosCount || '')}" placeholder="Ex: 20 fotos editadas" />
+            </div>
+            <div class="field-group">
+              <label class="field-label">Prazo de Entrega</label>
+              <input type="text" class="cms-input js-pkg-delivery" value="${escapeAttr(pkg.deliveryTime || '')}" placeholder="Ex: Entrega em 4 dias" />
+            </div>
+          </div>
 
-      <div class="field-grid-3">
-        <div class="field-group">
-          <label class="field-label">Duração</label>
-          <input type="text" class="cms-input js-pkg-duration" value="${escapeAttr(pkg.duration || '')}" placeholder="Ex: 1h – 1h30" />
-        </div>
-        <div class="field-group">
-          <label class="field-label">Quantidade de Fotos</label>
-          <input type="text" class="cms-input js-pkg-photos" value="${escapeAttr(pkg.photosCount || '')}" placeholder="Ex: 20 fotos editadas" />
-        </div>
-        <div class="field-group">
-          <label class="field-label">Prazo de Entrega</label>
-          <input type="text" class="cms-input js-pkg-delivery" value="${escapeAttr(pkg.deliveryTime || '')}" placeholder="Ex: Entrega em 4 dias" />
-        </div>
-      </div>
+          <div class="field-group">
+            <label class="field-label">Itens Inclusos (Escreva 1 item por linha)</label>
+            <textarea class="cms-textarea js-pkg-details">${escapeAttr((pkg.details || []).join('\n'))}</textarea>
+          </div>
 
-      <div class="field-group">
-        <label class="field-label">Itens Inclusos (Escreva 1 item por linha)</label>
-        <textarea class="cms-textarea js-pkg-details">${escapeAttr((pkg.details || []).join('\n'))}</textarea>
-      </div>
+          <div class="field-group">
+            <label class="field-label">Mensagem Automática ao Clicar em “Consultar no WhatsApp”</label>
+            <input type="text" class="cms-input js-pkg-wa" value="${escapeAttr(pkg.whatsappMsg || '')}" />
+          </div>
 
-      <div class="field-group">
-        <label class="field-label">Mensagem Automática ao Clicar em “Consultar no WhatsApp”</label>
-        <input type="text" class="cms-input js-pkg-wa" value="${escapeAttr(pkg.whatsappMsg || '')}" />
-      </div>
-    </article>
-  `).join('');
+          <div class="photo-card-toolbar">
+            <div class="order-btns">
+              <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-pkg-up" ${idx === 0 ? 'disabled' : ''}>↑ Subir</button>
+              <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-pkg-down" ${idx === pkgs.length - 1 ? 'disabled' : ''}>↓ Descer</button>
+            </div>
+            <button type="button" class="cms-btn cms-btn-danger cms-btn-sm js-pkg-delete" ${pkgs.length <= 1 ? 'disabled' : ''}>Excluir Formato</button>
+          </div>
+        </div>
+      </article>
+    `;
+  }).join('');
 
   const romans = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'];
 
   listEl.querySelectorAll('[data-pkg-idx]').forEach((card) => {
     const idx = parseInt(card.getAttribute('data-pkg-idx'), 10);
+    const pkgKey = card.getAttribute('data-pkg-key');
     const pkg = cmsData.packages[idx];
     if (!pkg) return;
 
     const titleEl = card.querySelector('.cms-section-card-title');
+    const drawer = card.querySelector('.cms-compact-drawer');
+    const toggleBtn = card.querySelector('.js-toggle-pkg-drawer');
+
+    toggleBtn?.addEventListener('click', () => {
+      const willOpen = drawer.hidden;
+      drawer.hidden = !willOpen;
+      card.classList.toggle('is-open', willOpen);
+      toggleBtn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+      toggleBtn.textContent = willOpen ? 'Fechar ▲' : 'Editar ▾';
+      if (willOpen) expandedPackageKeys.add(pkgKey);
+      else expandedPackageKeys.delete(pkgKey);
+    });
 
     card.querySelector('.js-pkg-popular')?.addEventListener('change', (e) => {
       pkg.popular = e.target.checked;

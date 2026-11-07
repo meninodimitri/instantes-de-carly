@@ -1,21 +1,23 @@
 /**
  * ============================================================================
- * INSTANTES DE CARLY — MOTOR UNIFICADO DE ÁLBUNS DE CLIENTES (V2)
+ * INSTANTES DE CARLY — MOTOR UNIFICADO DE ÁLBUNS DE CLIENTES (V3)
  * Galeria de Seleção & Extras (estilo Sineto Studio) +
- * Galeria de Entrega em Alta Resolução (estilo Pixieset).
+ * Galeria de Entrega em Alta Resolução & Design Customizável (estilo Pixieset).
  *
  * Inclui:
- * - Marca d'água personalizada (PNG enviado pelo fotógrafo ou texto) gravada no Canvas
+ * - Marca d'água personalizada (PNG enviado pelo fotógrafo ou texto) com chave ON/OFF
  * - 3 Níveis de Proteção:
- *     1. 'watermark'           -> Marca d'Água
- *     2. 'watermark_blur'      -> Marca d'Água + Desfoque Anti-Print
- *     3. 'watermark_spotlight' -> Marca d'Água + Foco Centralizado (Lupa Interativa)
- * - Cálculo seguro de pacote + fotos extras, BRCode Pix Banco Central e .ZIP nativo
+ *     1. 'watermark'           -> Marca d'Água (resolução de prova nítida)
+ *     2. 'watermark_lowres'    -> Marca d'Água + Baixa Resolução (visível p/ decidir, imprópria p/ uso)
+ *     3. 'watermark_spotlight' -> Marca d'Água + Foco no Cursor/Toque (100% desfocada em repouso; foca só onde o mouse/dedo passa)
+ * - Sistema completo de Design Pixieset (Capa, Tipografia, Cor, Grade)
+ * - Cálculo seguro de pacote + fotos extras (com chave ON/OFF), BRCode Pix e .ZIP nativo
  * ============================================================================
  */
 (function (window) {
   'use strict';
 
+  // IMPORTANTE: Mantém DB_NAME v2 para preservar álbuns reais já criados localmente!
   const DB_NAME = 'instantes_carly_albums_db_v2';
   const STORE_NAME = 'albums_state';
   const STATE_KEY = 'studio_albums_root';
@@ -24,6 +26,262 @@
   const syncChannel = typeof BroadcastChannel !== 'undefined'
     ? new BroadcastChannel(SYNC_CHANNEL_NAME)
     : null;
+
+  /* ==========================================================================
+     0. CATÁLOGO DE DESIGN ESTILO PIXIESET (CAPA, TIPOGRAFIA, COR E GRADE)
+     ========================================================================== */
+  const DESIGN_PRESETS = {
+    coverStyles: [
+      { id: 'cosmos', label: 'Cosmos', desc: 'Título centralizado sobre foto em tela cheia' },
+      { id: 'bondi', label: 'Bondi', desc: 'Moldura fina central sobre a fotografia' },
+      { id: 'oeste', label: 'Oeste', desc: 'Título alinhado à esquerda sobre a fotografia' },
+      { id: 'borda', label: 'Borda', desc: 'Moldura editorial ao redor da foto e título no canto inferior' },
+      { id: 'oakwood', label: 'Oakwood', desc: 'Data no topo e título minimalista centralizado' },
+      { id: 'ancora', label: 'Âncora', desc: 'Título no canto superior esquerdo e seta na base' },
+      { id: 'split', label: 'Editorial', desc: 'Metade fotografia e metade painel tipográfico' },
+      { id: 'none', label: 'Sem Capa', desc: 'Abre diretamente na grade de fotografias' }
+    ],
+    typographies: [
+      {
+        id: 'sans',
+        label: 'Sans',
+        sample: 'SANS',
+        desc: 'Uma fonte neutra',
+        fontFamily: "'Jost', 'Plus Jakarta Sans', sans-serif",
+        weight: 600,
+        tracking: '0.09em',
+        transform: 'uppercase'
+      },
+      {
+        id: 'serif',
+        label: 'Serif',
+        sample: 'Serif',
+        desc: 'Uma fonte clássica',
+        fontFamily: "'Cormorant Garamond', Georgia, serif",
+        weight: 500,
+        tracking: '-0.01em',
+        transform: 'none'
+      },
+      {
+        id: 'modern',
+        label: 'Modern',
+        sample: 'Modern',
+        desc: 'Uma fonte sofisticada',
+        fontFamily: "'Jost', 'Plus Jakarta Sans', sans-serif",
+        weight: 300,
+        tracking: '0.03em',
+        transform: 'none'
+      },
+      {
+        id: 'timeless',
+        label: 'Timeless',
+        sample: 'Timeless',
+        desc: 'Uma fonte leve e arejada',
+        fontFamily: "'Libre Baskerville', 'Cormorant Garamond', Georgia, serif",
+        weight: 400,
+        tracking: '0.01em',
+        transform: 'none'
+      },
+      {
+        id: 'bold',
+        label: 'Bold',
+        sample: 'BOLD',
+        desc: 'Uma fonte marcante',
+        fontFamily: "'Syne', 'Plus Jakarta Sans', sans-serif",
+        weight: 700,
+        tracking: '0.06em',
+        transform: 'uppercase'
+      },
+      {
+        id: 'subtle',
+        label: 'Subtle',
+        sample: 'SUBTLE',
+        desc: 'Uma fonte minimalista',
+        fontFamily: "'Jost', 'Plus Jakarta Sans', sans-serif",
+        weight: 300,
+        tracking: '0.16em',
+        transform: 'uppercase'
+      }
+    ],
+    colorThemes: [
+      {
+        id: 'claro',
+        label: 'Claro',
+        dots: ['#FFFFFF', '#F2F2F2', '#2E3236'],
+        ground: '#FFFFFF',
+        surface: '#F3F4F5',
+        ink: '#1E242B',
+        inkSecondary: '#525C68',
+        accent: '#2E3236',
+        accentHover: '#191C1F',
+        isDark: false
+      },
+      {
+        id: 'dourado',
+        label: 'Dourado',
+        dots: ['#FCFBF7', '#F6F2E7', '#9A8762'],
+        ground: '#FAF8F4',
+        surface: '#F1EDE3',
+        ink: '#1B2733',
+        inkSecondary: '#3C4A57',
+        accent: '#6E5B39',
+        accentHover: '#58482B',
+        isDark: false
+      },
+      {
+        id: 'rosa',
+        label: 'Rosa',
+        dots: ['#FBF6F6', '#F4EAEA', '#9C7375'],
+        ground: '#FBF6F6',
+        surface: '#F3E8E8',
+        ink: '#2F2224',
+        inkSecondary: '#594346',
+        accent: '#7D5154',
+        accentHover: '#663F42',
+        isDark: false
+      },
+      {
+        id: 'terracota',
+        label: 'Terracota',
+        dots: ['#FAF6F2', '#EFE7DF', '#9E7358'],
+        ground: '#FAF6F2',
+        surface: '#EFE7DF',
+        ink: '#2C221D',
+        inkSecondary: '#57453C',
+        accent: '#7E543B',
+        accentHover: '#66422D',
+        isDark: false
+      },
+      {
+        id: 'areia',
+        label: 'Areia',
+        dots: ['#F7F4F0', '#E9E3DC', '#9C897B'],
+        ground: '#F7F4F0',
+        surface: '#E9E3DC',
+        ink: '#2B2623',
+        inkSecondary: '#524943',
+        accent: '#6B594D',
+        accentHover: '#56473D',
+        isDark: false
+      },
+      {
+        id: 'oliva',
+        label: 'Oliva',
+        dots: ['#F6F7F4', '#EAECE5', '#8F967A'],
+        ground: '#F6F7F4',
+        surface: '#EAECE5',
+        ink: '#232820',
+        inkSecondary: '#485042',
+        accent: '#596146',
+        accentHover: '#474E37',
+        isDark: false
+      },
+      {
+        id: 'agave',
+        label: 'Agave',
+        dots: ['#F4F7F6', '#E6ECEA', '#7E968D'],
+        ground: '#F4F7F6',
+        surface: '#E6ECEA',
+        ink: '#1E2926',
+        inkSecondary: '#41524D',
+        accent: '#4B665D',
+        accentHover: '#3B524A',
+        isDark: false
+      },
+      {
+        id: 'mar',
+        label: 'Mar',
+        dots: ['#F5F6F8', '#E7E9EE', '#8B8F9E'],
+        ground: '#F5F6F8',
+        surface: '#E7E9EE',
+        ink: '#202530',
+        inkSecondary: '#454C5B',
+        accent: '#52586B',
+        accentHover: '#404556',
+        isDark: false
+      },
+      {
+        id: 'escuro',
+        label: 'Escuro',
+        dots: ['#16181A', '#24272B', '#52575E'],
+        ground: '#15181C',
+        surface: '#20252B',
+        ink: '#F5F3EE',
+        inkSecondary: '#B5BCC4',
+        accent: '#D8C29D',
+        accentHover: '#E5D3B3',
+        isDark: true
+      }
+    ],
+    gridStyles: [
+      { id: 'vertical', label: 'Vertical', desc: 'Colunas em mosaico respeitando retratos e paisagens' },
+      { id: 'horizontal', label: 'Horizontal', desc: 'Linhas panorâmicas alinhadas pela altura' }
+    ],
+    gridSpacings: [
+      { id: 'regular', label: 'Regular', gapPx: 8 },
+      { id: 'large', label: 'Amplo', gapPx: 20 }
+    ],
+    gridSizes: [
+      { id: 'regular', label: 'Regular', cols: 4, rowHeight: 250 },
+      { id: 'large', label: 'Grande', cols: 3, rowHeight: 330 }
+    ]
+  };
+
+  function getDefaultDesign() {
+    return {
+      coverStyle: 'borda',
+      typography: 'serif',
+      colorTheme: 'dourado',
+      gridStyle: 'vertical',
+      gridSpacing: 'regular',
+      gridSize: 'regular'
+    };
+  }
+
+  function normalizeAlbum(alb) {
+    if (!alb || typeof alb !== 'object') return alb;
+
+    // Migra 'watermark_blur' legado para o novo 'watermark_lowres'
+    if (alb.protectionLevel === 'watermark_blur') {
+      alb.protectionLevel = 'watermark_lowres';
+    }
+    if (!['watermark', 'watermark_lowres', 'watermark_spotlight'].includes(alb.protectionLevel)) {
+      alb.protectionLevel = 'watermark';
+    }
+
+    if (typeof alb.watermarkEnabled !== 'boolean') {
+      alb.watermarkEnabled = true;
+    }
+    if (typeof alb.passwordEnabled !== 'boolean') {
+      alb.passwordEnabled = Boolean(alb.password && String(alb.password).trim());
+    }
+    if (typeof alb.extrasEnabled !== 'boolean') {
+      alb.extrasEnabled = Number(alb.extraPhotoPrice ?? 20) > 0;
+    }
+    if (typeof alb.pinEnabled !== 'boolean') {
+      alb.pinEnabled = Boolean(alb.downloadPin && String(alb.downloadPin).trim());
+    }
+
+    const defDesign = getDefaultDesign();
+    const d = alb.design && typeof alb.design === 'object' ? alb.design : {};
+    alb.design = {
+      coverStyle: DESIGN_PRESETS.coverStyles.some((x) => x.id === d.coverStyle) ? d.coverStyle : defDesign.coverStyle,
+      typography: DESIGN_PRESETS.typographies.some((x) => x.id === d.typography) ? d.typography : defDesign.typography,
+      colorTheme: DESIGN_PRESETS.colorThemes.some((x) => x.id === d.colorTheme) ? d.colorTheme : defDesign.colorTheme,
+      gridStyle: DESIGN_PRESETS.gridStyles.some((x) => x.id === d.gridStyle) ? d.gridStyle : defDesign.gridStyle,
+      gridSpacing: DESIGN_PRESETS.gridSpacings.some((x) => x.id === d.gridSpacing) ? d.gridSpacing : defDesign.gridSpacing,
+      gridSize: DESIGN_PRESETS.gridSizes.some((x) => x.id === d.gridSize) ? d.gridSize : defDesign.gridSize
+    };
+
+    if (!alb.coverFocal) alb.coverFocal = '50% 35%';
+    if (!Array.isArray(alb.photos)) alb.photos = [];
+    if (!Array.isArray(alb.selectedIds)) alb.selectedIds = [];
+    if (!Array.isArray(alb.deliveryFavorites)) alb.deliveryFavorites = [];
+    if (!alb.photoComments || typeof alb.photoComments !== 'object') alb.photoComments = {};
+    if (!Array.isArray(alb.activityLog)) alb.activityLog = [];
+
+    return alb;
+  }
 
   function getBrandDefaults() {
     const b = (window.SITE_DATA && window.SITE_DATA.brand) || {};
@@ -41,10 +299,11 @@
      ========================================================================== */
   function createInitialDemoState() {
     const brand = getBrandDefaults();
-    return {
+    const state = {
       version: Date.now(),
       storageMode: 'local',
       watermarkConfig: {
+        enabled: true,
         mode: 'image',          // 'image' (PNG do fotógrafo) | 'text'
         imageSrc: brand.defaultWatermarkImg,
         text: brand.studioName.toUpperCase(),
@@ -69,16 +328,28 @@
           subtitle: 'Ensaio Gestante · Praia de Iracema',
           shootDate: '2026-11-05',
           welcomeMessage: 'Escolham com calma as fotografias favoritas de vocês. Se desejarem guardar registros além do pacote contratado, o valor adicional é calculado automaticamente.',
-          phase: 'proofing', // 'proofing' | 'delivery'
+          phase: 'proofing',
           status: 'awaiting_selection',
-          protectionLevel: 'watermark', // 'watermark' | 'watermark_blur' | 'watermark_spotlight'
+          protectionLevel: 'watermark',
+          watermarkEnabled: true,
+          passwordEnabled: true,
           password: '1234',
+          pinEnabled: true,
           downloadPin: '4580',
+          extrasEnabled: true,
           packageName: 'Ensaio Afeto',
           packageIncluded: 5,
           extraPhotoPrice: 20.00,
           coverSrc: 'assets/images/real/IMG_7513.jpg',
-          coverFocal: 'center 32%',
+          coverFocal: '50% 32%',
+          design: {
+            coverStyle: 'borda',
+            typography: 'serif',
+            colorTheme: 'dourado',
+            gridStyle: 'vertical',
+            gridSpacing: 'regular',
+            gridSize: 'regular'
+          },
           selectionLocked: false,
           selectedIds: ['p_01', 'p_02', 'p_04', 'p_05'],
           deliveryFavorites: [],
@@ -112,13 +383,25 @@
           phase: 'delivery',
           status: 'delivered',
           protectionLevel: 'watermark',
+          watermarkEnabled: true,
+          passwordEnabled: true,
           password: '1234',
+          pinEnabled: true,
           downloadPin: '7788',
+          extrasEnabled: true,
           packageName: 'Ensaio Completo',
           packageIncluded: 8,
           extraPhotoPrice: 20.00,
           coverSrc: 'assets/images/real/IMG_1186.jpg',
-          coverFocal: 'center 38%',
+          coverFocal: '50% 38%',
+          design: {
+            coverStyle: 'borda',
+            typography: 'modern',
+            colorTheme: 'dourado',
+            gridStyle: 'vertical',
+            gridSpacing: 'regular',
+            gridSize: 'regular'
+          },
           selectionLocked: true,
           selectedIds: ['d_01', 'd_02', 'd_03', 'd_04', 'd_05', 'd_06', 'd_07', 'd_08'],
           deliveryFavorites: ['d_01', 'd_04'],
@@ -150,6 +433,8 @@
         }
       ]
     };
+    state.albums.forEach(normalizeAlbum);
+    return state;
   }
 
   /* ==========================================================================
@@ -186,6 +471,13 @@
         if (!saved.watermarkConfig) {
           saved.watermarkConfig = createInitialDemoState().watermarkConfig;
         }
+        if (typeof saved.watermarkConfig.enabled !== 'boolean') {
+          saved.watermarkConfig.enabled = true;
+        }
+        if (!saved.paymentConfig) {
+          saved.paymentConfig = createInitialDemoState().paymentConfig;
+        }
+        saved.albums.forEach(normalizeAlbum);
         return saved;
       }
     } catch (_) {}
@@ -196,6 +488,9 @@
 
   async function saveState(nextState, opts = {}) {
     nextState.version = Date.now();
+    if (Array.isArray(nextState.albums)) {
+      nextState.albums.forEach(normalizeAlbum);
+    }
     try {
       const db = await openAlbumsDb();
       await new Promise((resolve, reject) => {
@@ -230,19 +525,20 @@
   }
 
   /* ==========================================================================
-     3. CÁLCULO SEGURO DE PACOTE + FOTOS EXTRAS
+     3. CÁLCULO SEGURO DE PACOTE + FOTOS EXTRAS (RESPEITA CHAVE ON/OFF)
      ========================================================================== */
   function calculateSelectionPricing(album, customSelectedIds) {
     const rawIds = Array.isArray(customSelectedIds) ? customSelectedIds : (album.selectedIds || []);
     const validSet = new Set((album.photos || []).map((p) => p.id));
     const uniqueIds = [...new Set(rawIds)].filter((id) => validSet.has(id));
 
+    const extrasEnabled = album.extrasEnabled !== false;
     const packageIncluded = Math.max(0, parseInt(album.packageIncluded, 10) || 0);
-    const extraPhotoPrice = Math.max(0, Number(album.extraPhotoPrice) || 0);
+    const extraPhotoPrice = extrasEnabled ? Math.max(0, Number(album.extraPhotoPrice) || 0) : 0;
     const selectedCount = uniqueIds.length;
     const includedSelected = Math.min(selectedCount, packageIncluded);
     const remainingInPackage = Math.max(0, packageIncluded - selectedCount);
-    const extraCount = Math.max(0, selectedCount - packageIncluded);
+    const extraCount = extrasEnabled ? Math.max(0, selectedCount - packageIncluded) : 0;
     const extraTotal = Number((extraCount * extraPhotoPrice).toFixed(2));
 
     return {
@@ -251,15 +547,16 @@
       packageIncluded,
       includedSelected,
       remainingInPackage,
+      extrasEnabled,
       extraCount,
       extraPhotoPrice,
       extraTotal,
-      hasExtras: extraCount > 0
+      hasExtras: extrasEnabled && extraCount > 0 && extraPhotoPrice > 0
     };
   }
 
   /* ==========================================================================
-     4. MOTOR DE PROTEÇÃO DE PROVAS EM CANVAS (3 NÍVEIS + MARCA D'ÁGUA PNG/TEXTO)
+     4. MOTOR DE PROTEÇÃO DE PROVAS EM CANVAS (3 NÍVEIS ATUALIZADOS)
      ========================================================================== */
   const imgCache = new Map();
   function loadImageElement(src) {
@@ -279,10 +576,12 @@
     return p;
   }
 
-  function getWatermarkSignature(wmConfig, protectionLevel) {
+  function getWatermarkSignature(wmConfig, protectionLevel, watermarkEnabled = true) {
     const cfg = wmConfig || {};
+    const activeWm = Boolean(watermarkEnabled) && cfg.enabled !== false;
     return [
       protectionLevel || 'watermark',
+      activeWm ? 'wm1' : 'wm0',
       cfg.mode || 'image',
       (cfg.imageSrc || '').slice(-48),
       cfg.text || '',
@@ -295,6 +594,7 @@
 
   async function drawWatermarkOverlay(ctx, w, h, wmConfig) {
     const cfg = wmConfig || {};
+    if (cfg.enabled === false) return;
     const opacity = Math.max(0.12, Math.min(0.9, Number(cfg.opacity) || 0.45));
     const scaleFactor = Math.max(0.14, Math.min(0.65, Number(cfg.scale) || 0.28));
     const pattern = cfg.pattern || 'tiled';
@@ -323,10 +623,10 @@
         ctx.shadowBlur = 8;
         ctx.drawImage(wmImg, (w - targetW) / 2, (h - targetH) / 2, targetW, targetH);
       } else {
-        const tileW = Math.max(90, Math.round(Math.min(w, h) * scaleFactor * 0.78));
-        const tileH = Math.max(28, Math.round(tileW / aspect));
+        const tileW = Math.max(82, Math.round(Math.min(w, h) * scaleFactor * 0.78));
+        const tileH = Math.max(24, Math.round(tileW / aspect));
         const stepX = Math.round(tileW * 1.85);
-        const stepY = Math.round(Math.max(tileH * 2.5, 110));
+        const stepY = Math.round(Math.max(tileH * 2.5, 96));
         const span = Math.hypot(w, h);
 
         ctx.translate(w / 2, h / 2);
@@ -343,7 +643,7 @@
       }
     } else {
       const label = (cfg.text || getBrandDefaults().studioName).toUpperCase();
-      const fontSize = Math.max(15, Math.round(Math.min(w, h) * scaleFactor * 0.16));
+      const fontSize = Math.max(14, Math.round(Math.min(w, h) * scaleFactor * 0.16));
       ctx.font = `600 ${fontSize}px "Plus Jakarta Sans", sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -354,8 +654,8 @@
         ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
         ctx.fillText(label, w / 2, h / 2);
       } else {
-        const stepX = Math.max(210, Math.round(fontSize * 12));
-        const stepY = Math.max(105, Math.round(fontSize * 5.2));
+        const stepX = Math.max(190, Math.round(fontSize * 12));
+        const stepY = Math.max(96, Math.round(fontSize * 5.2));
         const span = Math.hypot(w, h);
         ctx.translate(w / 2, h / 2);
         ctx.rotate(-Math.PI / 7);
@@ -377,27 +677,75 @@
 
   /**
    * Gera as versões protegidas nos pixels do Canvas conforme o nível escolhido:
-   * - 'watermark': foto nítida em baixa resolução + marca d'água
-   * - 'watermark_blur': foto borrada + marca d'água (com sharpWatermarked para inspeção segurando o clique)
-   * - 'watermark_spotlight': bordas borradas + centro em foco nítido + marca d'água em toda a área
+   * 1. 'watermark'           -> Prova nítida (1080px) + marca d'água
+   * 2. 'watermark_lowres'    -> Foto em baixa resolução (~420px reamostrada, clara p/ escolher mas sem definição p/ print/post) + marca d'água nítida
+   * 3. 'watermark_spotlight' -> Foto 100% desfocada em repouso + marca d'água; revealSrc nítida p/ foco exclusivo onde o cursor/dedo passa
    */
-  async function generateProtectedProofBundle(originalSrc, wmConfig, protectionLevel = 'watermark', maxDim = 1080) {
+  async function generateProtectedProofBundle(
+    originalSrc,
+    wmConfig,
+    protectionLevel = 'watermark',
+    maxDim = 1080,
+    watermarkEnabled = true
+  ) {
     const img = await loadImageElement(originalSrc);
     const w0 = img.naturalWidth || img.width;
     const h0 = img.naturalHeight || img.height;
+    const shouldDrawWm = Boolean(watermarkEnabled) && (wmConfig?.enabled !== false);
+
+    // NÍVEL 2: MARCA D'ÁGUA + BAIXA RESOLUÇÃO
+    if (protectionLevel === 'watermark_lowres') {
+      const lowMax = Math.min(410, maxDim);
+      const lowScale = Math.min(1, lowMax / Math.max(w0, h0));
+      const lw = Math.max(1, Math.round(w0 * lowScale));
+      const lh = Math.max(1, Math.round(h0 * lowScale));
+
+      const tinyCanvas = document.createElement('canvas');
+      tinyCanvas.width = lw;
+      tinyCanvas.height = lh;
+      const tCtx = tinyCanvas.getContext('2d');
+      tCtx.drawImage(img, 0, 0, lw, lh);
+
+      // Reamostra para ~820px preservando o aspecto de baixa resolução da foto, mas aplicando marca d'água nítida por cima
+      const outScale = Math.min(1, Math.min(820, maxDim) / Math.max(w0, h0));
+      const ow = Math.max(lw, Math.round(w0 * outScale));
+      const oh = Math.max(lh, Math.round(h0 * outScale));
+
+      const outCanvas = document.createElement('canvas');
+      outCanvas.width = ow;
+      outCanvas.height = oh;
+      const oCtx = outCanvas.getContext('2d');
+      oCtx.imageSmoothingEnabled = true;
+      oCtx.imageSmoothingQuality = 'low';
+      oCtx.drawImage(tinyCanvas, 0, 0, lw, lh, 0, 0, ow, oh);
+
+      if (shouldDrawWm) {
+        await drawWatermarkOverlay(oCtx, ow, oh, wmConfig);
+      }
+
+      const lowResUrl = outCanvas.toDataURL('image/jpeg', 0.54);
+      return {
+        primarySrc: lowResUrl,
+        revealSrc: lowResUrl
+      };
+    }
+
     const scale = Math.min(1, maxDim / Math.max(w0, h0));
     const w = Math.max(1, Math.round(w0 * scale));
     const h = Math.max(1, Math.round(h0 * scale));
 
-    // Base 1: Foto com Marca d'Água Nítida (usada no nível 'watermark' e dentro da lente de inspeção)
+    // Base Nítida com Marca d'Água (usada em 'watermark' e dentro do foco do cursor em 'watermark_spotlight')
     const sharpCanvas = document.createElement('canvas');
     sharpCanvas.width = w;
     sharpCanvas.height = h;
     const sCtx = sharpCanvas.getContext('2d');
     sCtx.drawImage(img, 0, 0, w, h);
-    await drawWatermarkOverlay(sCtx, w, h, wmConfig);
+    if (shouldDrawWm) {
+      await drawWatermarkOverlay(sCtx, w, h, wmConfig);
+    }
     const sharpWatermarkedUrl = sharpCanvas.toDataURL('image/jpeg', 0.78);
 
+    // NÍVEL 1: MARCA D'ÁGUA PADRÃO
     if (protectionLevel === 'watermark') {
       return {
         primarySrc: sharpWatermarkedUrl,
@@ -405,51 +753,22 @@
       };
     }
 
-    // Base 2: Versão Desfocada nos Pixels + Marca d'Água Nítida por cima
+    // NÍVEL 3 ('watermark_spotlight'): 100% DESFOCADA EM REPOUSO + FOCO ATRELADO AO CURSOR / DEDO
     const blurCanvas = document.createElement('canvas');
     blurCanvas.width = w;
     blurCanvas.height = h;
     const bCtx = blurCanvas.getContext('2d');
-    const blurPx = Math.max(8, Math.round(Math.min(w, h) * 0.018));
+    const blurPx = Math.max(10, Math.round(Math.min(w, h) * 0.022));
     bCtx.filter = `blur(${blurPx}px)`;
-    // Expande levemente nas bordas para evitar halo transparente do blur
     bCtx.drawImage(img, -blurPx * 2, -blurPx * 2, w + blurPx * 4, h + blurPx * 4);
     bCtx.filter = 'none';
 
-    if (protectionLevel === 'watermark_blur') {
+    if (shouldDrawWm) {
       await drawWatermarkOverlay(bCtx, w, h, wmConfig);
-      return {
-        primarySrc: blurCanvas.toDataURL('image/jpeg', 0.74),
-        revealSrc: sharpWatermarkedUrl
-      };
     }
 
-    // Nível 3 ('watermark_spotlight'): Foco Centralizado + Bordas Desfocadas + Marca d'Água
-    const focusCanvas = document.createElement('canvas');
-    focusCanvas.width = w;
-    focusCanvas.height = h;
-    const fCtx = focusCanvas.getContext('2d');
-
-    // Primeiro desenha a foto nítida e aplica máscara radial suave no centro
-    fCtx.drawImage(img, 0, 0, w, h);
-    fCtx.globalCompositeOperation = 'destination-in';
-    const cx = w / 2;
-    const cy = h * 0.46; // levemente acima do meio onde costumam ficar os rostos
-    const innerR = Math.min(w, h) * 0.21;
-    const outerR = Math.min(w, h) * 0.46;
-    const grad = fCtx.createRadialGradient(cx, cy, innerR, cx, cy, outerR);
-    grad.addColorStop(0, 'rgba(0,0,0,1)');
-    grad.addColorStop(0.55, 'rgba(0,0,0,0.85)');
-    grad.addColorStop(1, 'rgba(0,0,0,0)');
-    fCtx.fillStyle = grad;
-    fCtx.fillRect(0, 0, w, h);
-
-    // Combina o centro em foco sobre o fundo desfocado e grava a marca d'água por cima de tudo
-    bCtx.drawImage(focusCanvas, 0, 0);
-    await drawWatermarkOverlay(bCtx, w, h, wmConfig);
-
     return {
-      primarySrc: blurCanvas.toDataURL('image/jpeg', 0.76),
+      primarySrc: blurCanvas.toDataURL('image/jpeg', 0.74),
       revealSrc: sharpWatermarkedUrl
     };
   }
@@ -476,6 +795,9 @@
 
     return {
       filename: file.name || `FOTO_${Date.now()}.jpg`,
+      width: w,
+      height: h,
+      aspectRatio: Number((w / Math.max(1, h)).toFixed(3)),
       originalSrc: hiCanvas.toDataURL('image/jpeg', 0.90)
     };
   }
@@ -495,7 +817,6 @@
     const canvas = document.createElement('canvas');
     canvas.width = Math.max(1, Math.round(w0 * scale));
     canvas.height = Math.max(1, Math.round(h0 * scale));
-    // Mantém transparência PNG para marcas d'água!
     canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
     return canvas.toDataURL('image/png');
   }
@@ -623,7 +944,6 @@
       cv.setUint16(8, 0x0800, true);
       cv.setUint16(10, 0, true);
       cv.setUint16(12, dosTime, true);
-      cv.setUint14 ? null : null;
       cv.setUint16(14, dosDate, true);
       cv.setUint32(16, crc, true);
       cv.setUint32(20, size, true);
@@ -676,9 +996,6 @@
     return new Uint8Array(await blob.arrayBuffer());
   }
 
-  /**
-   * Extrai código limpo caso o cliente cole o link completo (ex: https://.../galeria?id=ana-e-lucas)
-   */
   function parseAlbumSlugFromInput(rawInput) {
     const trimmed = String(rawInput || '').trim();
     if (!trimmed) return '';
@@ -695,6 +1012,9 @@
   }
 
   window.AlbumsStore = {
+    DESIGN_PRESETS,
+    getDefaultDesign,
+    normalizeAlbum,
     loadState,
     saveState,
     subscribe,

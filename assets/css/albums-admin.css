@@ -1,98 +1,121 @@
 /* ==========================================================================
-   ESTILOS DO MÓDULO DE ÁLBUNS DE CLIENTES NO PAINEL /ADMIN (V2)
+   ESTILOS DO MÓDULO DE ÁLBUNS DE CLIENTES NO PAINEL /ADMIN (V3)
+   - Grade de fotos à prova de qualquer zoom (50% a 200%) com aspect-ratio 4:3
+   - Sub-abas limpas estilo Pixieset (Fotos, Design, Proteção, Pacote & Acesso)
+   - Customizador Visual de Capa, Tipografia, Cor (3 círculos) e Grade
    ========================================================================== */
+
 #panel-albums {
   container-type: inline-size;
 }
 
-.alb-kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
-  gap: 10px;
-  margin-bottom: 16px;
-}
-
-.alb-kpi-card {
+/* ==========================================================================
+   1. CABEÇALHO LIMPO DO ÁLBUM ATIVO + CRIADOR RÁPIDO
+   ========================================================================== */
+.alb-quick-create-card {
   background: #FFFFFF;
-  border: 1px solid var(--cms-border, rgba(27, 39, 51, 0.12));
-  border-radius: 10px;
-  padding: 12px 14px;
-}
-
-.alb-kpi-card span {
-  display: block;
-  font-size: 0.71rem;
-  color: var(--cms-muted, #627282);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.alb-kpi-card strong {
-  display: block;
-  font-size: 1.3rem;
-  margin-top: 4px;
-  color: var(--cms-text, #1B2733);
-  font-variant-numeric: tabular-nums;
-}
-
-.alb-top-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  border: 1.5px solid #3B7293;
+  border-radius: 12px;
+  padding: 16px 18px;
   margin-bottom: 16px;
+  box-shadow: 0 8px 24px rgba(27, 39, 51, 0.08);
 }
 
-.alb-switcher-list {
+.alb-quick-create-head {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 10px;
-  overflow-x: auto;
-  padding-bottom: 8px;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
 }
 
-.alb-pill-item {
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-  min-width: 210px;
-  padding: 12px 14px;
-  border-radius: 10px;
-  border: 1.5px solid rgba(27, 39, 51, 0.12);
-  background: #FFFFFF;
-  cursor: pointer;
-  text-align: left;
-  font-family: inherit;
-  transition: border-color 0.15s ease, background-color 0.15s ease;
-}
-
-.alb-pill-item:hover {
-  border-color: rgba(59, 114, 147, 0.45);
-}
-
-.alb-pill-item.active {
-  border-color: #3B7293;
-  background: #F4F9FC;
-}
-
-.alb-pill-item strong {
-  font-size: 0.9rem;
+.alb-quick-create-head strong {
+  font-size: 0.95rem;
   color: #1B2733;
 }
 
-.alb-pill-meta {
-  font-size: 0.74rem;
+.alb-quick-create-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.alb-quick-create-row .field-group {
+  flex: 1 1 200px;
+  min-width: 0;
+  margin: 0;
+}
+
+.alb-studio-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding-bottom: 16px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid rgba(27, 39, 51, 0.10);
+}
+
+.alb-studio-identity {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.alb-studio-toprow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.alb-studio-title {
+  margin: 0;
+  font-family: var(--font-serif, 'Cormorant Garamond', Georgia, serif);
+  font-size: 1.65rem;
+  font-weight: 600;
+  line-height: 1.15;
+  color: #1B2733;
+}
+
+.alb-studio-slug {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.77rem;
   color: #5A6978;
-  font-variant-numeric: tabular-nums;
+  word-break: break-all;
+}
+
+.alb-studio-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Seletor compacto visível apenas no celular (onde a sidebar fica oculta) */
+.alb-mobile-SelectWrap {
+  display: none;
+  width: 100%;
+  margin-bottom: 12px;
+  gap: 8px;
+}
+
+@media (max-width: 780px) {
+  .alb-mobile-SelectWrap {
+    display: flex;
+  }
 }
 
 .alb-status-tag {
-  display: inline-block;
-  padding: 2px 8px;
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
   border-radius: 999px;
-  font-size: 0.67rem;
+  font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.02em;
 }
@@ -102,58 +125,820 @@
 .alb-status-tag.st-pix  { background: #FFE8D9; color: #9E4208; }
 .alb-status-tag.st-deliv { background: #E1EFF8; color: #245775; }
 
+/* Banner de confirmação rápida de Pix */
+.alb-pix-alert-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+  border-radius: 10px;
+  background: #FFF6E5;
+  border: 1px solid #F5C97B;
+  color: #7A4B00;
+  font-size: 0.82rem;
+}
+
+/* ==========================================================================
+   2. CHAVE DE FASE (SELEÇÃO vs ENTREGA) + SUB-ABAS LIMPAS
+   ========================================================================== */
 .alb-phase-toggle-bar {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 6px;
-  background: #F3EFE3;
-  padding: 6px;
-  border-radius: 12px;
-  border: 1px solid rgba(27, 39, 51, 0.10);
-  margin-bottom: 16px;
+  background: #EFECE2;
+  padding: 5px;
+  border-radius: 10px;
+  border: 1px solid rgba(27, 39, 51, 0.09);
+  margin-bottom: 14px;
+}
+
+@container (max-width: 480px) {
+  .alb-phase-toggle-bar {
+    grid-template-columns: 1fr;
+  }
 }
 
 .alb-phase-btn {
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid transparent;
+  padding: 9px 12px;
+  border-radius: 7px;
+  border: none;
   background: transparent;
   font-family: inherit;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: #5A6978;
+  font-size: 0.79rem;
+  font-weight: 600;
+  color: #526170;
   cursor: pointer;
   transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.alb-phase-btn:hover {
+  color: #1B2733;
 }
 
 .alb-phase-btn.active {
   background: #1B2733;
   color: #FFFDF3;
+  box-shadow: 0 2px 6px rgba(27, 39, 51, 0.16);
 }
 
-.alb-section-box {
-  background: #FFFFFF;
-  border: 1px solid rgba(27, 39, 51, 0.10);
-  border-radius: 12px;
-  padding: 16px 18px;
-  margin-bottom: 16px;
+.alb-subtabs-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  border-bottom: 1px solid rgba(27, 39, 51, 0.12);
+  margin-bottom: 18px;
 }
 
-.alb-section-box h3 {
-  margin: 0 0 12px;
-  font-size: 0.94rem;
+.alb-subtab-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 14px;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #5A6978;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.alb-subtab-btn:hover {
   color: #1B2733;
 }
 
-/* Seletor de 3 Níveis de Proteção + Marca d'Água */
+.alb-subtab-btn.active {
+  color: #1B2733;
+  border-bottom-color: #268C7C;
+}
+
+.alb-subtab-pill {
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(27, 39, 51, 0.08);
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.alb-subtab-btn.active .alb-subtab-pill {
+  background: rgba(38, 140, 124, 0.14);
+  color: #196B5E;
+}
+
+.alb-card-clean {
+  background: #FFFFFF;
+  border: 1px solid rgba(27, 39, 51, 0.10);
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 16px;
+}
+
+/* ==========================================================================
+   3. ABA 1: FOTOS DO ÁLBUM (100% À PROVA DE QUALQUER ZOOM 50%–200%)
+   ========================================================================== */
+.alb-photos-topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.alb-photos-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: #4A5867;
+}
+
+.alb-photos-summary strong {
+  color: #1B2733;
+}
+
+.alb-lr-compact-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 9px;
+  background: #F6F4EC;
+  border: 1px solid rgba(27, 39, 51, 0.09);
+  margin-bottom: 14px;
+}
+
+.alb-lr-compact-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.alb-lr-compact-left span {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #4A5867;
+  white-space: nowrap;
+}
+
+.alb-lr-code-inline {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(27, 39, 51, 0.14);
+  background: #FFFFFF;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.75rem;
+  color: #1B2733;
+}
+
+/* GRADE DE FOTOS UNIFORME — NUNCA ESTICA RETRATO vs PAISAGEM NEM CORTA BOTÃO */
+.alb-photos-admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+
+.alb-adm-photo-card {
+  min-width: 0;
+  background: #FFFFFF;
+  border: 1px solid rgba(27, 39, 51, 0.12);
+  border-radius: 10px;
+  overflow: clip;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.alb-adm-photo-card:hover {
+  border-color: rgba(59, 114, 147, 0.45);
+  box-shadow: 0 4px 12px rgba(27, 39, 51, 0.06);
+}
+
+.alb-adm-photo-card.is-cover-card {
+  border-color: #C49B45;
+  box-shadow: 0 0 0 1px rgba(196, 155, 69, 0.35);
+}
+
+.alb-adm-thumb-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: clip;
+  flex-shrink: 0;
+  background: #EAE5D9;
+}
+
+.alb-adm-thumb-wrap > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Ações compactas sobre a miniatura (zero competição de largura no rodapé!) */
+.alb-thumb-cover-btn {
+  position: absolute;
+  top: 7px;
+  left: 7px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(18, 27, 36, 0.72);
+  color: #FFFDF3;
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: background-color 0.14s ease, color 0.14s ease;
+}
+
+.alb-thumb-cover-btn:hover {
+  background: rgba(18, 27, 36, 0.92);
+}
+
+.alb-thumb-cover-btn.is-active {
+  background: #E7C378;
+  border-color: #C89E4C;
+  color: #1B2733;
+  font-weight: 700;
+}
+
+.alb-thumb-del-btn {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  z-index: 2;
+  width: 25px;
+  height: 25px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(18, 27, 36, 0.72);
+  color: #FFFDF3;
+  font-size: 0.74rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: background-color 0.14s ease;
+}
+
+.alb-thumb-del-btn:hover {
+  background: #B42318;
+  border-color: #B42318;
+}
+
+.alb-thumb-sel-badge {
+  position: absolute;
+  bottom: 7px;
+  left: 7px;
+  z-index: 2;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(25, 97, 59, 0.90);
+  color: #FFFFFF;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.alb-adm-meta {
+  padding: 8px 10px;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.alb-adm-fname {
+  min-width: 0;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #243240;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.alb-notes-clean-list {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 9px;
+  background: #FBF9F3;
+  border: 1px solid rgba(27, 39, 51, 0.09);
+}
+
+.alb-notes-clean-list h4 {
+  margin: 0 0 8px;
+  font-size: 0.78rem;
+  color: #1B2733;
+}
+
+.alb-note-row {
+  font-size: 0.76rem;
+  color: #4A5867;
+  padding: 5px 0;
+  border-top: 1px solid rgba(27, 39, 51, 0.06);
+}
+
+/* ==========================================================================
+   4. ABA 2: DESIGN & APRESENTAÇÃO ESTILO PIXIESET (CAPA, TIPOGRAFIA, COR, GRADE)
+   ========================================================================== */
+.pix-design-shell {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+@container (max-width: 600px) {
+  .pix-design-shell {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pix-design-rail {
+  background: #FFFFFF;
+  border: 1px solid rgba(27, 39, 51, 0.10);
+  border-radius: 12px;
+  overflow: clip;
+}
+
+.pix-focal-box {
+  padding: 10px;
+  border-bottom: 1px solid rgba(27, 39, 51, 0.08);
+  background: #FAF8F3;
+}
+
+.pix-focal-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  max-height: 175px;
+  border-radius: 7px;
+  overflow: clip;
+  cursor: crosshair;
+  background: #1B2733;
+}
+
+.pix-focal-stage img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+}
+
+.pix-focal-pin {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  margin-left: -10px;
+  margin-top: -10px;
+  border-radius: 50%;
+  border: 2px solid #FFFFFF;
+  background: rgba(38, 140, 124, 0.85);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+  transition: left 0.12s ease, top 0.12s ease;
+}
+
+.pix-focal-caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 7px;
+  font-size: 0.69rem;
+  color: #526170;
+  font-weight: 600;
+}
+
+.pix-rail-label {
+  padding: 10px 14px 4px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: #7B8998;
+}
+
+.pix-rail-nav {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 6px 8px;
+  gap: 2px;
+}
+
+@container (max-width: 600px) {
+  .pix-rail-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+
+.pix-rail-btn {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 9px 10px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #3A4856;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.14s ease, color 0.14s ease;
+}
+
+@container (max-width: 600px) {
+  .pix-rail-btn {
+    width: auto;
+    flex: 1 1 110px;
+    justify-content: center;
+  }
+}
+
+.pix-rail-btn:hover {
+  background: #F3F4F6;
+  color: #1B2733;
+}
+
+.pix-rail-btn.active {
+  background: #EFF7F6;
+  color: #16655A;
+  font-weight: 700;
+}
+
+.pix-rail-icon {
+  width: 18px;
+  text-align: center;
+  font-size: 0.88rem;
+  flex-shrink: 0;
+}
+
+/* Painel Direito do Customizador Pixieset */
+.pix-design-stage {
+  background: #FFFFFF;
+  border: 1px solid rgba(27, 39, 51, 0.10);
+  border-radius: 12px;
+  padding: 18px;
+  min-width: 0;
+}
+
+.pix-stage-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.pix-stage-head h3 {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: #1B2733;
+}
+
+.pix-stage-hint {
+  font-size: 0.74rem;
+  color: #5E6D7C;
+}
+
+/* Grade de 2 colunas idêntica às Fotos 3, 4 e 5 do Pixieset */
+.pix-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+@container (max-width: 430px) {
+  .pix-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pix-choice-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+  min-width: 0;
+}
+
+.pix-choice-frame {
+  position: relative;
+  width: 100%;
+  border-radius: 6px;
+  border: 2px solid #E5E7EB;
+  background: #FFFFFF;
+  overflow: clip;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.pix-choice-item:hover .pix-choice-frame {
+  border-color: #94A3B8;
+}
+
+.pix-choice-item.active .pix-choice-frame {
+  border-color: #268C7C;
+  box-shadow: 0 0 0 1px #268C7C;
+}
+
+.pix-choice-label {
+  font-size: 0.79rem;
+  font-weight: 500;
+  color: #2A3642;
+}
+
+.pix-choice-item.active .pix-choice-label {
+  color: #16655A;
+  font-weight: 700;
+}
+
+/* Miniaturas visuais de Capa (Foto 3) */
+.pix-cover-thumb {
+  aspect-ratio: 16 / 10;
+  background: #1F2937;
+}
+
+.pix-cover-thumb img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.76);
+}
+
+.pix-cover-mini-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  color: #FFFFFF;
+  text-align: center;
+}
+
+.pix-cover-mini-title {
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.55);
+}
+
+.pix-cover-mini-sub {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.8);
+  margin-top: 4px;
+}
+
+/* Variações fiéis das 8 capas na miniatura */
+.pix-cover-thumb[data-style="bondi"] .pix-cover-mini-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 18% 14%;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+}
+
+.pix-cover-thumb[data-style="oeste"] .pix-cover-mini-overlay {
+  align-items: flex-start;
+  text-align: left;
+  padding-left: 14px;
+}
+
+.pix-cover-thumb[data-style="borda"] {
+  padding: 7px;
+  background: #FFFFFF;
+}
+
+.pix-cover-thumb[data-style="borda"] img {
+  inset: 7px;
+  width: calc(100% - 14px);
+  height: calc(100% - 14px);
+  border-radius: 2px;
+}
+
+.pix-cover-thumb[data-style="borda"] .pix-cover-mini-overlay {
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 14px;
+}
+
+.pix-cover-thumb[data-style="oakwood"] .pix-cover-mini-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 0.76rem;
+  letter-spacing: 0.04em;
+}
+
+.pix-cover-thumb[data-style="ancora"] .pix-cover-mini-overlay {
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 10px 12px;
+}
+
+.pix-cover-thumb[data-style="split"] img {
+  width: 52%;
+  filter: brightness(0.92);
+}
+
+.pix-cover-thumb[data-style="split"] .pix-cover-mini-overlay {
+  left: 52%;
+  background: #FAF8F4;
+  color: #1B2733;
+}
+
+.pix-cover-thumb[data-style="split"] .pix-cover-mini-title {
+  text-shadow: none;
+  font-size: 0.58rem;
+}
+
+.pix-cover-thumb[data-style="split"] .pix-cover-mini-sub {
+  background: #9A8762;
+}
+
+.pix-cover-thumb[data-style="none"] {
+  background: #F4F5F7;
+}
+
+.pix-cover-thumb[data-style="none"] .pix-none-grid {
+  position: absolute;
+  inset: 12px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+}
+
+.pix-cover-thumb[data-style="none"] .pix-none-grid span {
+  background: #CBD5E1;
+  border-radius: 3px;
+}
+
+/* Cartões de Tipografia (Foto 4) */
+.pix-typo-card {
+  padding: 20px 16px;
+  text-align: left;
+  min-height: 98px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+}
+
+.pix-typo-sample {
+  font-size: 1.28rem;
+  color: #1E242B;
+  line-height: 1.15;
+}
+
+.pix-typo-desc {
+  font-size: 0.74rem;
+  color: #64748B;
+  line-height: 1.3;
+}
+
+/* Cartões de Cor com 3 Círculos (Foto 5) */
+.pix-color-card {
+  padding: 22px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #FAFAFA;
+}
+
+.pix-color-dot {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  flex-shrink: 0;
+}
+
+/* Cartões de Grade (Vertical vs Horizontal, Espaçamento, Tamanho) */
+.pix-grid-group {
+  margin-bottom: 18px;
+}
+
+.pix-grid-group:last-child {
+  margin-bottom: 0;
+}
+
+.pix-grid-group-label {
+  display: block;
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #5A6978;
+  margin-bottom: 8px;
+}
+
+.pix-grid-diagram {
+  height: 76px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #F8FAFC;
+}
+
+.pix-wire-vert {
+  display: grid;
+  grid-template-columns: repeat(3, 22px);
+  gap: 5px;
+  align-items: start;
+}
+
+.pix-wire-vert span {
+  display: block;
+  background: #64748B;
+  border-radius: 2px;
+}
+
+.pix-wire-horiz {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 82px;
+}
+
+.pix-wire-horiz div {
+  display: flex;
+  gap: 5px;
+  height: 18px;
+}
+
+.pix-wire-horiz span {
+  background: #64748B;
+  border-radius: 2px;
+  height: 100%;
+}
+
+/* ==========================================================================
+   5. ABA 3: PROTEÇÃO & MARCA D'ÁGUA (COM LENTE INTERATIVA NA PRÉVIA)
+   ========================================================================== */
+.alb-switch-header-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 14px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid rgba(27, 39, 51, 0.08);
+}
+
 .alb-protection-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
-@container (max-width: 560px) {
+@container (max-width: 580px) {
   .alb-protection-grid {
     grid-template-columns: 1fr;
   }
@@ -163,11 +948,11 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 5px;
-  padding: 12px 13px;
+  gap: 6px;
+  padding: 13px 14px;
   border-radius: 10px;
   border: 1.5px solid rgba(27, 39, 51, 0.13);
-  background: #FAF9F5;
+  background: #FBF9F4;
   cursor: pointer;
   text-align: left;
   font-family: inherit;
@@ -175,13 +960,13 @@
 }
 
 .alb-prot-card:hover {
-  border-color: rgba(59, 114, 147, 0.5);
+  border-color: rgba(38, 140, 124, 0.55);
 }
 
 .alb-prot-card.active {
-  border-color: #1B2733;
-  background: #FFFDF3;
-  box-shadow: inset 0 0 0 1px #1B2733;
+  border-color: #268C7C;
+  background: #F3FAF8;
+  box-shadow: 0 0 0 1px #268C7C;
 }
 
 .alb-prot-card-top {
@@ -193,7 +978,7 @@
 }
 
 .alb-prot-card strong {
-  font-size: 0.82rem;
+  font-size: 0.81rem;
   color: #1B2733;
 }
 
@@ -207,8 +992,8 @@
 }
 
 .alb-prot-card.active .alb-prot-dot {
-  border-color: #1B2733;
-  background: #1B2733;
+  border-color: #268C7C;
+  background: #268C7C;
 }
 
 .alb-prot-card.active .alb-prot-dot::after {
@@ -216,114 +1001,42 @@
   position: absolute;
   inset: 3px;
   border-radius: 999px;
-  background: #FFFDF3;
+  background: #FFFFFF;
 }
 
 .alb-prot-card span {
   font-size: 0.73rem;
   line-height: 1.4;
-  color: #5A6978;
+  color: #526170;
 }
 
 .alb-wm-studio-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(220px, 0.85fr);
+  grid-template-columns: minmax(0, 1.25fr) minmax(220px, 0.9fr);
   gap: 16px;
   align-items: start;
-  padding-top: 14px;
-  border-top: 1px solid rgba(27, 39, 51, 0.08);
 }
 
-@container (max-width: 640px) {
+@container (max-width: 620px) {
   .alb-wm-studio-layout {
     grid-template-columns: 1fr;
   }
 }
 
-.alb-wm-thumb-box {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 14px;
-  border-radius: 10px;
-  background: #232F3B;
-  color: #FFFDF3;
-  margin-bottom: 12px;
-}
-
-.alb-btn-dark-ghost {
-  background: rgba(255, 253, 243, 0.12);
-  color: #FFFDF3;
-  border: 1px solid rgba(255, 253, 243, 0.28);
-}
-.alb-btn-dark-ghost:hover {
-  background: rgba(255, 253, 243, 0.22);
-}
-
-.alb-wm-thumb-checker {
-  width: 68px;
-  height: 46px;
-  border-radius: 6px;
-  background-color: #2E3D4B;
-  background-image:
-    linear-gradient(45deg, rgba(255,255,255,0.08) 25%, transparent 25%),
-    linear-gradient(-45deg, rgba(255,255,255,0.08) 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.08) 75%),
-    linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.08) 75%);
-  background-size: 12px 12px;
-  background-position: 0 0, 0 6px, 6px -6px, -6px 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px;
-  flex-shrink: 0;
-}
-
-.alb-wm-thumb-checker img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-}
-
-.alb-wm-preview-card {
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid rgba(27, 39, 51, 0.12);
-  background: #1B2733;
-}
-
-.alb-wm-preview-card img {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
-  display: block;
-}
-
-.alb-wm-preview-caption {
-  padding: 8px 10px;
-  font-size: 0.72rem;
-  color: rgba(255, 253, 243, 0.85);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
 .alb-seg-row {
   display: inline-flex;
-  background: #F1EFE8;
+  flex-wrap: wrap;
+  background: #F1EFE7;
   padding: 3px;
   border-radius: 8px;
   gap: 3px;
 }
 
 .alb-seg-btn {
-  border: none;
-  background: transparent;
   padding: 6px 11px;
   border-radius: 6px;
+  border: none;
+  background: transparent;
   font-family: inherit;
   font-size: 0.75rem;
   font-weight: 600;
@@ -334,138 +1047,138 @@
 .alb-seg-btn.active {
   background: #FFFFFF;
   color: #1B2733;
-  box-shadow: 0 1px 3px rgba(27, 39, 51, 0.12);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
-.alb-slider-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 10px;
-}
-
-.alb-slider-row input[type="range"] {
-  width: 100%;
-  accent-color: #3B7293;
-}
-
-.alb-lr-box {
-  background: #F7F9FB;
-  border: 1px dashed rgba(59, 114, 147, 0.4);
+.alb-wm-thumb-box {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 13px;
   border-radius: 10px;
-  padding: 12px;
+  background: #1B2733;
+  color: #FFFDF3;
   margin-top: 10px;
 }
 
-.alb-lr-code {
-  display: flex;
-  gap: 8px;
-  margin-top: 6px;
-}
-
-.alb-notes-list {
-  margin: 12px 0 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.alb-notes-list li {
-  background: #FFFDF3;
-  border-left: 3px solid #E7C378;
-  padding: 8px 12px;
+.alb-wm-logo-checker {
+  width: 68px;
+  height: 44px;
   border-radius: 6px;
-  font-size: 0.8rem;
-}
-
-.alb-photos-admin-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(156px, 1fr));
-  gap: 12px;
-  margin-top: 14px;
-}
-
-.alb-adm-photo-card {
-  background: #FFFDF3;
-  border: 1px solid rgba(27, 39, 51, 0.12);
-  border-radius: 10px;
-  overflow: hidden;
+  padding: 5px;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #2A3948;
+  border: 1px solid rgba(255, 255, 255, 0.14);
 }
 
-.alb-adm-photo-card.is-client-picked {
-  border: 2px solid #3B7293;
+.alb-wm-logo-checker img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
 }
 
-.alb-adm-thumb-wrap {
+.alb-wm-live-card {
   position: relative;
+  border-radius: 10px;
+  overflow: clip;
+  border: 1px solid rgba(27, 39, 51, 0.14);
+  background: #1B2733;
   aspect-ratio: 4 / 3;
-  background: #E9E5DA;
+  touch-action: none;
 }
 
-.alb-adm-thumb-wrap img {
+.alb-wm-live-card img.adm-wm-base {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
-.alb-adm-picked-badge {
+.alb-wm-live-card img.adm-wm-reveal {
   position: absolute;
-  top: 6px;
-  left: 6px;
-  background: #3B7293;
-  color: #FFFFFF;
-  font-size: 0.66rem;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 999px;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.14s ease;
+  -webkit-mask-image: radial-gradient(circle 75px at var(--spot-x, 50%) var(--spot-y, 50%), #000 0%, #000 58%, transparent 100%);
+  mask-image: radial-gradient(circle 75px at var(--spot-x, 50%) var(--spot-y, 50%), #000 0%, #000 58%, transparent 100%);
 }
 
-.alb-adm-cover-badge {
-  position: absolute;
-  bottom: 6px;
-  left: 6px;
-  background: #E7C378;
-  color: #1B2733;
-  font-size: 0.66rem;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 999px;
+.alb-wm-live-card.is-spot-active img.adm-wm-reveal {
+  opacity: 1;
 }
 
-.alb-adm-card-body {
-  padding: 8px 10px;
+.alb-wm-live-badge {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+  z-index: 3;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
   gap: 6px;
-  font-size: 0.75rem;
+  padding: 5px 9px;
+  border-radius: 6px;
+  background: rgba(18, 27, 36, 0.80);
+  color: #FFFDF3;
+  font-size: 0.69rem;
+  pointer-events: none;
 }
 
-.alb-log-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+/* ==========================================================================
+   6. ABA 4: PACOTE, EXTRAS & SENHAS (CHAVES ON/OFF LIMPAS)
+   ========================================================================== */
+.alb-toggle-setting-row {
+  padding: 13px 0;
+  border-top: 1px solid rgba(27, 39, 51, 0.08);
+}
+
+.alb-toggle-setting-head {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  max-height: 180px;
-  overflow-y: auto;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
-.alb-log-list li {
-  font-size: 0.78rem;
-  color: #465564;
-  padding-bottom: 6px;
-  border-bottom: 1px solid rgba(27, 39, 51, 0.06);
+.alb-toggle-setting-text strong {
+  display: block;
+  font-size: 0.85rem;
+  color: #1B2733;
 }
 
-.alb-log-list time {
-  color: #8492A0;
-  font-size: 0.71rem;
-  margin-right: 6px;
-  font-variant-numeric: tabular-nums;
+.alb-toggle-setting-text span {
+  display: block;
+  font-size: 0.74rem;
+  color: #5E6D7C;
+  margin-top: 2px;
+}
+
+.alb-toggle-setting-body {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 9px;
+  background: #FAF8F3;
+  border: 1px solid rgba(27, 39, 51, 0.08);
+}
+
+.alb-danger-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(27, 39, 51, 0.09);
 }

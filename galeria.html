@@ -9,7 +9,7 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%233B7293%22 stroke-width=%221.8%22><rect x=%222%22 y=%225%22 width=%2220%22 height=%2214%22 rx=%223%22/><circle cx=%2212%22 cy=%2212%22 r=%223.5%22/><circle cx=%2217%22 cy=%228%22 r=%221%22 fill=%22%23E7C378%22/></svg>" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Jost:wght@300;400;500;600&family=Libre+Baskerville:wght@400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Syne:wght@700&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="assets/css/galeria.css" />
 </head>
@@ -126,24 +126,28 @@
        ======================================================================== -->
   <main id="album-view" class="album-shell" hidden>
 
-    <!-- 3A. CAPA EDITORIAL PIXIESET (SOMENTE NO MODO ENTREGA FINAL 'delivery') -->
-    <section id="delivery-hero" class="pixieset-cover" aria-labelledby="delivery-hero-title" hidden>
-      <img id="delivery-hero-img" src="" alt="" width="1920" height="1280" class="pixieset-cover-img" />
-      <div class="pixieset-cover-scrim" aria-hidden="true"></div>
+    <!-- 3A. CAPA EDITORIAL PIXIESET (CUSTOMIZÁVEL: ESTILO, TIPOGRAFIA E COR) -->
+    <section id="delivery-hero" class="pixieset-cover" data-cover="borda" aria-labelledby="delivery-hero-title" hidden>
+      <div class="pixieset-cover-media">
+        <img id="delivery-hero-img" src="" alt="" width="1920" height="1280" class="pixieset-cover-img" />
+        <div class="pixieset-cover-scrim" aria-hidden="true"></div>
+      </div>
 
       <header class="pixieset-cover-top">
         <a href="index.html" class="pixieset-brand" aria-label="Instantes de Carly">
-          <img src="assets/images/logo-light.png" alt="Instantes de Carly" width="140" height="42" />
+          <img id="delivery-cover-logo" src="assets/images/logo-light.png" alt="Instantes de Carly" width="140" height="42" />
         </a>
         <span id="delivery-hero-date" class="pixieset-date"></span>
       </header>
 
       <div class="pixieset-cover-center">
-        <h1 id="delivery-hero-title" class="pixieset-title">Galeria em Alta Resolução</h1>
-        <p id="delivery-hero-msg" class="pixieset-subtitle"></p>
-        <button type="button" id="btn-scroll-gallery" class="gal-btn gal-btn-cover">
-          Ver fotografias
-        </button>
+        <div class="pixieset-cover-box">
+          <h1 id="delivery-hero-title" class="pixieset-title">Galeria em Alta Resolução</h1>
+          <p id="delivery-hero-msg" class="pixieset-subtitle"></p>
+          <button type="button" id="btn-scroll-gallery" class="gal-btn gal-btn-cover">
+            Ver fotografias
+          </button>
+        </div>
       </div>
     </section>
 
@@ -473,6 +477,25 @@
 
   <div id="gal-toast" class="gal-toast" role="status" aria-live="polite" hidden></div>
 
+  <script>
+    (function () {
+      var q = new URLSearchParams(window.location.search);
+      var id = q.get('id') || q.get('album');
+      var prev = q.get('preview') === '1';
+      if (id && prev) {
+        var av = document.getElementById('album-view');
+        var dh = document.getElementById('delivery-hero');
+        if (av) av.hidden = false;
+        if (dh) dh.hidden = false;
+      } else if (id) {
+        var pv = document.getElementById('password-view');
+        if (pv) pv.hidden = false;
+      } else {
+        var pt = document.getElementById('portal-view');
+        if (pt) pt.hidden = false;
+      }
+    })();
+  </script>
   <script src="assets/js/data.js"></script>
   <script src="assets/js/albums-store.js"></script>
   <script src="assets/js/galeria.js"></script>

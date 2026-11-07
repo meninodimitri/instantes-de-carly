@@ -1,8 +1,11 @@
 /**
  * ============================================================================
- * PAINEL ADMINISTRATIVO — GESTOR DE ÁLBUNS DE CLIENTES (V2)
- * Seleção & Fotos Extras (estilo Sineto Studio) + Entrega Final (estilo Pixieset)
- * Inclui Upload de Marca d'Água Personalizada + 3 Níveis de Proteção com Prévia Viva
+ * PAINEL ADMINISTRATIVO — GESTOR DE ÁLBUNS DE CLIENTES (V3)
+ * - Árvore de álbuns diretamente na barra vertical esquerda (#sidebar-albums-sublist)
+ * - 4 Sub-abas limpas estilo Pixieset: Fotos, Design & Capa, Proteção, Pacote & Senhas
+ * - Grade de fotos 4:3 imune a qualquer nível de zoom (50%–200%)
+ * - 3 Modos de Proteção (Marca d'Água, Baixa Resolução, Foco no Cursor / Toque)
+ * - Customizador completo de Entrega Final (Capa, Tipografia, Cor e Grade)
  * ============================================================================
  */
 (function () {
@@ -10,8 +13,13 @@
 
   let albumsState = null;
   let selectedAlbumId = null;
+  let activeAlbumSubTab = 'photos'; // 'photos' | 'design' | 'protection' | 'settings'
+  let activeDesignSection = 'cover'; // 'cover' | 'typography' | 'color' | 'grid'
+  let showQuickCreateAlbum = false;
   let showPaymentDrawer = false;
   let previewRenderSeq = 0;
+
+  const galeriaRoute = window.location.protocol === 'file:' ? 'galeria.html' : 'galeria';
 
   function formatBRL(val) {
     return Number(val || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -44,6 +52,15 @@
       .replace(/^-+|-+$/g, '') || `album-${Date.now().toString().slice(-4)}`;
   }
 
+  function parseFocalCoords(focalStr) {
+    const m = String(focalStr || '50% 35%').match(/([\d.]+)%\s+([\d.]+)%/);
+    if (!m) return { x: 50, y: 35 };
+    return {
+      x: Math.max(0, Math.min(100, Number(m[1]))),
+      y: Math.max(0, Math.min(100, Number(m[2])))
+    };
+  }
+
   function getActiveAlbum() {
     if (!albumsState || !Array.isArray(albumsState.albums)) return null;
     let found = albumsState.albums.find((a) => a.id === selectedAlbumId);
@@ -51,7 +68,24 @@
       found = albumsState.albums[0];
       selectedAlbumId = found.id;
     }
+    if (found && window.AlbumsStore?.normalizeAlbum) {
+      window.AlbumsStore.normalizeAlbum(found);
+    }
     return found || null;
+  }
+
+  function isAlbumsMainTabActive() {
+    const albumsTabBtn = document.querySelector('.sidebar-tab[data-tab="albums"]');
+    return Boolean(albumsTabBtn && albumsTabBtn.classList.contains('active'));
+  }
+
+  function activateAlbumsTabInAdmin() {
+    document.querySelectorAll('.sidebar-tab').forEach((btn) => {
+      btn.classList.toggle('active', btn.dataset.tab === 'albums');
+    });
+    document.querySelectorAll('.cms-panel').forEach((panel) => {
+      panel.classList.toggle('active', panel.id === 'panel-albums');
+    });
   }
 
   function updateSidebarBadge() {
@@ -61,20 +95,44 @@
     }
   }
 
-  const galeriaRoute = window.location.protocol === 'file:' ? 'galeria.html' : 'galeria';
+  function getStatusMeta(album) {
+    if (album.phase === 'delivery' || album.status === 'delivered') {
+      return { label: 'Entregue em Alta', cls: 'st-deliv', dotCls: 'is-deliv' };
+    }
+    if (album.status === 'selection_paid') {
+      return { label: 'Extras Pagas', cls: 'st-paid', dotCls: 'is-paid' };
+    }
+    if (album.status === 'awaiting_pix_confirm') {
+      return { label: 'Confirmar Pix', cls: 'st-pix', dotCls: 'is-pix' };
+    }
+    if (album.status === 'selection_completed') {
+      return { label: 'Seleção Concluída', cls: 'st-paid', dotCls: 'is-paid' };
+    }
+    return { label: 'Em Seleção', cls: 'st-wait', dotCls: '' };
+  }
+
+  function getProtectionLabel(level, watermarkEnabled = true) {
+    if (watermarkEnabled === false) return 'Sem Marca d\'Água';
+    if (level === 'watermark_lowres') return 'Marca d\'Água + Baixa Resolução';
+    if (level === 'watermark_spotlight') return 'Marca d\'Água + Foco no Cursor';
+    return 'Marca d\'Água';
+  }
 
   function syncPreviewIframeForAlbums() {
     const iframe = document.getElementById('cms-preview-iframe');
-    const albumsTabBtn = document.querySelector('.sidebar-tab[data-tab="albums"]');
-    if (!iframe || !albumsTabBtn) return;
+    if (!iframe) return;
 
-    const isAlbumsActive = albumsTabBtn.classList.contains('active');
-    if (isAlbumsActive) {
+    if (isAlbumsMainTabActive()) {
       const alb = getActiveAlbum();
-      const targetUrl = alb
-        ? `${galeriaRoute}?id=${encodeURIComponent(alb.slug)}&preview=1`
-        : galeriaRoute;
-      if (!iframe.getAttribute('src')?.startsWith(targetUrl)) {
+      if (!alb) {
+        if (iframe.getAttribute('src') !== galeriaRoute) {
+          iframe.setAttribute('src', galeriaRoute);
+        }
+        return;
+      }
+      const wantDesignPreview = activeAlbumSubTab === 'design';
+      const targetUrl = `${galeriaRoute}?id=${encodeURIComponent(alb.slug)}&preview=1${wantDesignPreview ? '&designPreview=1' : ''}`;
+      if (iframe.getAttribute('src') !== targetUrl) {
         iframe.setAttribute('src', targetUrl);
       }
     } else if (iframe.getAttribute('src')?.includes('galeria')) {
@@ -82,458 +140,148 @@
     }
   }
 
-  function getStatusMeta(album) {
-    if (album.phase === 'delivery' || album.status === 'delivered') {
-      return { label: 'Entregue em Alta', cls: 'st-deliv' };
-    }
-    if (album.status === 'selection_paid') {
-      return { label: 'Extras Pagas · Pronto p/ Editar', cls: 'st-paid' };
-    }
-    if (album.status === 'awaiting_pix_confirm') {
-      return { label: 'Confirmar Pix Direto', cls: 'st-pix' };
-    }
-    if (album.status === 'selection_completed') {
-      return { label: 'Seleção Concluída', cls: 'st-paid' };
-    }
-    return { label: 'Aguardando Seleção', cls: 'st-wait' };
+  /* ==========================================================================
+     1. LISTA DE ÁLBUNS NA BARRA VERTICAL ESQUERDA (#sidebar-albums-sublist)
+     ========================================================================== */
+  function renderSidebarAlbumsSublist() {
+    const sublist = document.getElementById('sidebar-albums-sublist');
+    if (!sublist || !albumsState) return;
+
+    const albums = albumsState.albums || [];
+    const activeAlbum = getActiveAlbum();
+    const tabIsAlbums = isAlbumsMainTabActive();
+
+    sublist.innerHTML = `
+      ${albums.map((alb) => {
+        const st = getStatusMeta(alb);
+        const isSelected = tabIsAlbums && activeAlbum && alb.id === activeAlbum.id && !showQuickCreateAlbum;
+        return `
+          <button
+            type="button"
+            class="sidebar-album-item ${isSelected ? 'is-selected' : ''}"
+            data-sidebar-album-id="${escapeHtml(alb.id)}"
+            title="${escapeHtml(alb.clientName)} (${escapeHtml(st.label)})"
+          >
+            <span class="sidebar-album-left">
+              <span class="sidebar-album-dot ${st.dotCls}"></span>
+              <span class="sidebar-album-name">${escapeHtml(alb.clientName)}</span>
+            </span>
+            <span class="sidebar-album-qty">${(alb.photos || []).length}</span>
+          </button>
+        `;
+      }).join('')}
+      <button type="button" class="sidebar-album-add-btn" id="btn-sidebar-new-album">
+        + Novo álbum de cliente
+      </button>
+    `;
+
+    sublist.querySelectorAll('[data-sidebar-album-id]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        selectedAlbumId = btn.getAttribute('data-sidebar-album-id');
+        showQuickCreateAlbum = false;
+        activateAlbumsTabInAdmin();
+        renderAlbumsAdminPanel();
+      });
+    });
+
+    document.getElementById('btn-sidebar-new-album')?.addEventListener('click', () => {
+      showQuickCreateAlbum = true;
+      activateAlbumsTabInAdmin();
+      renderAlbumsAdminPanel();
+      setTimeout(() => document.getElementById('quick-alb-client-input')?.focus(), 30);
+    });
   }
 
-  function getProtectionLabel(level) {
-    if (level === 'watermark_blur') return 'Marca d\'Água + Desfoque';
-    if (level === 'watermark_spotlight') return 'Marca d\'Água + Foco Centralizado';
-    return 'Marca d\'Água';
-  }
-
+  /* ==========================================================================
+     2. PRÉVIA VIVA DA MARCA D'ÁGUA + LENTE INTERATIVA NO /ADMIN
+     ========================================================================== */
   async function refreshWatermarkSamplePreview() {
-    const imgEl = document.getElementById('adm-wm-live-preview');
+    const baseImg = document.getElementById('adm-wm-live-preview');
+    const revealImg = document.getElementById('adm-wm-live-reveal');
     const captionEl = document.getElementById('adm-wm-live-caption');
-    if (!imgEl || !albumsState) return;
+    const cardEl = document.getElementById('adm-wm-live-card');
+    if (!baseImg || !albumsState) return;
 
     const seq = ++previewRenderSeq;
     const activeAlbum = getActiveAlbum();
     const sampleSrc = activeAlbum?.photos?.[0]?.originalSrc || activeAlbum?.coverSrc || 'assets/images/real/IMG_7513.jpg';
+    const wmEnabled = activeAlbum ? activeAlbum.watermarkEnabled !== false : true;
     const level = activeAlbum?.protectionLevel || 'watermark';
 
     if (captionEl) {
-      captionEl.textContent = getProtectionLabel(level);
+      captionEl.textContent = getProtectionLabel(level, wmEnabled);
     }
 
     try {
       const bundle = await window.AlbumsStore.generateProtectedProofBundle(
         sampleSrc,
-        albumsState.watermarkConfig,
+        { ...albumsState.watermarkConfig, enabled: wmEnabled },
         level,
         640
       );
-      if (seq === previewRenderSeq && imgEl.isConnected) {
-        imgEl.src = bundle.primarySrc;
+      if (seq === previewRenderSeq && baseImg.isConnected) {
+        baseImg.src = bundle.primarySrc;
+        if (revealImg) {
+          if (level === 'watermark_spotlight' && bundle.revealSrc) {
+            revealImg.src = bundle.revealSrc;
+            revealImg.hidden = false;
+          } else {
+            revealImg.hidden = true;
+            cardEl?.classList.remove('is-spot-active');
+          }
+        }
       }
     } catch (_) {
-      if (seq === previewRenderSeq && imgEl.isConnected) {
-        imgEl.src = sampleSrc;
+      if (seq === previewRenderSeq && baseImg.isConnected) {
+        baseImg.src = sampleSrc;
       }
     }
   }
 
-  function renderAlbumsAdminPanel() {
-    const panel = document.getElementById('panel-albums');
-    if (!panel || !albumsState) return;
-
-    updateSidebarBadge();
-    const albums = albumsState.albums || [];
+  function bindAdminPreviewSpotlight() {
+    const cardEl = document.getElementById('adm-wm-live-card');
     const activeAlbum = getActiveAlbum();
+    if (!cardEl || !activeAlbum || activeAlbum.protectionLevel !== 'watermark_spotlight') return;
 
-    const waitingCount = albums.filter((a) => a.phase === 'proofing' && !a.selectionLocked).length;
-    const readyEditCount = albums.filter((a) => a.phase === 'proofing' && a.selectionLocked).length;
-    const deliveredCount = albums.filter((a) => a.phase === 'delivery').length;
-    const extraRevenue = albums.reduce((acc, a) => {
-      if (a.paymentOrder && a.paymentOrder.status === 'approved') {
-        return acc + Number(a.paymentOrder.totalAmount || 0);
-      }
-      return acc;
-    }, 0);
+    const updateSpot = (clientX, clientY) => {
+      const rect = cardEl.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const x = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
+      const y = Math.max(0, Math.min(100, ((clientY - rect.top) / rect.height) * 100));
+      cardEl.style.setProperty('--spot-x', `${x.toFixed(1)}%`);
+      cardEl.style.setProperty('--spot-y', `${y.toFixed(1)}%`);
+      cardEl.classList.add('is-spot-active');
+    };
 
-    const payCfg = albumsState.paymentConfig || {};
-
-    panel.innerHTML = `
-      <div class="panel-header">
-        <div>
-          <span class="panel-kicker">Área Privada do Cliente</span>
-          <h2 class="panel-title">Álbuns de Seleção, Proteção &amp; Entrega</h2>
-          <p class="panel-desc">
-            Envie o link privado do ensaio com sua marca d'água e o nível de proteção escolhido para o cliente selecionar as fotos do pacote, adquirir fotos extras e depois receber o álbum final em alta resolução.
-          </p>
-        </div>
-      </div>
-
-      <div class="alb-kpi-grid">
-        <div class="alb-kpi-card">
-          <span>Álbuns Ativos</span>
-          <strong>${albums.length}</strong>
-        </div>
-        <div class="alb-kpi-card">
-          <span>Em Seleção</span>
-          <strong>${waitingCount}</strong>
-        </div>
-        <div class="alb-kpi-card">
-          <span>Prontos p/ Editar</span>
-          <strong>${readyEditCount}</strong>
-        </div>
-        <div class="alb-kpi-card">
-          <span>Entregues</span>
-          <strong>${deliveredCount}</strong>
-        </div>
-        <div class="alb-kpi-card">
-          <span>Extras Aprovadas</span>
-          <strong style="color: #19613B;">${formatBRL(extraRevenue)}</strong>
-        </div>
-      </div>
-
-      <div class="alb-top-toolbar">
-        <button type="button" id="btn-create-client-album" class="cms-btn cms-btn-primary">
-          <span>+ Novo Álbum de Cliente</span>
-        </button>
-        <button type="button" id="btn-toggle-pay-drawer" class="cms-btn cms-btn-outline">
-          <span>Configurar Pix &amp; Pagamentos</span>
-        </button>
-        <button type="button" id="btn-reset-demo-albums" class="cms-btn cms-btn-outline">
-          <span>Restaurar Exemplos de Teste</span>
-        </button>
-      </div>
-
-      ${showPaymentDrawer ? `
-        <div class="alb-section-box" style="background: #FDF6DF; border-color: rgba(231, 195, 120, 0.6);">
-          <h3>Recebimento Seguro de Fotos Extras</h3>
-          <div class="field-grid">
-            <div class="field-group">
-              <label class="field-label">Chave Pix Oficial do Estúdio (Modo 0% Taxa)</label>
-              <input type="text" id="cfg-pix-key" class="cms-input" value="${escapeHtml(payCfg.pixKey || '')}" placeholder="CPF, CNPJ, E-mail ou Telefone" />
-            </div>
-            <div class="field-group">
-              <label class="field-label">Nome do Recebedor no Banco</label>
-              <input type="text" id="cfg-pix-name" class="cms-input" value="${escapeHtml(payCfg.merchantName || '')}" />
-            </div>
-          </div>
-          <div class="field-grid" style="margin-top: 10px;">
-            <div class="field-group">
-              <label class="field-label">Cidade (Padrão Banco Central)</label>
-              <input type="text" id="cfg-pix-city" class="cms-input" value="${escapeHtml(payCfg.merchantCity || 'FORTALEZA')}" />
-            </div>
-            <div class="field-group">
-              <label class="field-label">Mercado Pago (Produção Vercel)</label>
-              <input type="text" class="cms-input" value="Ativo via MP_ACCESS_TOKEN (/api/checkout)" disabled />
-            </div>
-          </div>
-          <p class="field-hint" style="margin-top: 8px;">
-            Em produção na Vercel, o token secreto <code>MP_ACCESS_TOKEN</code> fica isolado no servidor e aprova Pix/Cartão via Webhook assinado em <code>/api/webhooks/mercadopago</code>.
-          </p>
-          <button type="button" id="btn-save-pay-cfg" class="cms-btn cms-btn-primary cms-btn-sm" style="margin-top: 10px;">
-            Salvar Dados de Recebimento
-          </button>
-        </div>
-      ` : ''}
-
-      <div class="alb-switcher-list">
-        ${albums.map((alb) => {
-          const st = getStatusMeta(alb);
-          const calc = window.AlbumsStore.calculateSelectionPricing(alb);
-          return `
-            <button type="button" class="alb-pill-item ${alb.id === activeAlbum?.id ? 'active' : ''}" data-pick-alb="${escapeHtml(alb.id)}">
-              <span class="alb-status-tag ${st.cls}">${escapeHtml(st.label)}</span>
-              <strong>${escapeHtml(alb.clientName)}</strong>
-              <span class="alb-pill-meta">
-                /${escapeHtml(alb.slug)} · ${(alb.photos || []).length} fotos (${calc.selectedCount} escolhidas)
-              </span>
-            </button>
-          `;
-        }).join('')}
-      </div>
-
-      ${activeAlbum ? renderActiveAlbumDetailHtml(activeAlbum) : '<p>Crie seu primeiro álbum de cliente acima.</p>'}
-    `;
-
-    bindAlbumsAdminEvents();
-    syncPreviewIframeForAlbums();
-    refreshWatermarkSamplePreview();
+    cardEl.addEventListener('pointermove', (e) => updateSpot(e.clientX, e.clientY));
+    cardEl.addEventListener('pointerleave', () => cardEl.classList.remove('is-spot-active'));
+    cardEl.addEventListener('touchstart', (e) => {
+      if (e.touches[0]) updateSpot(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: true });
+    cardEl.addEventListener('touchmove', (e) => {
+      if (e.touches[0]) updateSpot(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: true });
+    cardEl.addEventListener('touchend', () => cardEl.classList.remove('is-spot-active'));
   }
 
-  function renderActiveAlbumDetailHtml(album) {
-    const calc = window.AlbumsStore.calculateSelectionPricing(album);
-    const lr = window.AlbumsStore.formatLightroomCodes(album);
-    const wm = albumsState.watermarkConfig || {};
-    const wmMode = wm.mode === 'text' ? 'text' : 'image';
-    const wmPattern = wm.pattern === 'center' ? 'center' : 'tiled';
-    const wmOpacityPct = Math.round((Number(wm.opacity) || 0.45) * 100);
-    const wmScalePct = Math.round((Number(wm.scale) || 0.28) * 100);
-    const activeProt = album.protectionLevel || 'watermark';
-
-    const commentsEntries = Object.entries(album.photoComments || {}).filter(([, txt]) => String(txt || '').trim());
-    const galleryUrl = `${window.location.origin}${window.location.pathname.replace(/admin(\.html)?$/i, '')}${galeriaRoute}?id=${encodeURIComponent(album.slug)}`;
+  /* ==========================================================================
+     3. RENDERIZADORES DAS 4 SUB-ABAS LIMPAS DO ÁLBUM ATIVO
+     ========================================================================== */
+  function renderPhotosSubTab(activeAlbum, calc) {
+    const selectedSet = new Set(activeAlbum.selectedIds || []);
+    const lrInfo = window.AlbumsStore.formatLightroomCodes(activeAlbum);
+    const lrList = typeof lrInfo === 'string' ? lrInfo : (lrInfo?.lightroomComma || '');
+    const commentEntries = Object.entries(activeAlbum.photoComments || {}).filter(([, txt]) => String(txt || '').trim());
 
     return `
-      <!-- Chave Unificada: Fase 1 (Seleção Sineto) <-> Fase 2 (Entrega Pixieset) -->
-      <div class="alb-phase-toggle-bar">
-        <button type="button" class="alb-phase-btn ${album.phase === 'proofing' ? 'active' : ''}" data-set-phase="proofing">
-          Fase 1 · Seleção de Provas (Protegida + Extras)
-        </button>
-        <button type="button" class="alb-phase-btn ${album.phase === 'delivery' ? 'active' : ''}" data-set-phase="delivery">
-          Fase 2 · Entrega Final (Alta Resolução + .ZIP)
-        </button>
-      </div>
-
-      <!-- Link Exclusivo do Cliente -->
-      <div class="alb-section-box" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px;">
-        <div>
-          <strong style="font-size: 0.86rem;">Link Privado deste Álbum:</strong>
-          <div style="font-size: 0.8rem; color: #3B7293; word-break: break-all;">${escapeHtml(galleryUrl)}</div>
-          <span class="field-hint">Senha de Acesso: <strong>${escapeHtml(album.password || 'Sem senha')}</strong> · PIN de Download Final: <strong>${escapeHtml(album.downloadPin || 'Livre')}</strong></span>
-        </div>
-        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-          <button type="button" id="btn-copy-whatsapp-invite" class="cms-btn cms-btn-gold cms-btn-sm">
-            Copiar Convite p/ WhatsApp
-          </button>
-          <a href="${galeriaRoute}?id=${encodeURIComponent(album.slug)}" target="_blank" rel="noopener" class="cms-btn cms-btn-outline cms-btn-sm">
-            Abrir como Cliente ↗
-          </a>
-        </div>
-      </div>
-
-      <!-- PROTEÇÃO DE IMAGEM & MARCA D'ÁGUA DO ESTÚDIO -->
-      <div class="alb-section-box">
-        <div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 10px;">
-          <h3 style="margin: 0;">Marca d'Água &amp; Nível de Proteção das Provas</h3>
-          <span class="field-hint">Gravada diretamente nos pixels (sem botão de download na Fase 1)</span>
-        </div>
-
-        <div class="alb-protection-grid" role="radiogroup" aria-label="Nível de proteção das provas">
-          <button type="button" class="alb-prot-card ${activeProt === 'watermark' ? 'active' : ''}" data-set-prot="watermark">
-            <div class="alb-prot-card-top">
-              <strong>Marca d'Água</strong>
-              <span class="alb-prot-dot"></span>
-            </div>
-            <span>Fotografia nítida em resolução de prova com sua marca d'água aplicada.</span>
-          </button>
-
-          <button type="button" class="alb-prot-card ${activeProt === 'watermark_blur' ? 'active' : ''}" data-set-prot="watermark_blur">
-            <div class="alb-prot-card-top">
-              <strong>Marca d'Água + Desfoque</strong>
-              <span class="alb-prot-dot"></span>
-            </div>
-            <span>Miniaturas desfocadas anti-print; no zoom o cliente segura o clique para inspecionar.</span>
-          </button>
-
-          <button type="button" class="alb-prot-card ${activeProt === 'watermark_spotlight' ? 'active' : ''}" data-set-prot="watermark_spotlight">
-            <div class="alb-prot-card-top">
-              <strong>Marca d'Água + Foco Centralizado</strong>
-              <span class="alb-prot-dot"></span>
-            </div>
-            <span>Centro em foco nítido com bordas desfocadas e lupa circular interativa ao ampliar.</span>
-          </button>
-        </div>
-
-        <div class="alb-wm-studio-layout">
-          <div>
-            <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px;">
-              <div>
-                <span class="field-label" style="margin-bottom: 4px; display: block;">Formato da Marca d'Água</span>
-                <div class="alb-seg-row">
-                  <button type="button" class="alb-seg-btn ${wmMode === 'image' ? 'active' : ''}" data-wm-mode="image">Sua Logo (PNG/SVG)</button>
-                  <button type="button" class="alb-seg-btn ${wmMode === 'text' ? 'active' : ''}" data-wm-mode="text">Texto do Estúdio</button>
-                </div>
-              </div>
-
-              <div>
-                <span class="field-label" style="margin-bottom: 4px; display: block;">Disposição na Foto</span>
-                <div class="alb-seg-row">
-                  <button type="button" class="alb-seg-btn ${wmPattern === 'tiled' ? 'active' : ''}" data-wm-pattern="tiled">Grade Repetida</button>
-                  <button type="button" class="alb-seg-btn ${wmPattern === 'center' ? 'active' : ''}" data-wm-pattern="center">Centralizada</button>
-                </div>
-              </div>
-            </div>
-
-            ${wmMode === 'image' ? `
-              <div class="alb-wm-thumb-box">
-                <div class="alb-wm-thumb-checker">
-                  <img src="${escapeHtml(wm.imageSrc || 'assets/images/logo-light.png')}" alt="Marca d'água atual" />
-                </div>
-                <div style="flex: 1; min-width: 140px;">
-                  <strong style="display: block; font-size: 0.8rem;">Arquivo da Marca d'Água</strong>
-                  <span style="font-size: 0.72rem; color: rgba(255,253,243,0.72);">PNG ou SVG com fundo transparente recomendado</span>
-                </div>
-                <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-                  <input type="file" id="wm-file-upload" accept="image/png,image/webp,image/svg+xml,image/jpeg" hidden />
-                  <button type="button" id="btn-upload-wm-img" class="cms-btn cms-btn-gold cms-btn-sm">
-                    Subir Marca d'Água
-                  </button>
-                  <button type="button" id="btn-reset-wm-default" class="cms-btn alb-btn-dark-ghost cms-btn-sm" title="Voltar para a logo clara padrão do site">
-                    Logo Padrão
-                  </button>
-                </div>
-              </div>
-            ` : `
-              <div class="field-group" style="margin-bottom: 12px;">
-                <label class="field-label" for="wm-text-input">Texto da Marca d'Água</label>
-                <input type="text" id="wm-text-input" class="cms-input" value="${escapeHtml(wm.text || '')}" placeholder="Ex: INSTANTES DE CARLY · PROVA" />
-              </div>
-            `}
-
-            <div class="alb-slider-row">
-              <div>
-                <label class="field-label" for="wm-opacity-range" style="display: flex; justify-content: space-between; gap: 8px;">
-                  <span>Opacidade</span>
-                  <strong id="wm-opacity-val" style="font-variant-numeric: tabular-nums;">${wmOpacityPct}%</strong>
-                </label>
-                <input type="range" id="wm-opacity-range" min="15" max="85" step="5" value="${wmOpacityPct}" />
-              </div>
-              <div>
-                <label class="field-label" for="wm-scale-range" style="display: flex; justify-content: space-between; gap: 8px;">
-                  <span>Tamanho da Marca</span>
-                  <strong id="wm-scale-val" style="font-variant-numeric: tabular-nums;">${wmScalePct}%</strong>
-                </label>
-                <input type="range" id="wm-scale-range" min="15" max="60" step="3" value="${wmScalePct}" />
-              </div>
-            </div>
+      <div class="alb-card-clean">
+        <div class="alb-photos-topbar">
+          <div class="alb-photos-summary">
+            <strong>${(activeAlbum.photos || []).length} fotografias no álbum</strong>
+            <span>·</span>
+            <span>${calc.selectedCount} escolhidas de ${calc.packageIncluded} inclusas</span>
+            ${calc.hasExtras ? `<span class="alb-status-tag st-paid">+${calc.extraCount} extras (${formatBRL(calc.extraTotal)})</span>` : ''}
           </div>
-
-          <div class="alb-wm-preview-card">
-            <img id="adm-wm-live-preview" src="${escapeHtml(album.coverSrc || 'assets/images/real/IMG_7513.jpg')}" alt="Prévia real da proteção na fotografia" />
-            <div class="alb-wm-preview-caption">
-              <span>Prévia real no álbum</span>
-              <strong id="adm-wm-live-caption">${escapeHtml(getProtectionLabel(activeProt))}</strong>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Seleção do Cliente, Pagamento de Extras & Código Lightroom -->
-      <div class="alb-section-box">
-        <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px;">
-          <h3>Seleção do Cliente &amp; Filtro Lightroom (${calc.selectedCount} escolhidas)</h3>
-          ${album.selectionLocked ? `
-            <button type="button" id="btn-unlock-selection" class="cms-btn cms-btn-outline cms-btn-sm">
-              Reabrir Seleção p/ Cliente
-            </button>
-          ` : ''}
-        </div>
-
-        <p style="margin: 0 0 10px; font-size: 0.84rem; color: #465564; font-variant-numeric: tabular-nums;">
-          Pacote contratado: <strong>${calc.includedSelected}/${calc.packageIncluded} inclusas</strong>
-          ${calc.hasExtras ? ` · <strong style="color: #9D6E15;">+${calc.extraCount} fotos extras (${formatBRL(calc.extraTotal)})</strong>` : ' · Sem fotos extras até o momento'}
-        </p>
-
-        ${album.status === 'awaiting_pix_confirm' && album.paymentOrder ? `
-          <div style="background: #FFF4D9; border: 1px solid #E7C378; padding: 12px 14px; border-radius: 10px; margin-bottom: 12px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px;">
-            <div style="font-size: 0.83rem;">
-              <strong>Pix Direto aguardando confirmação (${escapeHtml(album.paymentOrder.id)}):</strong><br />
-              Valor esperado: <strong>${formatBRL(album.paymentOrder.totalAmount)}</strong> (${album.paymentOrder.extraCount} fotos extras).
-            </div>
-            <button type="button" id="btn-approve-direct-pix" class="cms-btn cms-btn-primary cms-btn-sm">
-              Confirmar Pix Recebido
-            </button>
-          </div>
-        ` : ''}
-
-        ${album.status === 'selection_paid' && album.paymentOrder ? `
-          <div style="background: #DFF5E8; color: #165434; padding: 10px 14px; border-radius: 10px; margin-bottom: 12px; font-size: 0.82rem; font-weight: 600;">
-            Pagamento de ${formatBRL(album.paymentOrder.totalAmount)} confirmado (${album.paymentOrder.extraCount} fotos extras liberadas).
-          </div>
-        ` : ''}
-
-        <div class="alb-lr-box">
-          <strong style="font-size: 0.78rem;">Filtro para Adobe Lightroom Classic (Biblioteca &gt; Texto &gt; Nome do Arquivo):</strong>
-          <div class="alb-lr-code">
-            <input type="text" id="lr-code-output" class="cms-input" readonly value="${escapeHtml(lr.lightroomComma || 'Nenhuma foto selecionada ainda')}" />
-            <button type="button" id="btn-copy-lr-code" class="cms-btn cms-btn-primary cms-btn-sm" ${lr.count === 0 ? 'disabled' : ''}>
-              Copiar Lista
-            </button>
-          </div>
-        </div>
-
-        ${commentsEntries.length > 0 ? `
-          <div style="margin-top: 14px;">
-            <strong style="font-size: 0.8rem;">Observações deixadas pelo cliente (${commentsEntries.length}):</strong>
-            <ul class="alb-notes-list">
-              ${commentsEntries.map(([pid, note]) => {
-                const ph = (album.photos || []).find((p) => p.id === pid);
-                return `<li><strong>${escapeHtml(ph?.filename || pid)}:</strong> ${escapeHtml(note)}</li>`;
-              }).join('')}
-            </ul>
-          </div>
-        ` : ''}
-      </div>
-
-      <!-- Configurações de Regras do Pacote, Senha, PIN e Textos -->
-      <div class="alb-section-box">
-        <h3>Pacote, Valor de Foto Extra &amp; Acesso</h3>
-        <div class="field-grid">
-          <div class="field-group">
-            <label class="field-label" for="alb-in-client">Nome do Cliente</label>
-            <input type="text" id="alb-in-client" class="cms-input" value="${escapeHtml(album.clientName)}" />
-          </div>
-          <div class="field-group">
-            <label class="field-label" for="alb-in-slug">Código do Link (/galeria?id=...)</label>
-            <input type="text" id="alb-in-slug" class="cms-input" value="${escapeHtml(album.slug)}" />
-          </div>
-        </div>
-
-        <div class="field-grid" style="margin-top: 10px;">
-          <div class="field-group">
-            <label class="field-label" for="alb-in-title">Título do Álbum</label>
-            <input type="text" id="alb-in-title" class="cms-input" value="${escapeHtml(album.title)}" />
-          </div>
-          <div class="field-group">
-            <label class="field-label" for="alb-in-sub">Subtítulo / Data &amp; Local</label>
-            <input type="text" id="alb-in-sub" class="cms-input" value="${escapeHtml(album.subtitle || '')}" />
-          </div>
-        </div>
-
-        <div class="field-grid" style="margin-top: 10px;">
-          <div class="field-group">
-            <label class="field-label" for="alb-in-pkgname">Pacote Contratado</label>
-            <input type="text" id="alb-in-pkgname" class="cms-input" value="${escapeHtml(album.packageName || 'Ensaio')}" />
-          </div>
-          <div class="field-group">
-            <label class="field-label" for="alb-in-included">Qtd. Fotos Inclusas no Pacote</label>
-            <input type="number" min="0" id="alb-in-included" class="cms-input" value="${Number(album.packageIncluded) || 0}" />
-          </div>
-        </div>
-
-        <div class="field-grid" style="margin-top: 10px;">
-          <div class="field-group">
-            <label class="field-label" for="alb-in-extraprice">Valor por Foto Extra (R$)</label>
-            <input type="number" min="0" step="0.50" id="alb-in-extraprice" class="cms-input" value="${Number(album.extraPhotoPrice) || 0}" />
-          </div>
-          <div class="field-group">
-            <label class="field-label" for="alb-in-password">Senha de Acesso do Cliente</label>
-            <input type="text" id="alb-in-password" class="cms-input" value="${escapeHtml(album.password || '')}" placeholder="Deixe vazio para acesso sem senha" />
-          </div>
-        </div>
-
-        <div class="field-grid" style="margin-top: 10px;">
-          <div class="field-group">
-            <label class="field-label" for="alb-in-pin">PIN p/ Baixar em Alta (Fase 2 · Entrega)</label>
-            <input type="text" id="alb-in-pin" class="cms-input" value="${escapeHtml(album.downloadPin || '')}" placeholder="Ex: 7788 (vazio libera sem PIN)" />
-          </div>
-          <div class="field-group">
-            <label class="field-label" for="alb-in-welcome">Mensagem para o Cliente</label>
-            <input type="text" id="alb-in-welcome" class="cms-input" value="${escapeHtml(album.welcomeMessage || '')}" />
-          </div>
-        </div>
-
-        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; margin-top: 14px;">
-          <button type="button" id="btn-save-album-meta" class="cms-btn cms-btn-primary">
-            Salvar Regras do Álbum
-          </button>
-          <button type="button" id="btn-delete-album" class="cms-btn cms-btn-danger cms-btn-sm">
-            Excluir Álbum
-          </button>
-        </div>
-      </div>
-
-      <!-- Grade de Fotografias do Álbum -->
-      <div class="alb-section-box">
-        <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px;">
-          <h3>Fotografias do Álbum (${(album.photos || []).length})</h3>
           <div>
             <input type="file" id="alb-upload-input" accept="image/*" multiple hidden />
             <button type="button" id="btn-trigger-alb-upload" class="cms-btn cms-btn-primary cms-btn-sm">
@@ -541,174 +289,1007 @@
             </button>
           </div>
         </div>
-        <p id="alb-upload-status" class="field-hint" style="margin-top: 6px; color: #3B7293; font-weight: 600;" hidden></p>
 
-        <div class="alb-photos-admin-grid">
-          ${(album.photos || []).map((ph) => {
-            const isPicked = (album.selectedIds || []).includes(ph.id);
-            const isCover = album.coverSrc === ph.originalSrc;
-            return `
-              <div class="alb-adm-photo-card ${isPicked ? 'is-client-picked' : ''}">
-                <div class="alb-adm-thumb-wrap">
-                  <img src="${escapeHtml(ph.originalSrc)}" alt="${escapeHtml(ph.filename)}" loading="lazy" />
-                  ${isPicked ? '<span class="alb-adm-picked-badge">Escolhida</span>' : ''}
-                  ${isCover ? '<span class="alb-adm-cover-badge">Capa</span>' : ''}
-                </div>
-                <div class="alb-adm-card-body">
-                  <strong style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escapeHtml(ph.filename)}">${escapeHtml(ph.filename)}</strong>
-                  <div style="display: flex; gap: 4px; justify-content: space-between;">
-                    <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-set-alb-cover" data-photo-id="${escapeHtml(ph.id)}" style="padding: 4px 8px; font-size: 0.68rem;">
-                      ${isCover ? 'Capa Ativa' : 'Usar na Capa'}
-                    </button>
-                    <button type="button" class="cms-btn cms-btn-danger cms-btn-sm js-del-alb-photo" data-photo-id="${escapeHtml(ph.id)}" style="padding: 4px 8px; font-size: 0.68rem;">
-                      Remover
-                    </button>
+        <div id="alb-upload-status" class="alb-pix-alert-banner" hidden>
+          Otimizando fotografias e aplicando proteção...
+        </div>
+
+        ${calc.selectedCount > 0 ? `
+          <div class="alb-lr-compact-bar">
+            <div class="alb-lr-compact-left">
+              <span>Filtro Lightroom:</span>
+              <input type="text" id="lr-code-output" class="alb-lr-code-inline" readonly value="${escapeHtml(lrList)}" />
+            </div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <button type="button" id="btn-copy-lr-code" class="cms-btn cms-btn-outline cms-btn-sm">
+                Copiar Códigos
+              </button>
+              ${activeAlbum.selectionLocked ? `
+                <button type="button" id="btn-unlock-selection" class="cms-btn cms-btn-outline cms-btn-sm">
+                  Reabrir Seleção
+                </button>
+              ` : ''}
+            </div>
+          </div>
+        ` : ''}
+
+        ${(activeAlbum.photos || []).length === 0 ? `
+          <div style="padding: 34px 16px; text-align: center; background: #FAF8F3; border-radius: 10px; border: 1px dashed rgba(27,39,51,0.18);">
+            <strong style="display:block; color:#1B2733; margin-bottom:4px;">Este álbum ainda está vazio</strong>
+            <span style="font-size:0.8rem; color:#5E6D7C;">Clique em "+ Enviar Fotos do Ensaio" para subir as fotos da sessão.</span>
+          </div>
+        ` : `
+          <div class="alb-photos-admin-grid">
+            ${(activeAlbum.photos || []).map((ph) => {
+              const isCover = activeAlbum.coverSrc === ph.originalSrc;
+              const isSel = selectedSet.has(ph.id);
+              return `
+                <div class="alb-adm-photo-card ${isCover ? 'is-cover-card' : ''}">
+                  <div class="alb-adm-thumb-wrap">
+                    <img src="${escapeHtml(ph.originalSrc)}" alt="${escapeHtml(ph.filename)}" loading="lazy" />
+                    <button
+                      type="button"
+                      class="alb-thumb-cover-btn ${isCover ? 'is-active' : ''} js-set-alb-cover"
+                      data-photo-id="${escapeHtml(ph.id)}"
+                      title="${isCover ? 'Foto de capa atual' : 'Definir como capa do álbum'}"
+                    >${isCover ? '★ Capa' : '☆ Capa'}</button>
+                    <button
+                      type="button"
+                      class="alb-thumb-del-btn js-del-alb-photo"
+                      data-photo-id="${escapeHtml(ph.id)}"
+                      aria-label="Remover foto ${escapeHtml(ph.filename)}"
+                      title="Remover foto"
+                    >✕</button>
+                    ${isSel ? `<span class="alb-thumb-sel-badge">♥ Escolhida</span>` : ''}
+                  </div>
+                  <div class="alb-adm-meta">
+                    <span class="alb-adm-fname">${escapeHtml(ph.filename)}</span>
                   </div>
                 </div>
-              </div>
-            `;
-          }).join('')}
-        </div>
-      </div>
+              `;
+            }).join('')}
+          </div>
+        `}
 
-      <!-- Histórico de Atividades -->
-      <div class="alb-section-box">
-        <h3>Histórico do Álbum</h3>
-        <ul class="alb-log-list">
-          ${(album.activityLog || []).map((ev) => `
-            <li>
-              <time>${new Date(ev.at).toLocaleString('pt-BR')}</time>
-              <span>${escapeHtml(ev.text)}</span>
-            </li>
-          `).join('')}
-        </ul>
+        ${commentEntries.length > 0 ? `
+          <div class="alb-notes-clean-list">
+            <h4>Observações deixadas pelo cliente (${commentEntries.length})</h4>
+            ${commentEntries.map(([pid, note]) => {
+              const ph = (activeAlbum.photos || []).find((p) => p.id === pid);
+              return `
+                <div class="alb-note-row">
+                  <strong>${escapeHtml(ph?.filename || pid)}:</strong> ${escapeHtml(note)}
+                </div>
+              `;
+            }).join('')}
+          </div>
+        ` : ''}
       </div>
     `;
   }
 
-  function bindAlbumsAdminEvents() {
+  function renderDesignSubTab(activeAlbum) {
+    const presets = window.AlbumsStore.DESIGN_PRESETS;
+    const design = activeAlbum.design || window.AlbumsStore.getDefaultDesign();
+    const coverSrc = activeAlbum.coverSrc || activeAlbum.photos?.[0]?.originalSrc || 'assets/images/real/IMG_7513.jpg';
+    const focal = parseFocalCoords(activeAlbum.coverFocal);
+    const shortTitle = (activeAlbum.clientName || activeAlbum.title || 'Álbum').slice(0, 18);
+
+    let stageBody = '';
+    let stageHeading = 'Capa';
+    let stageHint = 'Escolha a abertura do álbum (reflete na Entrega Final ao vivo ao lado)';
+
+    if (activeDesignSection === 'cover') {
+      stageHeading = 'Capa';
+      stageHint = 'Clique no estilo desejado · Ajuste o ponto focal clicando na miniatura à esquerda';
+      stageBody = `
+        <div class="pix-cards-grid">
+          ${presets.coverStyles.map((st) => {
+            const isAct = design.coverStyle === st.id;
+            return `
+              <button type="button" class="pix-choice-item ${isAct ? 'active' : ''}" data-design-cover="${escapeHtml(st.id)}">
+                <div class="pix-choice-frame pix-cover-thumb" data-style="${escapeHtml(st.id)}">
+                  ${st.id === 'none' ? `
+                    <div class="pix-none-grid">
+                      <span></span><span></span><span></span>
+                      <span></span><span></span><span></span>
+                    </div>
+                  ` : `
+                    <img src="${escapeHtml(coverSrc)}" alt="" style="object-position: ${focal.x}% ${focal.y}%;" />
+                    <div class="pix-cover-mini-overlay">
+                      <span class="pix-cover-mini-title">${escapeHtml(shortTitle)}</span>
+                      <span class="pix-cover-mini-sub"></span>
+                    </div>
+                  `}
+                </div>
+                <span class="pix-choice-label">${escapeHtml(st.label)}</span>
+              </button>
+            `;
+          }).join('')}
+        </div>
+      `;
+    } else if (activeDesignSection === 'typography') {
+      stageHeading = 'Tipografia';
+      stageHint = 'Define a personalidade dos títulos na capa e no cabeçalho do álbum';
+      stageBody = `
+        <div class="pix-cards-grid">
+          ${presets.typographies.map((tp) => {
+            const isAct = design.typography === tp.id;
+            return `
+              <button type="button" class="pix-choice-item ${isAct ? 'active' : ''}" data-design-typo="${escapeHtml(tp.id)}">
+                <div class="pix-choice-frame pix-typo-card">
+                  <span
+                    class="pix-typo-sample"
+                    style="font-family:${escapeHtml(tp.fontFamily)}; font-weight:${tp.weight}; letter-spacing:${tp.tracking}; text-transform:${tp.transform};"
+                  >${escapeHtml(tp.sample)}</span>
+                  <span class="pix-typo-desc">${escapeHtml(tp.desc)}</span>
+                </div>
+                <span class="pix-choice-label">${escapeHtml(tp.label)}</span>
+              </button>
+            `;
+          }).join('')}
+        </div>
+      `;
+    } else if (activeDesignSection === 'color') {
+      stageHeading = 'Cor';
+      stageHint = 'Paleta de fundo, superfície e destaque editorial do álbum';
+      stageBody = `
+        <div class="pix-cards-grid">
+          ${presets.colorThemes.map((ct) => {
+            const isAct = design.colorTheme === ct.id;
+            return `
+              <button type="button" class="pix-choice-item ${isAct ? 'active' : ''}" data-design-color="${escapeHtml(ct.id)}">
+                <div class="pix-choice-frame pix-color-card">
+                  ${ct.dots.map((hex) => `<span class="pix-color-dot" style="background-color:${escapeHtml(hex)};"></span>`).join('')}
+                </div>
+                <span class="pix-choice-label">${escapeHtml(ct.label)}</span>
+              </button>
+            `;
+          }).join('')}
+        </div>
+      `;
+    } else {
+      stageHeading = 'Grade';
+      stageHint = 'Disposição das fotografias, respiro entre imagens e tamanho das colunas';
+      const gStyle = design.gridStyle || 'vertical';
+      const gSpacing = design.gridSpacing || 'regular';
+      const gSize = design.gridSize || 'regular';
+      stageBody = `
+        <div class="pix-grid-group">
+          <span class="pix-grid-group-label">Estilo da Grade</span>
+          <div class="pix-cards-grid">
+            <button type="button" class="pix-choice-item ${gStyle !== 'horizontal' ? 'active' : ''}" data-grid-style="vertical">
+              <div class="pix-choice-frame pix-grid-diagram">
+                <div class="pix-wire-vert">
+                  <span style="height:28px;"></span>
+                  <span style="height:18px;"></span>
+                  <span style="height:24px;"></span>
+                  <span style="height:16px;"></span>
+                  <span style="height:26px;"></span>
+                  <span style="height:20px;"></span>
+                </div>
+              </div>
+              <span class="pix-choice-label">Vertical</span>
+            </button>
+            <button type="button" class="pix-choice-item ${gStyle === 'horizontal' ? 'active' : ''}" data-grid-style="horizontal">
+              <div class="pix-choice-frame pix-grid-diagram">
+                <div class="pix-wire-horiz">
+                  <div><span style="flex:1.5;"></span><span style="flex:1;"></span></div>
+                  <div><span style="flex:1;"></span><span style="flex:1.6;"></span></div>
+                </div>
+              </div>
+              <span class="pix-choice-label">Horizontal</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="pix-grid-group">
+          <span class="pix-grid-group-label">Espaçamento entre Fotos</span>
+          <div class="pix-cards-grid">
+            ${presets.gridSpacings.map((sp) => `
+              <button type="button" class="pix-choice-item ${gSpacing === sp.id ? 'active' : ''}" data-grid-spacing="${escapeHtml(sp.id)}">
+                <div class="pix-choice-frame" style="padding:14px 12px; text-align:center; font-size:0.8rem; font-weight:600; color:#1B2733;">
+                  ${escapeHtml(sp.label)} (${sp.gapPx}px)
+                </div>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="pix-grid-group">
+          <span class="pix-grid-group-label">Tamanho das Miniaturas</span>
+          <div class="pix-cards-grid">
+            ${presets.gridSizes.map((sz) => `
+              <button type="button" class="pix-choice-item ${gSize === sz.id ? 'active' : ''}" data-grid-size="${escapeHtml(sz.id)}">
+                <div class="pix-choice-frame" style="padding:14px 12px; text-align:center; font-size:0.8rem; font-weight:600; color:#1B2733;">
+                  ${escapeHtml(sz.label)} (${sz.cols} colunas)
+                </div>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="pix-design-shell">
+        <aside class="pix-design-rail">
+          <div class="pix-focal-box">
+            <div class="pix-focal-stage" id="pix-focal-picker" title="Clique para mover o ponto focal da capa">
+              <img src="${escapeHtml(coverSrc)}" alt="Capa do álbum" style="object-position: ${focal.x}% ${focal.y}%;" />
+              <span class="pix-focal-pin" id="pix-focal-pin" style="left: ${focal.x}%; top: ${focal.y}%;"></span>
+            </div>
+            <div class="pix-focal-caption">
+              <span>⊙ Ponto Focal</span>
+              <span id="pix-focal-coords">${Math.round(focal.x)}% · ${Math.round(focal.y)}%</span>
+            </div>
+          </div>
+          <div class="pix-rail-label">Design</div>
+          <nav class="pix-rail-nav" aria-label="Opções de design do álbum">
+            <button type="button" class="pix-rail-btn ${activeDesignSection === 'cover' ? 'active' : ''}" data-design-sec="cover">
+              <span class="pix-rail-icon">▣</span>
+              <span>Capa</span>
+            </button>
+            <button type="button" class="pix-rail-btn ${activeDesignSection === 'typography' ? 'active' : ''}" data-design-sec="typography">
+              <span class="pix-rail-icon" style="font-family:Georgia,serif;font-weight:700;">T</span>
+              <span>Tipografia</span>
+            </button>
+            <button type="button" class="pix-rail-btn ${activeDesignSection === 'color' ? 'active' : ''}" data-design-sec="color">
+              <span class="pix-rail-icon">◐</span>
+              <span>Cor</span>
+            </button>
+            <button type="button" class="pix-rail-btn ${activeDesignSection === 'grid' ? 'active' : ''}" data-design-sec="grid">
+              <span class="pix-rail-icon">⊞</span>
+              <span>Grade</span>
+            </button>
+          </nav>
+        </aside>
+
+        <div class="pix-design-stage">
+          <div class="pix-stage-head">
+            <h3>${stageHeading}</h3>
+            <span class="pix-stage-hint">${stageHint}</span>
+          </div>
+          ${stageBody}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderProtectionSubTab(activeAlbum) {
+    const wmCfg = albumsState.watermarkConfig || {};
+    const wmEnabled = activeAlbum.watermarkEnabled !== false;
+    const activeProt = activeAlbum.protectionLevel || 'watermark';
+    const wmOpacityPct = Math.round((Number(wmCfg.opacity) || 0.45) * 100);
+    const wmScalePct = Math.round((Number(wmCfg.scale) || 0.28) * 100);
+
+    return `
+      <div class="alb-card-clean">
+        <div class="alb-switch-header-row">
+          <div class="alb-toggle-setting-text">
+            <strong>Proteger fotos na Fase de Seleção com Marca d'Água</strong>
+            <span>Na Entrega Final (Fase 2), as fotos ficam limpas em alta resolução automaticamente.</span>
+          </div>
+          <label class="cms-switch">
+            <input type="checkbox" id="sw-alb-wm-enabled" ${wmEnabled ? 'checked' : ''} />
+            <span class="cms-switch-track"></span>
+            <span>${wmEnabled ? 'ON' : 'OFF'}</span>
+          </label>
+        </div>
+
+        <div class="alb-protection-grid">
+          <button type="button" class="alb-prot-card ${activeProt === 'watermark' ? 'active' : ''}" data-set-prot="watermark">
+            <div class="alb-prot-card-top">
+              <strong>Marca d'Água</strong>
+              <span class="alb-prot-dot"></span>
+            </div>
+            <span>Fotografia nítida com sua marca d'água aplicada sobre a imagem.</span>
+          </button>
+
+          <button type="button" class="alb-prot-card ${activeProt === 'watermark_lowres' ? 'active' : ''}" data-set-prot="watermark_lowres">
+            <div class="alb-prot-card-top">
+              <strong>Marca d'Água + Baixa Resolução</strong>
+              <span class="alb-prot-dot"></span>
+            </div>
+            <span>O cliente vê bem rostos e expressões para escolher, mas a resolução reduzida impede uso ou impressão.</span>
+          </button>
+
+          <button type="button" class="alb-prot-card ${activeProt === 'watermark_spotlight' ? 'active' : ''}" data-set-prot="watermark_spotlight">
+            <div class="alb-prot-card-top">
+              <strong>Marca d'Água + Foco no Cursor</strong>
+              <span class="alb-prot-dot"></span>
+            </div>
+            <span>Foto inteira desfocada; foca apenas onde o cliente passa o mouse ou o dedo na tela.</span>
+          </button>
+        </div>
+
+        <div class="alb-wm-studio-layout">
+          <div>
+            ${wmEnabled ? `
+              <div style="display:flex; flex-wrap:wrap; gap:14px; margin-bottom:10px;">
+                <div>
+                  <label class="field-label" style="display:block; margin-bottom:5px;">Formato da Marca</label>
+                  <div class="alb-seg-row">
+                    <button type="button" class="alb-seg-btn ${wmCfg.mode !== 'text' ? 'active' : ''}" data-wm-mode="image">Sua Logo (PNG/SVG)</button>
+                    <button type="button" class="alb-seg-btn ${wmCfg.mode === 'text' ? 'active' : ''}" data-wm-mode="text">Texto</button>
+                  </div>
+                </div>
+                <div>
+                  <label class="field-label" style="display:block; margin-bottom:5px;">Disposição</label>
+                  <div class="alb-seg-row">
+                    <button type="button" class="alb-seg-btn ${wmCfg.pattern !== 'center' ? 'active' : ''}" data-wm-pattern="tiled">Grade Repetida</button>
+                    <button type="button" class="alb-seg-btn ${wmCfg.pattern === 'center' ? 'active' : ''}" data-wm-pattern="center">Centralizada</button>
+                  </div>
+                </div>
+              </div>
+
+              ${wmCfg.mode !== 'text' ? `
+                <div class="alb-wm-thumb-box">
+                  <div style="display:flex; align-items:center; gap:10px;">
+                    <div class="alb-wm-logo-checker">
+                      <img src="${escapeHtml(wmCfg.imageSrc || 'assets/images/logo-light.png')}" alt="Logo Marca d'Água" />
+                    </div>
+                    <div style="font-size:0.75rem; line-height:1.35;">
+                      <strong style="display:block;">Arquivo da Marca d'Água</strong>
+                      <span style="color:rgba(255,253,243,0.72);">PNG ou SVG transparente</span>
+                    </div>
+                  </div>
+                  <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                    <input type="file" id="wm-file-upload" accept="image/png,image/webp,image/svg+xml,image/jpeg" hidden />
+                    <button type="button" id="btn-upload-wm-img" class="cms-btn cms-btn-gold cms-btn-sm">Subir Logo</button>
+                    <button type="button" id="btn-reset-wm-default" class="cms-btn cms-btn-outline cms-btn-sm" style="color:#FFFDF3; border-color:rgba(255,253,243,0.28);">Padrão</button>
+                  </div>
+                </div>
+              ` : `
+                <div class="field-group" style="margin-top:10px;">
+                  <label class="field-label">Texto da Marca d'Água</label>
+                  <input type="text" id="wm-text-input" class="cms-input" value="${escapeHtml(wmCfg.text || '')}" placeholder="Ex: INSTANTES DE CARLY · PROVA" />
+                </div>
+              `}
+
+              <div class="field-grid" style="margin-top:12px;">
+                <div class="field-group">
+                  <div style="display:flex; justify-content:space-between; font-size:0.74rem; font-weight:600; margin-bottom:4px;">
+                    <span>Opacidade</span>
+                    <strong id="wm-opacity-val">${wmOpacityPct}%</strong>
+                  </div>
+                  <input type="range" id="wm-opacity-range" min="15" max="85" step="5" value="${wmOpacityPct}" style="width:100%;" />
+                </div>
+                <div class="field-group">
+                  <div style="display:flex; justify-content:space-between; font-size:0.74rem; font-weight:600; margin-bottom:4px;">
+                    <span>Tamanho</span>
+                    <strong id="wm-scale-val">${wmScalePct}%</strong>
+                  </div>
+                  <input type="range" id="wm-scale-range" min="15" max="60" step="5" value="${wmScalePct}" style="width:100%;" />
+                </div>
+              </div>
+            ` : `
+              <div style="padding:18px; border-radius:9px; background:#FAF8F3; color:#526170; font-size:0.8rem;">
+                A marca d'água sobreposta está desativada (<strong>OFF</strong>). O modo de resolução/foco selecionado acima continua protegendo as fotos.
+              </div>
+            `}
+          </div>
+
+          <div>
+            <div class="alb-wm-live-card" id="adm-wm-live-card">
+              <img id="adm-wm-live-preview" class="adm-wm-base" src="assets/images/real/IMG_7513.jpg" alt="Prévia viva da proteção" />
+              <img id="adm-wm-live-reveal" class="adm-wm-reveal" src="assets/images/real/IMG_7513.jpg" alt="" hidden />
+              <div class="alb-wm-live-badge">
+                <span>${activeProt === 'watermark_spotlight' ? 'Passe o mouse p/ testar' : 'Prévia real'}</span>
+                <strong id="adm-wm-live-caption">${escapeHtml(getProtectionLabel(activeProt, wmEnabled))}</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderSettingsSubTab(activeAlbum) {
+    const pwOn = activeAlbum.passwordEnabled !== false && Boolean(activeAlbum.password || activeAlbum.passwordEnabled === true);
+    const extrasOn = activeAlbum.extrasEnabled !== false;
+    const pinOn = Boolean(activeAlbum.pinEnabled && activeAlbum.downloadPin) || activeAlbum.pinEnabled === true;
+    const payCfg = albumsState.paymentConfig || {};
+
+    return `
+      <div class="alb-card-clean">
+        <div class="field-grid">
+          <div class="field-group">
+            <label class="field-label">Nome do Cliente / Casal</label>
+            <input type="text" id="alb-in-client" class="cms-input" value="${escapeHtml(activeAlbum.clientName)}" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Código do Link (/galeria?id=...)</label>
+            <input type="text" id="alb-in-slug" class="cms-input" value="${escapeHtml(activeAlbum.slug)}" />
+          </div>
+        </div>
+
+        <div class="field-grid" style="margin-top:10px;">
+          <div class="field-group">
+            <label class="field-label">Título Exibido no Álbum</label>
+            <input type="text" id="alb-in-title" class="cms-input" value="${escapeHtml(activeAlbum.title)}" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Subtítulo / Local / Data</label>
+            <input type="text" id="alb-in-sub" class="cms-input" value="${escapeHtml(activeAlbum.subtitle || '')}" />
+          </div>
+        </div>
+
+        <div class="field-grid" style="margin-top:10px;">
+          <div class="field-group">
+            <label class="field-label">Nome do Pacote</label>
+            <input type="text" id="alb-in-pkgname" class="cms-input" value="${escapeHtml(activeAlbum.packageName || 'Ensaio')}" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Fotos Inclusas no Pacote</label>
+            <input type="number" min="0" id="alb-in-included" class="cms-input" value="${Number(activeAlbum.packageIncluded || 0)}" />
+          </div>
+        </div>
+
+        <div class="field-group" style="margin-top:10px;">
+          <label class="field-label">Mensagem de Boas-Vindas (Opcional)</label>
+          <textarea id="alb-in-welcome" class="cms-textarea" rows="2">${escapeHtml(activeAlbum.welcomeMessage || '')}</textarea>
+        </div>
+
+        <!-- CHAVE ON/OFF 1: VENDA DE FOTOS EXTRAS -->
+        <div class="alb-toggle-setting-row" style="margin-top:14px;">
+          <div class="alb-toggle-setting-head">
+            <div class="alb-toggle-setting-text">
+              <strong>Permitir compra de fotos extras além do pacote</strong>
+              <span>Calcula automaticamente o valor adicional quando o cliente escolhe além da franquia.</span>
+            </div>
+            <label class="cms-switch">
+              <input type="checkbox" id="sw-alb-extras" ${extrasOn ? 'checked' : ''} />
+              <span class="cms-switch-track"></span>
+              <span>${extrasOn ? 'ON' : 'OFF'}</span>
+            </label>
+          </div>
+          ${extrasOn ? `
+            <div class="alb-toggle-setting-body">
+              <div class="field-grid">
+                <div class="field-group">
+                  <label class="field-label">Valor por Foto Extra (R$)</label>
+                  <input type="number" min="0" step="1" id="alb-in-extraprice" class="cms-input" value="${Number(activeAlbum.extraPhotoPrice || 0)}" />
+                </div>
+                <div class="field-group" style="display:flex; align-items:flex-end;">
+                  <button type="button" id="btn-toggle-pay-drawer" class="cms-btn cms-btn-outline cms-btn-sm">
+                    ${showPaymentDrawer ? 'Ocultar Dados Pix ▲' : 'Configurar Chave Pix do Estúdio ▾'}
+                  </button>
+                </div>
+              </div>
+              ${showPaymentDrawer ? `
+                <div class="field-grid" style="margin-top:12px; padding-top:12px; border-top:1px solid rgba(27,39,51,0.08);">
+                  <div class="field-group">
+                    <label class="field-label">Chave Pix Oficial (0% Taxa)</label>
+                    <input type="text" id="cfg-pix-key" class="cms-input" value="${escapeHtml(payCfg.pixKey || '')}" placeholder="CPF, CNPJ, E-mail ou Celular" />
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label">Nome do Recebedor</label>
+                    <input type="text" id="cfg-pix-name" class="cms-input" value="${escapeHtml(payCfg.merchantName || '')}" />
+                  </div>
+                </div>
+              ` : ''}
+            </div>
+          ` : ''}
+        </div>
+
+        <!-- CHAVE ON/OFF 2: SENHA DE ACESSO AO ÁLBUM -->
+        <div class="alb-toggle-setting-row">
+          <div class="alb-toggle-setting-head">
+            <div class="alb-toggle-setting-text">
+              <strong>Exigir senha para abrir o álbum</strong>
+              <span>Mantém o ensaio privado apenas para quem recebeu o convite.</span>
+            </div>
+            <label class="cms-switch">
+              <input type="checkbox" id="sw-alb-password" ${pwOn ? 'checked' : ''} />
+              <span class="cms-switch-track"></span>
+              <span>${pwOn ? 'ON' : 'OFF'}</span>
+            </label>
+          </div>
+          ${pwOn ? `
+            <div class="alb-toggle-setting-body">
+              <div class="field-group" style="max-width:260px; margin:0;">
+                <label class="field-label">Senha do Cliente</label>
+                <input type="text" id="alb-in-password" class="cms-input" value="${escapeHtml(activeAlbum.password || '1234')}" />
+              </div>
+            </div>
+          ` : ''}
+        </div>
+
+        <!-- CHAVE ON/OFF 3: PIN DE DOWNLOAD EM ALTA -->
+        <div class="alb-toggle-setting-row">
+          <div class="alb-toggle-setting-head">
+            <div class="alb-toggle-setting-text">
+              <strong>Exigir PIN de 4 dígitos para baixar fotos em Alta Resolução</strong>
+              <span>Útil quando convidados podem ver o álbum final, mas só os noivos/cliente baixam o .ZIP.</span>
+            </div>
+            <label class="cms-switch">
+              <input type="checkbox" id="sw-alb-pin" ${pinOn ? 'checked' : ''} />
+              <span class="cms-switch-track"></span>
+              <span>${pinOn ? 'ON' : 'OFF'}</span>
+            </label>
+          </div>
+          ${pinOn ? `
+            <div class="alb-toggle-setting-body">
+              <div class="field-group" style="max-width:220px; margin:0;">
+                <label class="field-label">PIN de Download (4 dígitos)</label>
+                <input type="text" maxlength="6" id="alb-in-pin" class="cms-input" value="${escapeHtml(activeAlbum.downloadPin || '2026')}" />
+              </div>
+            </div>
+          ` : ''}
+        </div>
+
+        <div class="alb-danger-footer">
+          <button type="button" id="btn-save-album-meta" class="cms-btn cms-btn-primary">
+            Salvar Alterações deste Álbum
+          </button>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button type="button" id="btn-reset-demo-albums" class="cms-btn cms-btn-outline cms-btn-sm">
+              Restaurar Exemplos
+            </button>
+            <button type="button" id="btn-delete-album" class="cms-btn cms-btn-danger cms-btn-sm">
+              Excluir Álbum
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  /* ==========================================================================
+     4. RENDERIZAÇÃO PRINCIPAL DO PAINEL #panel-albums
+     ========================================================================== */
+  function renderAlbumsAdminPanel() {
+    const panel = document.getElementById('panel-albums');
+    if (!panel || !albumsState) return;
+
+    updateSidebarBadge();
+    renderSidebarAlbumsSublist();
+
+    const albums = albumsState.albums || [];
+    const activeAlbum = getActiveAlbum();
+
+    const quickCreateMarkup = showQuickCreateAlbum ? `
+      <div class="alb-quick-create-card">
+        <div class="alb-quick-create-head">
+          <strong>Criar Novo Álbum Privado de Cliente</strong>
+          <button type="button" id="btn-cancel-quick-create" class="cms-btn cms-btn-outline cms-btn-sm">Cancelar</button>
+        </div>
+        <div class="alb-quick-create-row">
+          <div class="field-group">
+            <label class="field-label">Nome do Cliente ou Casal</label>
+            <input type="text" id="quick-alb-client-input" class="cms-input" placeholder="Ex: Camila & Rafael" />
+          </div>
+          <div class="field-group" style="max-width: 150px;">
+            <label class="field-label">Fotos no Pacote</label>
+            <input type="number" id="quick-alb-pkg-input" class="cms-input" value="15" min="0" />
+          </div>
+          <button type="button" id="btn-confirm-quick-create" class="cms-btn cms-btn-primary">
+            Criar Álbum
+          </button>
+        </div>
+      </div>
+    ` : '';
+
+    if (!activeAlbum) {
+      panel.innerHTML = `
+        ${quickCreateMarkup}
+        <div class="alb-card-clean" style="text-align:center; padding:42px 20px;">
+          <h3 style="margin:0 0 8px; color:#1B2733;">Nenhum álbum criado ainda</h3>
+          <p style="font-size:0.84rem; color:#5E6D7C; margin:0 0 16px;">Crie o primeiro álbum usando o menu lateral esquerdo ou o botão abaixo.</p>
+          <button type="button" id="btn-empty-new-alb" class="cms-btn cms-btn-primary">+ Novo Álbum de Cliente</button>
+        </div>
+      `;
+      bindQuickCreateEvents();
+      document.getElementById('btn-empty-new-alb')?.addEventListener('click', () => {
+        showQuickCreateAlbum = true;
+        renderAlbumsAdminPanel();
+      });
+      syncPreviewIframeForAlbums();
+      return;
+    }
+
+    const st = getStatusMeta(activeAlbum);
+    const calc = window.AlbumsStore.calculateSelectionPricing(activeAlbum);
+
+    let subTabContent = '';
+    if (activeAlbumSubTab === 'design') {
+      subTabContent = renderDesignSubTab(activeAlbum);
+    } else if (activeAlbumSubTab === 'protection') {
+      subTabContent = renderProtectionSubTab(activeAlbum);
+    } else if (activeAlbumSubTab === 'settings') {
+      subTabContent = renderSettingsSubTab(activeAlbum);
+    } else {
+      subTabContent = renderPhotosSubTab(activeAlbum, calc);
+    }
+
+    panel.innerHTML = `
+      ${quickCreateMarkup}
+
+      <!-- Seletor compacto apenas em telas mobile (no desktop os álbuns ficam na barra esquerda) -->
+      <div class="alb-mobile-SelectWrap">
+        <select id="alb-mobile-switcher" class="cms-select" style="flex:1;">
+          ${albums.map((a) => `<option value="${escapeHtml(a.id)}" ${a.id === activeAlbum.id ? 'selected' : ''}>${escapeHtml(a.clientName)} (${(a.photos || []).length} fotos)</option>`).join('')}
+        </select>
+        <button type="button" id="btn-mobile-new-album" class="cms-btn cms-btn-primary cms-btn-sm">+ Novo</button>
+      </div>
+
+      <div class="alb-studio-header">
+        <div class="alb-studio-identity">
+          <div class="alb-studio-toprow">
+            <h2 class="alb-studio-title">${escapeHtml(activeAlbum.clientName)}</h2>
+            <span class="alb-status-tag ${st.cls}">${escapeHtml(st.label)}</span>
+          </div>
+          <div class="alb-studio-slug">
+            <span>${escapeHtml(activeAlbum.title || '')}</span>
+            <span>·</span>
+            <code>/${escapeHtml(activeAlbum.slug)}</code>
+          </div>
+        </div>
+
+        <div class="alb-studio-actions">
+          <button type="button" id="btn-copy-whatsapp-invite" class="cms-btn cms-btn-gold cms-btn-sm">
+            Copiar Convite WhatsApp
+          </button>
+          <a href="${galeriaRoute}?id=${encodeURIComponent(activeAlbum.slug)}" target="_blank" rel="noopener" class="cms-btn cms-btn-outline cms-btn-sm">
+            Abrir Álbum ↗
+          </a>
+        </div>
+      </div>
+
+      ${activeAlbum.status === 'awaiting_pix_confirm' ? `
+        <div class="alb-pix-alert-banner">
+          <span><strong>Pix informado pelo cliente:</strong> confirme o recebimento de <strong>${formatBRL(activeAlbum.paymentOrder?.totalAmount)}</strong> para liberar a seleção.</span>
+          <button type="button" id="btn-approve-direct-pix" class="cms-btn cms-btn-primary cms-btn-sm">
+            Confirmar Pix Recebido
+          </button>
+        </div>
+      ` : ''}
+
+      <div class="alb-phase-toggle-bar" role="tablist" aria-label="Fase atual do álbum">
+        <button type="button" class="alb-phase-btn ${activeAlbum.phase === 'proofing' ? 'active' : ''}" data-set-phase="proofing">
+          Fase 1 · Seleção de Fotos (${calc.selectedCount}/${calc.packageIncluded})
+        </button>
+        <button type="button" class="alb-phase-btn ${activeAlbum.phase === 'delivery' ? 'active' : ''}" data-set-phase="delivery">
+          Fase 2 · Entrega Final em Alta
+        </button>
+      </div>
+
+      <nav class="alb-subtabs-nav" aria-label="Editor do álbum">
+        <button type="button" class="alb-subtab-btn ${activeAlbumSubTab === 'photos' ? 'active' : ''}" data-alb-subtab="photos">
+          <span>Fotos</span>
+          <span class="alb-subtab-pill">${(activeAlbum.photos || []).length}</span>
+        </button>
+        <button type="button" class="alb-subtab-btn ${activeAlbumSubTab === 'design' ? 'active' : ''}" data-alb-subtab="design">
+          <span>Design &amp; Capa</span>
+        </button>
+        <button type="button" class="alb-subtab-btn ${activeAlbumSubTab === 'protection' ? 'active' : ''}" data-alb-subtab="protection">
+          <span>Marca d'Água &amp; Proteção</span>
+        </button>
+        <button type="button" class="alb-subtab-btn ${activeAlbumSubTab === 'settings' ? 'active' : ''}" data-alb-subtab="settings">
+          <span>Pacote &amp; Senhas</span>
+        </button>
+      </nav>
+
+      ${subTabContent}
+    `;
+
+    bindQuickCreateEvents();
+    bindAlbumWorkspaceEvents(activeAlbum);
+    syncPreviewIframeForAlbums();
+    if (activeAlbumSubTab === 'protection') {
+      refreshWatermarkSamplePreview();
+      bindAdminPreviewSpotlight();
+    }
+  }
+
+  /* ==========================================================================
+     5. EVENTOS INTERATIVOS DO EDITOR DE ÁLBUNS
+     ========================================================================== */
+  function bindQuickCreateEvents() {
+    document.getElementById('btn-cancel-quick-create')?.addEventListener('click', () => {
+      showQuickCreateAlbum = false;
+      renderAlbumsAdminPanel();
+    });
+
+    const createNow = async () => {
+      const nameInput = document.getElementById('quick-alb-client-input');
+      const pkgInput = document.getElementById('quick-alb-pkg-input');
+      const clientName = nameInput?.value.trim();
+      if (!clientName) {
+        nameInput?.focus();
+        return;
+      }
+      const slug = slugify(clientName);
+      const newAlb = window.AlbumsStore.normalizeAlbum({
+        id: `alb_${Date.now()}`,
+        slug,
+        clientName,
+        title: `Ensaio — ${clientName}`,
+        subtitle: (window.SITE_DATA?.brand?.location || 'Fortaleza, CE').toUpperCase(),
+        phase: 'proofing',
+        status: 'awaiting_selection',
+        protectionLevel: 'watermark',
+        watermarkEnabled: true,
+        passwordEnabled: true,
+        password: String(Math.floor(1000 + Math.random() * 9000)),
+        pinEnabled: false,
+        downloadPin: '',
+        packageName: 'Ensaio Autoral',
+        packageIncluded: Math.max(0, parseInt(pkgInput?.value, 10) || 15),
+        extrasEnabled: true,
+        extraPhotoPrice: 25,
+        allowHighResDownload: true,
+        allowWebDownload: true,
+        welcomeMessage: `Olá, ${clientName}! Escolham com carinho suas fotografias favoritas.`,
+        coverSrc: '',
+        coverFocal: '50% 35%',
+        design: window.AlbumsStore.getDefaultDesign(),
+        photos: [],
+        selectedIds: [],
+        photoComments: {},
+        deliveryFavorites: [],
+        selectionLocked: false,
+        paymentOrder: null,
+        activityLog: [{ at: new Date().toISOString(), type: 'created', text: 'Álbum criado no painel.' }]
+      });
+
+      albumsState.albums.unshift(newAlb);
+      selectedAlbumId = newAlb.id;
+      showQuickCreateAlbum = false;
+      activeAlbumSubTab = 'photos';
+      await window.AlbumsStore.saveState(albumsState);
+      renderAlbumsAdminPanel();
+      notifyAdminToast(`Álbum "${clientName}" criado!`);
+    };
+
+    document.getElementById('btn-confirm-quick-create')?.addEventListener('click', createNow);
+    document.getElementById('quick-alb-client-input')?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        createNow();
+      }
+    });
+  }
+
+  function bindAlbumWorkspaceEvents(activeAlbum) {
     const panel = document.getElementById('panel-albums');
     if (!panel) return;
 
-    panel.querySelectorAll('[data-pick-alb]').forEach((btn) => {
+    // Switcher mobile
+    document.getElementById('alb-mobile-switcher')?.addEventListener('change', (e) => {
+      selectedAlbumId = e.target.value;
+      renderAlbumsAdminPanel();
+    });
+    document.getElementById('btn-mobile-new-album')?.addEventListener('click', () => {
+      showQuickCreateAlbum = true;
+      renderAlbumsAdminPanel();
+    });
+
+    // Sub-abas (Fotos | Design | Proteção | Pacote & Senhas)
+    panel.querySelectorAll('[data-alb-subtab]').forEach((btn) => {
       btn.addEventListener('click', () => {
-        selectedAlbumId = btn.getAttribute('data-pick-alb');
+        activeAlbumSubTab = btn.getAttribute('data-alb-subtab');
         renderAlbumsAdminPanel();
       });
     });
 
-    document.getElementById('btn-toggle-pay-drawer')?.addEventListener('click', () => {
-      showPaymentDrawer = !showPaymentDrawer;
-      renderAlbumsAdminPanel();
-    });
-
-    document.getElementById('btn-save-pay-cfg')?.addEventListener('click', async () => {
-      albumsState.paymentConfig = {
-        ...albumsState.paymentConfig,
-        pixKey: document.getElementById('cfg-pix-key')?.value.trim() || '',
-        merchantName: document.getElementById('cfg-pix-name')?.value.trim() || '',
-        merchantCity: document.getElementById('cfg-pix-city')?.value.trim() || 'FORTALEZA'
-      };
-      await window.AlbumsStore.saveState(albumsState);
-      notifyAdminToast('Dados de recebimento Pix salvos.');
-    });
-
-    document.getElementById('btn-reset-demo-albums')?.addEventListener('click', async () => {
-      if (!window.confirm('Restaurar os 2 álbuns de exemplo originais (Ana & Lucas + Marina & Pedro)?')) return;
-      albumsState = await window.AlbumsStore.resetToDemo();
-      selectedAlbumId = albumsState.albums[0]?.id || null;
-      renderAlbumsAdminPanel();
-      const iframe = document.getElementById('cms-preview-iframe');
-      if (iframe && iframe.getAttribute('src')?.includes('galeria')) {
-        iframe.contentWindow?.location.reload();
-      }
-      notifyAdminToast('Álbuns de teste restaurados.');
-    });
-
-    document.getElementById('btn-create-client-album')?.addEventListener('click', async () => {
-      const num = (albumsState.albums?.length || 0) + 1;
-      const clientName = `Novo Cliente #${num}`;
-      const newAlb = {
-        id: `alb_${Date.now()}`,
-        slug: slugify(`ensaio-cliente-${num}`),
-        clientName,
-        title: `${clientName}`,
-        subtitle: 'Fortaleza, Ceará',
-        shootDate: new Date().toISOString().slice(0, 10),
-        welcomeMessage: 'Escolham com calma as fotografias favoritas de vocês.',
-        phase: 'proofing',
-        status: 'awaiting_selection',
-        protectionLevel: 'watermark',
-        password: String(Math.floor(1000 + Math.random() * 9000)),
-        downloadPin: String(Math.floor(1000 + Math.random() * 9000)),
-        packageName: 'Ensaio Simples',
-        packageIncluded: 10,
-        extraPhotoPrice: 20.00,
-        coverSrc: 'assets/images/real/IMG_1186.jpg',
-        coverFocal: 'center 35%',
-        selectionLocked: false,
-        selectedIds: [],
-        deliveryFavorites: [],
-        photoComments: {},
-        paymentOrder: null,
-        activityLog: [
-          { at: new Date().toISOString(), type: 'created', text: 'Novo álbum criado no painel do estúdio.' }
-        ],
-        photos: []
-      };
-      albumsState.albums.unshift(newAlb);
-      selectedAlbumId = newAlb.id;
-      await window.AlbumsStore.saveState(albumsState);
-      renderAlbumsAdminPanel();
-      notifyAdminToast('Novo álbum criado.');
-    });
-
-    const activeAlbum = getActiveAlbum();
-    if (!activeAlbum) return;
-
-    // Alternar Fase Unificada (Fase 1 Seleção <-> Fase 2 Entrega)
+    // Alternar Fase 1 (Seleção) <-> Fase 2 (Entrega Final)
     panel.querySelectorAll('[data-set-phase]').forEach((btn) => {
       btn.addEventListener('click', async () => {
         const nextPhase = btn.getAttribute('data-set-phase');
         if (activeAlbum.phase === nextPhase) return;
         activeAlbum.phase = nextPhase;
-        if (nextPhase === 'delivery') {
-          activeAlbum.status = 'delivered';
-          activeAlbum.activityLog.unshift({
-            at: new Date().toISOString(),
-            type: 'delivered',
-            text: 'Álbum publicado como Galeria de Entrega Final (Alta Resolução).'
-          });
-        } else if (activeAlbum.status === 'delivered') {
-          activeAlbum.status = activeAlbum.selectionLocked ? 'selection_completed' : 'awaiting_selection';
+        activeAlbum.status = nextPhase === 'delivery'
+          ? 'delivered'
+          : (activeAlbum.selectionLocked ? 'selection_completed' : 'awaiting_selection');
+        await window.AlbumsStore.saveState(albumsState);
+        renderAlbumsAdminPanel();
+        notifyAdminToast(
+          nextPhase === 'delivery'
+            ? 'Fase 2 ativada: álbum publicado como Entrega Final!'
+            : 'Fase 1 ativada: galeria em modo protegido de seleção.'
+        );
+      });
+    });
+
+    // Convite WhatsApp inteligente (omite senha/PIN quando desativados!)
+    document.getElementById('btn-copy-whatsapp-invite')?.addEventListener('click', () => {
+      const baseUrl = `${window.location.origin}${window.location.pathname.replace(/admin(\.html)?$/i, '')}${galeriaRoute}?id=${encodeURIComponent(activeAlbum.slug)}`;
+      const pwLine = activeAlbum.passwordEnabled !== false && activeAlbum.password
+        ? `\nSenha: ${activeAlbum.password}`
+        : '';
+      const pinLine = activeAlbum.pinEnabled && activeAlbum.downloadPin
+        ? `\nPIN de Download: ${activeAlbum.downloadPin}`
+        : '';
+      const extraInfo = activeAlbum.extrasEnabled !== false
+        ? ` (fotos extras opcionais: ${formatBRL(activeAlbum.extraPhotoPrice)} cada)`
+        : '';
+
+      const msg = activeAlbum.phase === 'proofing'
+        ? `Olá, ${activeAlbum.clientName}!\nAs prévias do seu ensaio já estão prontas para escolha:\n\nLink: ${baseUrl}${pwLine}\nPacote: ${activeAlbum.packageIncluded} fotos inclusas${extraInfo}.`
+        : `Olá, ${activeAlbum.clientName}!\nSeu álbum final em alta resolução está pronto para ver e baixar:\n\nLink: ${baseUrl}${pwLine}${pinLine}`;
+      navigator.clipboard?.writeText(msg);
+      notifyAdminToast('Convite copiado para colar no WhatsApp.');
+    });
+
+    // Confirmar Pix Direto
+    document.getElementById('btn-approve-direct-pix')?.addEventListener('click', async () => {
+      activeAlbum.status = 'selection_paid';
+      if (activeAlbum.paymentOrder) {
+        activeAlbum.paymentOrder.status = 'approved';
+        activeAlbum.paymentOrder.paidAt = new Date().toISOString();
+      }
+      await window.AlbumsStore.saveState(albumsState);
+      renderAlbumsAdminPanel();
+      notifyAdminToast('Pagamento Pix confirmado!');
+    });
+
+    /* --- SUB-ABA 1: FOTOS --- */
+    const fileInput = document.getElementById('alb-upload-input');
+    document.getElementById('btn-trigger-alb-upload')?.addEventListener('click', () => fileInput?.click());
+    fileInput?.addEventListener('change', async (e) => {
+      const files = Array.from(e.target.files || []);
+      if (!files.length) return;
+      const statusEl = document.getElementById('alb-upload-status');
+      if (statusEl) statusEl.hidden = false;
+
+      for (let i = 0; i < files.length; i++) {
+        if (statusEl) statusEl.textContent = `Otimizando foto ${i + 1} de ${files.length}...`;
+        const processed = await window.AlbumsStore.processUploadedAlbumFile(files[i]);
+        const newPhoto = {
+          id: `ph_${Date.now()}_${i}`,
+          filename: processed.filename,
+          originalSrc: processed.originalSrc
+        };
+        activeAlbum.photos.push(newPhoto);
+        if (!activeAlbum.coverSrc || activeAlbum.photos.length === 1) {
+          activeAlbum.coverSrc = newPhoto.originalSrc;
+        }
+      }
+
+      await window.AlbumsStore.saveState(albumsState);
+      renderAlbumsAdminPanel();
+      notifyAdminToast(`${files.length} ${files.length === 1 ? 'foto adicionada' : 'fotos adicionadas'} ao álbum.`);
+    });
+
+    panel.querySelectorAll('.js-set-alb-cover').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const pid = btn.getAttribute('data-photo-id');
+        const ph = (activeAlbum.photos || []).find((p) => p.id === pid);
+        if (ph) {
+          activeAlbum.coverSrc = ph.originalSrc;
+          await window.AlbumsStore.saveState(albumsState);
+          renderAlbumsAdminPanel();
+          notifyAdminToast('Foto definida como capa do álbum.');
+        }
+      });
+    });
+
+    panel.querySelectorAll('.js-del-alb-photo').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const pid = btn.getAttribute('data-photo-id');
+        const removed = (activeAlbum.photos || []).find((p) => p.id === pid);
+        activeAlbum.photos = (activeAlbum.photos || []).filter((p) => p.id !== pid);
+        activeAlbum.selectedIds = (activeAlbum.selectedIds || []).filter((id) => id !== pid);
+        if (removed && activeAlbum.coverSrc === removed.originalSrc) {
+          activeAlbum.coverSrc = activeAlbum.photos[0]?.originalSrc || '';
         }
         await window.AlbumsStore.saveState(albumsState);
         renderAlbumsAdminPanel();
-        notifyAdminToast(nextPhase === 'delivery'
-          ? 'Álbum em modo de Entrega Final (alta resolução + download).'
-          : 'Álbum em modo de Seleção de Provas protegidas.');
       });
     });
 
-    // Nível de proteção (3 cartões: watermark, watermark_blur, watermark_spotlight)
+    document.getElementById('btn-copy-lr-code')?.addEventListener('click', () => {
+      const val = document.getElementById('lr-code-output')?.value || '';
+      navigator.clipboard?.writeText(val);
+      notifyAdminToast('Códigos copiados para o filtro do Lightroom.');
+    });
+
+    document.getElementById('btn-unlock-selection')?.addEventListener('click', async () => {
+      activeAlbum.selectionLocked = false;
+      activeAlbum.status = 'awaiting_selection';
+      await window.AlbumsStore.saveState(albumsState);
+      renderAlbumsAdminPanel();
+      notifyAdminToast('Seleção reaberta para o cliente.');
+    });
+
+    /* --- SUB-ABA 2: DESIGN ESTILO PIXIESET --- */
+    panel.querySelectorAll('[data-design-sec]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        activeDesignSection = btn.getAttribute('data-design-sec');
+        renderAlbumsAdminPanel();
+      });
+    });
+
+    const focalPicker = document.getElementById('pix-focal-picker');
+    focalPicker?.addEventListener('click', async (e) => {
+      const rect = focalPicker.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const x = Math.round(Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100)));
+      const y = Math.round(Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100)));
+      activeAlbum.coverFocal = `${x}% ${y}%`;
+      await window.AlbumsStore.saveState(albumsState);
+      renderAlbumsAdminPanel();
+      notifyAdminToast(`Ponto focal da capa ajustado (${x}% · ${y}%).`);
+    });
+
+    panel.querySelectorAll('[data-design-cover]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        activeAlbum.design = activeAlbum.design || window.AlbumsStore.getDefaultDesign();
+        activeAlbum.design.coverStyle = btn.getAttribute('data-design-cover');
+        await window.AlbumsStore.saveState(albumsState);
+        renderAlbumsAdminPanel();
+      });
+    });
+
+    panel.querySelectorAll('[data-design-typo]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        activeAlbum.design = activeAlbum.design || window.AlbumsStore.getDefaultDesign();
+        activeAlbum.design.typography = btn.getAttribute('data-design-typo');
+        await window.AlbumsStore.saveState(albumsState);
+        renderAlbumsAdminPanel();
+      });
+    });
+
+    panel.querySelectorAll('[data-design-color]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        activeAlbum.design = activeAlbum.design || window.AlbumsStore.getDefaultDesign();
+        activeAlbum.design.colorTheme = btn.getAttribute('data-design-color');
+        await window.AlbumsStore.saveState(albumsState);
+        renderAlbumsAdminPanel();
+      });
+    });
+
+    panel.querySelectorAll('[data-grid-style]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        activeAlbum.design = activeAlbum.design || window.AlbumsStore.getDefaultDesign();
+        activeAlbum.design.gridStyle = btn.getAttribute('data-grid-style');
+        await window.AlbumsStore.saveState(albumsState);
+        renderAlbumsAdminPanel();
+      });
+    });
+
+    panel.querySelectorAll('[data-grid-spacing]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        activeAlbum.design = activeAlbum.design || window.AlbumsStore.getDefaultDesign();
+        activeAlbum.design.gridSpacing = btn.getAttribute('data-grid-spacing');
+        await window.AlbumsStore.saveState(albumsState);
+        renderAlbumsAdminPanel();
+      });
+    });
+
+    panel.querySelectorAll('[data-grid-size]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        activeAlbum.design = activeAlbum.design || window.AlbumsStore.getDefaultDesign();
+        activeAlbum.design.gridSize = btn.getAttribute('data-grid-size');
+        await window.AlbumsStore.saveState(albumsState);
+        renderAlbumsAdminPanel();
+      });
+    });
+
+    /* --- SUB-ABA 3: PROTEÇÃO & MARCA D'ÁGUA --- */
+    document.getElementById('sw-alb-wm-enabled')?.addEventListener('change', async (e) => {
+      activeAlbum.watermarkEnabled = Boolean(e.target.checked);
+      await window.AlbumsStore.saveState(albumsState);
+      renderAlbumsAdminPanel();
+    });
+
     panel.querySelectorAll('[data-set-prot]').forEach((btn) => {
       btn.addEventListener('click', async () => {
         const nextProt = btn.getAttribute('data-set-prot');
-        if (!nextProt || activeAlbum.protectionLevel === nextProt) return;
         activeAlbum.protectionLevel = nextProt;
         await window.AlbumsStore.saveState(albumsState);
         renderAlbumsAdminPanel();
-        notifyAdminToast(`Proteção alterada para: ${getProtectionLabel(nextProt)}`);
+        notifyAdminToast(`Proteção alterada: ${getProtectionLabel(nextProt, activeAlbum.watermarkEnabled !== false)}`);
       });
     });
 
-    // Marca d'água: Modo (Imagem PNG vs Texto)
     panel.querySelectorAll('[data-wm-mode]').forEach((btn) => {
       btn.addEventListener('click', async () => {
-        const mode = btn.getAttribute('data-wm-mode');
         albumsState.watermarkConfig = {
           ...albumsState.watermarkConfig,
-          mode,
+          mode: btn.getAttribute('data-wm-mode'),
           updatedAt: Date.now()
         };
         await window.AlbumsStore.saveState(albumsState);
@@ -716,13 +1297,11 @@
       });
     });
 
-    // Marca d'água: Padrão (Grade Repetida vs Centralizada)
     panel.querySelectorAll('[data-wm-pattern]').forEach((btn) => {
       btn.addEventListener('click', async () => {
-        const pattern = btn.getAttribute('data-wm-pattern');
         albumsState.watermarkConfig = {
           ...albumsState.watermarkConfig,
-          pattern,
+          pattern: btn.getAttribute('data-wm-pattern'),
           updatedAt: Date.now()
         };
         await window.AlbumsStore.saveState(albumsState);
@@ -730,7 +1309,6 @@
       });
     });
 
-    // Upload de imagem personalizada de Marca d'Água (PNG/WebP/SVG)
     const wmFileInput = document.getElementById('wm-file-upload');
     document.getElementById('btn-upload-wm-img')?.addEventListener('click', () => wmFileInput?.click());
     wmFileInput?.addEventListener('change', async (e) => {
@@ -746,9 +1324,9 @@
         };
         await window.AlbumsStore.saveState(albumsState);
         renderAlbumsAdminPanel();
-        notifyAdminToast('Marca d\'água personalizada aplicada em todas as provas.');
+        notifyAdminToast('Logo personalizada aplicada na marca d\'água!');
       } catch (_) {
-        notifyAdminToast('Não foi possível ler o arquivo de marca d\'água.');
+        notifyAdminToast('Não foi possível ler a imagem da marca d\'água.');
       }
     });
 
@@ -762,7 +1340,7 @@
       };
       await window.AlbumsStore.saveState(albumsState);
       renderAlbumsAdminPanel();
-      notifyAdminToast('Logo padrão restaurada na marca d\'água.');
+      notifyAdminToast('Logo padrão do estúdio restaurada.');
     });
 
     document.getElementById('wm-text-input')?.addEventListener('change', async (e) => {
@@ -773,7 +1351,6 @@
       };
       await window.AlbumsStore.saveState(albumsState);
       refreshWatermarkSamplePreview();
-      notifyAdminToast('Texto da marca d\'água atualizado.');
     });
 
     const opacityRange = document.getElementById('wm-opacity-range');
@@ -806,136 +1383,101 @@
       refreshWatermarkSamplePreview();
     });
 
-    // Copiar convite WhatsApp
-    document.getElementById('btn-copy-whatsapp-invite')?.addEventListener('click', () => {
-      const baseUrl = `${window.location.origin}${window.location.pathname.replace(/admin(\.html)?$/i, '')}${galeriaRoute}?id=${encodeURIComponent(activeAlbum.slug)}`;
-      const msg = activeAlbum.phase === 'proofing'
-        ? `Olá, ${activeAlbum.clientName}!\nAs prévias do seu ensaio já estão prontas para escolha:\n\nLink: ${baseUrl}\nSenha: ${activeAlbum.password}\nPacote: ${activeAlbum.packageIncluded} fotos inclusas (fotos extras opcionais: ${formatBRL(activeAlbum.extraPhotoPrice)} cada).`
-        : `Olá, ${activeAlbum.clientName}!\nSeu álbum final em alta resolução está pronto para ver e baixar:\n\nLink: ${baseUrl}\nSenha: ${activeAlbum.password}\nPIN de Download: ${activeAlbum.downloadPin}`;
-      navigator.clipboard?.writeText(msg);
-      notifyAdminToast('Convite copiado para colar no WhatsApp.');
-    });
+    /* --- SUB-ABA 4: PACOTE, EXTRAS & SENHAS (CHAVES ON/OFF) --- */
+    const flushTextMetaInputs = () => {
+      const cName = document.getElementById('alb-in-client');
+      if (cName) activeAlbum.clientName = cName.value.trim() || activeAlbum.clientName;
+      const cSlug = document.getElementById('alb-in-slug');
+      if (cSlug) activeAlbum.slug = slugify(cSlug.value || activeAlbum.clientName);
+      const cTitle = document.getElementById('alb-in-title');
+      if (cTitle) activeAlbum.title = cTitle.value.trim() || activeAlbum.clientName;
+      const cSub = document.getElementById('alb-in-sub');
+      if (cSub) activeAlbum.subtitle = cSub.value.trim();
+      const cPkg = document.getElementById('alb-in-pkgname');
+      if (cPkg) activeAlbum.packageName = cPkg.value.trim() || 'Ensaio';
+      const cInc = document.getElementById('alb-in-included');
+      if (cInc) activeAlbum.packageIncluded = Math.max(0, parseInt(cInc.value, 10) || 0);
+      const cWel = document.getElementById('alb-in-welcome');
+      if (cWel) activeAlbum.welcomeMessage = cWel.value.trim();
+      const cExt = document.getElementById('alb-in-extraprice');
+      if (cExt) activeAlbum.extraPhotoPrice = Math.max(0, Number(cExt.value) || 0);
+      const cPw = document.getElementById('alb-in-password');
+      if (cPw) activeAlbum.password = cPw.value.trim();
+      const cPin = document.getElementById('alb-in-pin');
+      if (cPin) activeAlbum.downloadPin = cPin.value.trim();
 
-    // Copiar código Lightroom
-    document.getElementById('btn-copy-lr-code')?.addEventListener('click', () => {
-      const val = document.getElementById('lr-code-output')?.value || '';
-      navigator.clipboard?.writeText(val);
-      notifyAdminToast('Lista copiada para o filtro do Lightroom.');
-    });
-
-    // Reabrir seleção
-    document.getElementById('btn-unlock-selection')?.addEventListener('click', async () => {
-      activeAlbum.selectionLocked = false;
-      activeAlbum.status = 'awaiting_selection';
-      activeAlbum.activityLog.unshift({
-        at: new Date().toISOString(),
-        type: 'reopened',
-        text: 'Seleção reaberta para ajustes do cliente.'
-      });
-      await window.AlbumsStore.saveState(albumsState);
-      renderAlbumsAdminPanel();
-      notifyAdminToast('Seleção reaberta para o cliente.');
-    });
-
-    // Aprovar Pix Direto
-    document.getElementById('btn-approve-direct-pix')?.addEventListener('click', async () => {
-      activeAlbum.status = 'selection_paid';
-      if (activeAlbum.paymentOrder) {
-        activeAlbum.paymentOrder.status = 'approved';
-        activeAlbum.paymentOrder.paidAt = new Date().toISOString();
+      const pixKey = document.getElementById('cfg-pix-key');
+      const pixName = document.getElementById('cfg-pix-name');
+      if (pixKey || pixName) {
+        albumsState.paymentConfig = {
+          ...albumsState.paymentConfig,
+          pixKey: pixKey ? pixKey.value.trim() : albumsState.paymentConfig?.pixKey,
+          merchantName: pixName ? pixName.value.trim() : albumsState.paymentConfig?.merchantName
+        };
       }
-      activeAlbum.activityLog.unshift({
-        at: new Date().toISOString(),
-        type: 'payment',
-        text: `Pix Direto confirmado no painel (${formatBRL(activeAlbum.paymentOrder?.totalAmount)}).`
-      });
+    };
+
+    document.getElementById('sw-alb-extras')?.addEventListener('change', async (e) => {
+      flushTextMetaInputs();
+      activeAlbum.extrasEnabled = Boolean(e.target.checked);
       await window.AlbumsStore.saveState(albumsState);
       renderAlbumsAdminPanel();
-      notifyAdminToast('Pagamento Pix confirmado.');
     });
 
-    // Salvar regras do álbum
+    document.getElementById('sw-alb-password')?.addEventListener('change', async (e) => {
+      flushTextMetaInputs();
+      activeAlbum.passwordEnabled = Boolean(e.target.checked);
+      if (activeAlbum.passwordEnabled && !activeAlbum.password) {
+        activeAlbum.password = '1234';
+      }
+      await window.AlbumsStore.saveState(albumsState);
+      renderAlbumsAdminPanel();
+    });
+
+    document.getElementById('sw-alb-pin')?.addEventListener('change', async (e) => {
+      flushTextMetaInputs();
+      activeAlbum.pinEnabled = Boolean(e.target.checked);
+      if (activeAlbum.pinEnabled && !activeAlbum.downloadPin) {
+        activeAlbum.downloadPin = '2026';
+      }
+      await window.AlbumsStore.saveState(albumsState);
+      renderAlbumsAdminPanel();
+    });
+
+    document.getElementById('btn-toggle-pay-drawer')?.addEventListener('click', () => {
+      flushTextMetaInputs();
+      showPaymentDrawer = !showPaymentDrawer;
+      renderAlbumsAdminPanel();
+    });
+
     document.getElementById('btn-save-album-meta')?.addEventListener('click', async () => {
-      activeAlbum.clientName = document.getElementById('alb-in-client')?.value.trim() || activeAlbum.clientName;
-      activeAlbum.slug = slugify(document.getElementById('alb-in-slug')?.value || activeAlbum.clientName);
-      activeAlbum.title = document.getElementById('alb-in-title')?.value.trim() || activeAlbum.clientName;
-      activeAlbum.subtitle = document.getElementById('alb-in-sub')?.value.trim() || '';
-      activeAlbum.packageName = document.getElementById('alb-in-pkgname')?.value.trim() || 'Ensaio';
-      activeAlbum.packageIncluded = Math.max(0, parseInt(document.getElementById('alb-in-included')?.value, 10) || 0);
-      activeAlbum.extraPhotoPrice = Math.max(0, Number(document.getElementById('alb-in-extraprice')?.value) || 0);
-      activeAlbum.password = document.getElementById('alb-in-password')?.value.trim() || '';
-      activeAlbum.downloadPin = document.getElementById('alb-in-pin')?.value.trim() || '';
-      activeAlbum.welcomeMessage = document.getElementById('alb-in-welcome')?.value.trim() || '';
-
+      flushTextMetaInputs();
       await window.AlbumsStore.saveState(albumsState);
       renderAlbumsAdminPanel();
-      notifyAdminToast('Configurações do álbum salvas.');
+      notifyAdminToast('Configurações do álbum salvas!');
     });
 
-    // Excluir álbum
+    document.getElementById('btn-reset-demo-albums')?.addEventListener('click', async () => {
+      if (!window.confirm('Restaurar os álbuns demonstrativos originais?')) return;
+      albumsState = await window.AlbumsStore.resetToDemo();
+      selectedAlbumId = albumsState.albums[0]?.id || null;
+      renderAlbumsAdminPanel();
+      notifyAdminToast('Álbuns de exemplo restaurados.');
+    });
+
     document.getElementById('btn-delete-album')?.addEventListener('click', async () => {
-      if (!window.confirm(`Excluir o álbum de "${activeAlbum.clientName}"?`)) return;
+      if (!window.confirm(`Excluir permanentemente o álbum de "${activeAlbum.clientName}"?`)) return;
       albumsState.albums = albumsState.albums.filter((a) => a.id !== activeAlbum.id);
       selectedAlbumId = albumsState.albums[0]?.id || null;
       await window.AlbumsStore.saveState(albumsState);
       renderAlbumsAdminPanel();
-      notifyAdminToast('Álbum removido.');
-    });
-
-    // Upload em lote de novas fotos
-    const fileInput = document.getElementById('alb-upload-input');
-    document.getElementById('btn-trigger-alb-upload')?.addEventListener('click', () => fileInput?.click());
-    fileInput?.addEventListener('change', async (e) => {
-      const files = Array.from(e.target.files || []);
-      if (!files.length) return;
-      const statusEl = document.getElementById('alb-upload-status');
-      if (statusEl) statusEl.hidden = false;
-
-      for (let i = 0; i < files.length; i++) {
-        if (statusEl) {
-          statusEl.textContent = `Otimizando foto ${i + 1} de ${files.length}...`;
-        }
-        const processed = await window.AlbumsStore.processUploadedAlbumFile(files[i]);
-        const newPhoto = {
-          id: `ph_${Date.now()}_${i}`,
-          filename: processed.filename,
-          originalSrc: processed.originalSrc
-        };
-        activeAlbum.photos.push(newPhoto);
-        if (activeAlbum.photos.length === 1) {
-          activeAlbum.coverSrc = newPhoto.originalSrc;
-        }
-      }
-
-      await window.AlbumsStore.saveState(albumsState);
-      renderAlbumsAdminPanel();
-      notifyAdminToast(`${files.length} ${files.length === 1 ? 'fotografia adicionada' : 'fotografias adicionadas'} ao álbum.`);
-    });
-
-    panel.querySelectorAll('.js-set-alb-cover').forEach((btn) => {
-      btn.addEventListener('click', async () => {
-        const pid = btn.getAttribute('data-photo-id');
-        const ph = (activeAlbum.photos || []).find((p) => p.id === pid);
-        if (ph) {
-          activeAlbum.coverSrc = ph.originalSrc;
-          await window.AlbumsStore.saveState(albumsState);
-          renderAlbumsAdminPanel();
-          notifyAdminToast('Foto definida como capa do álbum.');
-        }
-      });
-    });
-
-    panel.querySelectorAll('.js-del-alb-photo').forEach((btn) => {
-      btn.addEventListener('click', async () => {
-        const pid = btn.getAttribute('data-photo-id');
-        activeAlbum.photos = (activeAlbum.photos || []).filter((p) => p.id !== pid);
-        activeAlbum.selectedIds = (activeAlbum.selectedIds || []).filter((id) => id !== pid);
-        await window.AlbumsStore.saveState(albumsState);
-        renderAlbumsAdminPanel();
-      });
+      notifyAdminToast('Álbum excluído.');
     });
   }
 
+  /* ==========================================================================
+     6. INICIALIZAÇÃO E SINCRONIZAÇÃO EM TEMPO REAL
+     ========================================================================== */
   document.addEventListener('DOMContentLoaded', async () => {
     albumsState = await window.AlbumsStore.loadState();
     selectedAlbumId = albumsState.albums?.[0]?.id || null;
@@ -943,7 +1485,10 @@
 
     document.querySelectorAll('.sidebar-tab').forEach((tabBtn) => {
       tabBtn.addEventListener('click', () => {
-        setTimeout(syncPreviewIframeForAlbums, 20);
+        setTimeout(() => {
+          renderSidebarAlbumsSublist();
+          syncPreviewIframeForAlbums();
+        }, 20);
       });
     });
 

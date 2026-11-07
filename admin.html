@@ -9,7 +9,7 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%233B7293%22 stroke-width=%221.8%22><rect x=%222%22 y=%225%22 width=%2220%22 height=%2214%22 rx=%223%22/><circle cx=%2212%22 cy=%2212%22 r=%223.5%22/><circle cx=%2217%22 cy=%228%22 r=%221%22 fill=%22%23E7C378%22/></svg>" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400&family=Jost:wght@300;400;500;600&family=Libre+Baskerville:wght@400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Syne:wght@700&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="assets/css/admin.css" />
   <link rel="stylesheet" href="assets/css/albums-admin.css" />
@@ -148,6 +148,7 @@
               <span class="sidebar-tab-left"><span>💝</span> <span>Álbuns de Clientes</span></span>
               <span class="sidebar-count" id="count-albums">2</span>
             </button>
+            <div id="sidebar-albums-sublist" class="sidebar-albums-sublist" aria-label="Lista de álbuns de clientes"></div>
           </nav>
 
           <div class="sidebar-group-label">Conteúdo &amp; Comercial</div>
@@ -196,27 +197,25 @@
             </div>
           </div>
 
-          <!-- Zona de Upload Inteligente com Categoria Pré-Selecionada -->
-          <div id="portfolio-upload-box" class="upload-box">
-            <div class="upload-defaults-bar">
-              <div class="field-group" style="margin-bottom: 0;">
-                <label for="upload-default-category" class="field-label">Enviar novas fotos direto na categoria:</label>
-                <select id="upload-default-category" class="cms-select"></select>
+          <!-- Zona de Upload Compacta & Limpa -->
+          <div id="portfolio-upload-box" class="upload-box upload-box-compact">
+            <div class="upload-compact-row">
+              <div class="upload-compact-fields">
+                <div class="field-group" style="margin-bottom: 0;">
+                  <label for="upload-default-category" class="field-label">Categoria ao enviar</label>
+                  <select id="upload-default-category" class="cms-select"></select>
+                </div>
+                <div class="field-group" style="margin-bottom: 0;">
+                  <label for="upload-default-location" class="field-label">Local padrão</label>
+                  <input type="text" id="upload-default-location" class="cms-input" value="Fortaleza, Ceará" placeholder="Ex: Praia de Iracema" />
+                </div>
               </div>
-              <div class="field-group" style="margin-bottom: 0;">
-                <label for="upload-default-location" class="field-label">Local padrão das fotos enviadas:</label>
-                <input type="text" id="upload-default-location" class="cms-input" value="Fortaleza, Ceará" placeholder="Ex: Ponte dos Ingleses, Praia de Iracema..." />
-              </div>
-            </div>
 
-            <input type="file" id="portfolio-file-input" accept="image/jpeg,image/png,image/webp" multiple hidden />
-            <div id="portfolio-drop-trigger" class="upload-drop-area" role="button" tabindex="0">
-              <div class="upload-icon-circle">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+              <input type="file" id="portfolio-file-input" accept="image/jpeg,image/png,image/webp" multiple hidden />
+              <div id="portfolio-drop-trigger" class="upload-compact-trigger" role="button" tabindex="0">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                <span>+ Enviar Novas Fotos (arraste ou clique)</span>
               </div>
-              <h3 class="upload-drop-title">Arraste suas fotos aqui ou clique para escolher</h3>
-              <p class="upload-drop-sub">Aceita várias fotos de uma vez (JPG, PNG, WebP). Redimensionamento e detecção Horizontal/Vertical automáticos.</p>
-              <span class="cms-btn cms-btn-primary">Selecionar Fotografias do Dispositivo</span>
             </div>
           </div>
 

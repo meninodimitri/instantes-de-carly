@@ -1,6 +1,8 @@
 /**
  * ============================================================================
- * ÁREA DO CLIENTE V2 — GALERIA DE SELEÇÃO (SINETO) & ENTREGA (PIXIESET)
+ * ÁREA DO CLIENTE V3 — GALERIA DE SELEÇÃO (SINETO) & ENTREGA (PIXIESET)
+ * Inclui Design Customizável (Capa, Tipografia, Cor, Grade) +
+ * Foco Interativo no Cursor / Toque na Grade e no Lightbox
  * ============================================================================
  */
 (function () {
@@ -12,6 +14,7 @@
   const hashSlug = window.location.hash.replace(/^#/, '').trim().toLowerCase();
   const initialSlug = (params.get('id') || params.get('album') || hashSlug || '').trim().toLowerCase();
   const isAdminPreview = params.get('preview') === '1';
+  const isDesignPreview = params.get('designPreview') === '1';
 
   const SVG_HEART_OUTLINE = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
   const SVG_HEART_SOLID = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
@@ -24,6 +27,7 @@
   let lightboxList = [];
   let lightboxIdx = 0;
   let pendingDownloadTarget = null;
+  let activeTouchSpotlightTile = null;
 
   // Cache em memória da sessão para os bundles protegidos (primarySrc + revealSrc)
   const runtimeProofMap = new Map();
@@ -45,6 +49,7 @@
     albumView: document.getElementById('album-view'),
     deliveryHero: document.getElementById('delivery-hero'),
     deliveryHeroImg: document.getElementById('delivery-hero-img'),
+    deliveryCoverLogo: document.getElementById('delivery-cover-logo'),
     deliveryHeroDate: document.getElementById('delivery-hero-date'),
     deliveryHeroTitle: document.getElementById('delivery-hero-title'),
     deliveryHeroMsg: document.getElementById('delivery-hero-msg'),
@@ -169,6 +174,57 @@
   }
 
   /* ==========================================================================
+     0. MOTOR DE APRESENTAÇÃO PIXIESET (COR, TIPOGRAFIA, CAPA E GRADE)
+     ========================================================================== */
+  function applyAlbumDesign(album) {
+    const presets = window.AlbumsStore.DESIGN_PRESETS;
+    const d = (album && album.design) || window.AlbumsStore.getDefaultDesign();
+
+    const theme = presets.colorThemes.find((t) => t.id === d.colorTheme) || presets.colorThemes[1];
+    const typo = presets.typographies.find((t) => t.id === d.typography) || presets.typographies[1];
+    const gSpacing = presets.gridSpacings.find((g) => g.id === d.gridSpacing) || presets.gridSpacings[0];
+    const gSize = presets.gridSizes.find((g) => g.id === d.gridSize) || presets.gridSizes[0];
+    const gStyle = d.gridStyle === 'horizontal' ? 'horizontal' : 'vertical';
+    const coverStyle = d.coverStyle || 'borda';
+
+    const root = document.documentElement;
+    root.style.setProperty('--ground', theme.ground);
+    root.style.setProperty('--surface', theme.surface);
+    root.style.setProperty('--ink', theme.ink);
+    root.style.setProperty('--ink-secondary', theme.inkSecondary);
+    root.style.setProperty('--accent', theme.accent);
+    root.style.setProperty('--accent-hover', theme.accentHover);
+    root.style.setProperty('--font-display', typo.fontFamily);
+    root.style.setProperty('--title-weight', String(typo.weight));
+    root.style.setProperty('--title-tracking', typo.tracking);
+    root.style.setProperty('--title-transform', typo.transform);
+    root.style.setProperty('--grid-gap', `${gSpacing.gapPx}px`);
+    root.style.setProperty('--grid-cols', String(gSize.cols));
+    root.style.setProperty('--row-h', `${gSize.rowHeight}px`);
+
+    document.body.classList.toggle('theme-is-dark', Boolean(theme.isDark));
+
+    // Alterna logos automaticamente quando o tema do álbum é escuro ou capa Split clara
+    const surfaceLogo = theme.isDark ? 'assets/images/logo-light.png' : 'assets/images/logo-dark.png';
+    document.querySelectorAll('.topbar-logo-link img, .auth-brand-link img').forEach((img) => {
+      img.setAttribute('src', surfaceLogo);
+    });
+
+    if (els.deliveryCoverLogo) {
+      const useDarkOnCover = coverStyle === 'split' && !theme.isDark;
+      els.deliveryCoverLogo.setAttribute('src', useDarkOnCover ? 'assets/images/logo-dark.png' : 'assets/images/logo-light.png');
+    }
+
+    if (els.deliveryHero) {
+      els.deliveryHero.setAttribute('data-cover', coverStyle);
+    }
+
+    if (els.grid) {
+      els.grid.setAttribute('data-grid-style', gStyle);
+    }
+  }
+
+  /* ==========================================================================
      1. PROTEÇÃO ANTI-CÓPIA EM MODO DE PROVA
      ========================================================================== */
   function setupAntiCopyProtection() {
@@ -187,16 +243,16 @@
       }
     });
 
-    // Oculta imediatamente a camada de nitidez caso o cliente mude de janela ou tente atalho de captura
-    const hideHoldReveal = () => {
-      if (currentAlbum?.phase === 'proofing' && currentAlbum.protectionLevel === 'watermark_blur') {
-        if (els.lbRevealImg) els.lbRevealImg.hidden = true;
-      }
+    const hideAllSpotlights = () => {
+      if (els.lbRevealImg) els.lbRevealImg.style.opacity = '0';
+      document.querySelectorAll('.tile-spotlight-reveal').forEach((el) => {
+        el.style.opacity = '0';
+      });
     };
-    window.addEventListener('blur', hideHoldReveal);
-    document.addEventListener('visibilitychange', hideHoldReveal);
+    window.addEventListener('blur', hideAllSpotlights);
+    document.addEventListener('visibilitychange', hideAllSpotlights);
     document.addEventListener('keyup', (e) => {
-      if (e.key === 'PrintScreen') hideHoldReveal();
+      if (e.key === 'PrintScreen') hideAllSpotlights();
     });
   }
 
@@ -211,13 +267,14 @@
 
   function renderPortalView() {
     currentAlbum = null;
+    applyAlbumDesign(null);
     showOnlySection(els.portalView);
     document.body.classList.remove('is-proofing-protected');
     document.title = `Área do Cliente — ${window.AlbumsStore.getBrandDefaults().studioName}`;
   }
 
   function isAlbumUnlocked(album) {
-    if (!album.password || isAdminPreview) return true;
+    if (album.passwordEnabled === false || !album.password || isAdminPreview) return true;
     try {
       return sessionStorage.getItem(`unlocked_alb_${album.id}`) === album.password;
     } catch (_) {
@@ -232,17 +289,18 @@
   }
 
   function renderPasswordGate(album) {
+    applyAlbumDesign(album);
     showOnlySection(els.pwView);
     document.body.classList.remove('is-proofing-protected');
     const cover = album.coverSrc || album.photos?.[0]?.originalSrc || 'assets/images/real/IMG_7513.jpg';
     if (els.pwCoverImg) {
       els.pwCoverImg.src = cover;
-      els.pwCoverImg.style.objectPosition = album.coverFocal || 'center 34%';
+      els.pwCoverImg.style.objectPosition = album.coverFocal || '50% 34%';
     }
     if (els.pwTitle) els.pwTitle.textContent = album.title || album.clientName;
     if (els.pwSubtitle) {
       els.pwSubtitle.textContent = album.subtitle
-        ? `${album.subtitle} — Digite a senha enviada pela sua fotógrafa para abrir o álbum.`
+        ? `${album.subtitle} · Digite a senha enviada pela sua fotógrafa para abrir o álbum.`
         : 'Digite a senha enviada pela sua fotógrafa para abrir o álbum.';
     }
     if (els.pwError) els.pwError.hidden = true;
@@ -256,7 +314,8 @@
   function getProofKey(album, photo) {
     const sig = window.AlbumsStore.getWatermarkSignature(
       rootState.watermarkConfig,
-      album.protectionLevel || 'watermark'
+      album.protectionLevel || 'watermark',
+      album.watermarkEnabled !== false
     );
     return `${photo.id}::${sig}`;
   }
@@ -266,6 +325,7 @@
     const photos = album.photos || [];
     const level = album.protectionLevel || 'watermark';
     const wmCfg = rootState.watermarkConfig || {};
+    const wmEnabled = album.watermarkEnabled !== false;
 
     const pending = photos.filter((p) => !runtimeProofMap.has(getProofKey(album, p)));
     if (!pending.length) return;
@@ -278,7 +338,9 @@
         const bundle = await window.AlbumsStore.generateProtectedProofBundle(
           photo.originalSrc,
           wmCfg,
-          level
+          level,
+          1080,
+          wmEnabled
         );
         runtimeProofMap.set(getProofKey(album, photo), bundle);
       } catch (_) {
@@ -313,23 +375,29 @@
      ========================================================================== */
   async function openAlbumExperience(album) {
     currentAlbum = album;
+    applyAlbumDesign(album);
     showOnlySection(els.albumView);
     document.title = `${album.clientName} — ${window.AlbumsStore.getBrandDefaults().studioName}`;
 
     const isProof = album.phase === 'proofing';
+    const coverStyle = album.design?.coverStyle || 'borda';
+    const shouldShowCover = (!isProof || isDesignPreview) && coverStyle !== 'none';
+
     document.body.classList.toggle('is-proofing-protected', isProof);
 
-    // Garante que apenas os elementos da fase correta existam visualmente
-    if (els.deliveryHero) els.deliveryHero.hidden = isProof;
+    if (els.deliveryHero) els.deliveryHero.hidden = !shouldShowCover;
     if (els.proofingTitle) els.proofingTitle.hidden = !isProof;
     if (els.deliveryTopbarTitle) els.deliveryTopbarTitle.hidden = isProof;
     if (els.topbarProofingActions) els.topbarProofingActions.hidden = !isProof;
     if (els.topbarDeliveryActions) els.topbarDeliveryActions.hidden = isProof;
     if (els.dock) els.dock.hidden = !isProof || Boolean(album.selectionLocked);
 
-    // Reseta filtro inválido ao trocar de fase
     if (isProof && activeFilter === 'favorites') activeFilter = 'all';
     if (!isProof && ['selected', 'unselected', 'commented'].includes(activeFilter)) activeFilter = 'all';
+
+    if (shouldShowCover) {
+      hydrateCoverHero(album);
+    }
 
     if (isProof) {
       updateProofingChrome(album);
@@ -343,13 +411,26 @@
     renderMasonryWall(album);
   }
 
+  function hydrateCoverHero(album) {
+    const cover = album.coverSrc || album.photos?.[0]?.originalSrc || 'assets/images/real/IMG_1186.jpg';
+    if (els.deliveryHeroImg) {
+      els.deliveryHeroImg.src = cover;
+      els.deliveryHeroImg.alt = album.title || album.clientName;
+      els.deliveryHeroImg.style.objectPosition = album.coverFocal || '50% 36%';
+    }
+    if (els.deliveryHeroDate) els.deliveryHeroDate.textContent = album.subtitle || '';
+    if (els.deliveryHeroTitle) els.deliveryHeroTitle.textContent = album.title || album.clientName;
+    if (els.deliveryHeroMsg) els.deliveryHeroMsg.textContent = album.welcomeMessage || '';
+  }
+
   function updateProofingChrome(album) {
+    const calc = window.AlbumsStore.calculateSelectionPricing(album);
     if (els.proofingTitle) els.proofingTitle.textContent = album.title || album.clientName;
     if (els.proofingPkgMeta) {
-      els.proofingPkgMeta.textContent = `${album.packageName || 'Pacote'}: ${album.packageIncluded} fotos inclusas · Foto extra ${formatBRL(album.extraPhotoPrice)}`;
+      els.proofingPkgMeta.textContent = calc.extrasEnabled
+        ? `${album.packageName || 'Pacote'}: ${calc.packageIncluded} fotos inclusas · Foto extra ${formatBRL(album.extraPhotoPrice)}`
+        : `${album.packageName || 'Pacote'}: selecione até ${calc.packageIncluded} fotos inclusas`;
     }
-
-    const calc = window.AlbumsStore.calculateSelectionPricing(album);
 
     if (els.topSelStat) {
       els.topSelStat.textContent = `Selecionadas: ${calc.selectedCount} / ${calc.packageIncluded}`;
@@ -410,16 +491,7 @@
   }
 
   function updateDeliveryChrome(album) {
-    const cover = album.coverSrc || album.photos?.[0]?.originalSrc || '';
-    if (els.deliveryHeroImg) {
-      els.deliveryHeroImg.src = cover;
-      els.deliveryHeroImg.alt = album.title || album.clientName;
-      els.deliveryHeroImg.style.objectPosition = album.coverFocal || 'center 36%';
-    }
-    if (els.deliveryHeroDate) els.deliveryHeroDate.textContent = album.subtitle || '';
-    if (els.deliveryHeroTitle) els.deliveryHeroTitle.textContent = album.title || album.clientName;
-    if (els.deliveryHeroMsg) els.deliveryHeroMsg.textContent = album.welcomeMessage || '';
-
+    hydrateCoverHero(album);
     if (els.deliveryTopbarTitle) els.deliveryTopbarTitle.textContent = album.clientName;
     if (els.proofingPkgMeta) {
       els.proofingPkgMeta.textContent = `${(album.photos || []).length} fotografias em alta resolução`;
@@ -427,7 +499,7 @@
   }
 
   /* ==========================================================================
-     5. FILTROS LIMPOS (APENAS OS SOLICITADOS PELO YAN) & PAREDE MASONRY
+     5. FILTROS LIMPOS & PAREDE DE FOTOS (COM FOCO NO CURSOR/DEDO EM SPOTLIGHT)
      ========================================================================== */
   function getFilteredPhotos(album) {
     const photos = album.photos || [];
@@ -483,6 +555,26 @@
     });
   }
 
+  function updateTileSpotlightMask(tile, clientX, clientY) {
+    const revealImg = tile?.querySelector('.tile-spotlight-reveal');
+    const frame = tile?.querySelector('.masonry-img-btn');
+    if (!revealImg || !frame) return;
+    const rect = frame.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const x = Math.max(0, Math.min(rect.width, clientX - rect.left));
+    const y = Math.max(0, Math.min(rect.height, clientY - rect.top));
+    const radius = Math.max(76, Math.min(115, Math.round(Math.min(rect.width, rect.height) * 0.34)));
+    const mask = `radial-gradient(circle ${radius}px at ${x.toFixed(1)}px ${y.toFixed(1)}px, rgba(0,0,0,1) 0%, rgba(0,0,0,0.88) 54%, rgba(0,0,0,0) 100%)`; // taste-skill-ignore: functional mask-image for cursor spotlight lens
+    revealImg.style.webkitMaskImage = mask;
+    revealImg.style.maskImage = mask;
+    revealImg.style.opacity = '1';
+  }
+
+  function clearTileSpotlightMask(tile) {
+    const revealImg = tile?.querySelector('.tile-spotlight-reveal');
+    if (revealImg) revealImg.style.opacity = '0';
+  }
+
   function renderMasonryWall(album) {
     if (!els.grid) return;
     const filtered = getFilteredPhotos(album);
@@ -494,25 +586,30 @@
     if (els.emptyBox) els.emptyBox.hidden = filtered.length > 0;
 
     const isProof = album.phase === 'proofing';
+    const isSpotlight = isProof && album.protectionLevel === 'watermark_spotlight';
     const selectedOrder = album.selectedIds || [];
     const selectedSet = new Set(selectedOrder);
     const favSet = new Set(album.deliveryFavorites || []);
     const comments = album.photoComments || {};
     const pkgLimit = Math.max(0, parseInt(album.packageIncluded, 10) || 0);
+    const extrasOn = album.extrasEnabled !== false;
 
     els.grid.innerHTML = filtered.map((photo, idx) => {
       const src = getPhotoPrimarySrc(album, photo);
+      const revealSrc = isSpotlight ? getPhotoRevealSrc(album, photo) : '';
+      const ratioStyle = photo.aspectRatio ? `style="--ratio: ${Number(photo.aspectRatio).toFixed(3)};"` : '';
 
       if (isProof) {
         const isSel = selectedSet.has(photo.id);
         const selPos = selectedOrder.indexOf(photo.id);
-        const isExtra = isSel && selPos >= pkgLimit;
+        const isExtra = extrasOn && isSel && selPos >= pkgLimit && Number(album.extraPhotoPrice) > 0;
         const hasNote = Boolean(comments[photo.id]?.trim());
 
         return `
-          <figure class="masonry-tile ${isSel ? 'is-selected' : ''}" data-photo-id="${escapeHtml(photo.id)}">
+          <figure class="masonry-tile ${isSel ? 'is-selected' : ''} ${isSpotlight ? 'has-cursor-spotlight' : ''}" data-photo-id="${escapeHtml(photo.id)}" ${ratioStyle}>
             <button type="button" class="masonry-img-btn js-open-lb" data-lb-idx="${idx}" aria-label="Ampliar foto ${escapeHtml(photo.filename)}">
-              <img src="${escapeHtml(src)}" alt="${escapeHtml(photo.filename)}" loading="lazy" draggable="false" />
+              <img src="${escapeHtml(src)}" alt="${escapeHtml(photo.filename)}" loading="lazy" draggable="false" class="tile-base-img" />
+              ${isSpotlight ? `<img src="${escapeHtml(revealSrc)}" alt="" aria-hidden="true" draggable="false" class="tile-spotlight-reveal" />` : ''}
             </button>
             ${isExtra ? `<span class="tile-extra-flag">Extra · ${formatBRL(album.extraPhotoPrice)}</span>` : ''}
             <span class="tile-code-label">${escapeHtml(photo.filename)}</span>
@@ -536,9 +633,9 @@
 
       const isFav = favSet.has(photo.id);
       return `
-        <figure class="masonry-tile ${isFav ? 'is-selected' : ''}" data-photo-id="${escapeHtml(photo.id)}">
+        <figure class="masonry-tile ${isFav ? 'is-selected' : ''}" data-photo-id="${escapeHtml(photo.id)}" ${ratioStyle}>
           <button type="button" class="masonry-img-btn js-open-lb" data-lb-idx="${idx}" aria-label="Ampliar foto ${escapeHtml(photo.filename)}">
-            <img src="${escapeHtml(src)}" alt="${escapeHtml(photo.filename)}" loading="lazy" />
+            <img src="${escapeHtml(src)}" alt="${escapeHtml(photo.filename)}" loading="lazy" class="tile-base-img" />
           </button>
           <button
             type="button"
@@ -556,6 +653,32 @@
         </figure>
       `;
     }).join('');
+
+    // Calcula aspect-ratio natural para fotos antigas na Grade Horizontal
+    els.grid.querySelectorAll('img.tile-base-img').forEach((img) => {
+      const syncRatio = () => {
+        if (img.naturalWidth && img.naturalHeight) {
+          const tile = img.closest('.masonry-tile');
+          if (tile) {
+            tile.style.setProperty('--ratio', (img.naturalWidth / img.naturalHeight).toFixed(3));
+          }
+        }
+      };
+      if (img.complete) syncRatio();
+      else img.addEventListener('load', syncRatio, { once: true });
+    });
+
+    // Eventos de foco interativo por cursor/toque na miniatura (Nível 3: watermark_spotlight)
+    if (isSpotlight) {
+      els.grid.querySelectorAll('.masonry-tile.has-cursor-spotlight').forEach((tile) => {
+        tile.addEventListener('pointermove', (e) => {
+          if (e.pointerType === 'touch') return;
+          updateTileSpotlightMask(tile, e.clientX, e.clientY);
+        });
+        tile.addEventListener('pointerleave', () => clearTileSpotlightMask(tile));
+        tile.addEventListener('pointercancel', () => clearTileSpotlightMask(tile));
+      });
+    }
 
     els.grid.querySelectorAll('.js-open-lb').forEach((btn) => {
       btn.addEventListener('click', () => openLightboxAt(Number(btn.getAttribute('data-lb-idx')) || 0, false));
@@ -578,6 +701,35 @@
     });
   }
 
+  function setupGridTouchSpotlight() {
+    if (!els.grid) return;
+    const handleTouchPoint = (e) => {
+      if (!currentAlbum || currentAlbum.phase !== 'proofing' || currentAlbum.protectionLevel !== 'watermark_spotlight') return;
+      const t = e.touches?.[0];
+      if (!t) return;
+      const hitEl = document.elementFromPoint(t.clientX, t.clientY);
+      const tile = hitEl?.closest?.('.masonry-tile.has-cursor-spotlight') || null;
+      if (activeTouchSpotlightTile && activeTouchSpotlightTile !== tile) {
+        clearTileSpotlightMask(activeTouchSpotlightTile);
+      }
+      activeTouchSpotlightTile = tile;
+      if (tile) {
+        updateTileSpotlightMask(tile, t.clientX, t.clientY);
+      }
+    };
+    const clearTouch = () => {
+      if (activeTouchSpotlightTile) {
+        clearTileSpotlightMask(activeTouchSpotlightTile);
+        activeTouchSpotlightTile = null;
+      }
+    };
+
+    els.grid.addEventListener('touchstart', handleTouchPoint, { passive: true });
+    els.grid.addEventListener('touchmove', handleTouchPoint, { passive: true });
+    els.grid.addEventListener('touchend', clearTouch, { passive: true });
+    els.grid.addEventListener('touchcancel', clearTouch, { passive: true });
+  }
+
   async function togglePhotoSelection(photoId) {
     if (!currentAlbum || currentAlbum.phase !== 'proofing' || currentAlbum.selectionLocked) return;
     if (!Array.isArray(currentAlbum.selectedIds)) currentAlbum.selectedIds = [];
@@ -586,9 +738,14 @@
     if (idx >= 0) {
       currentAlbum.selectedIds.splice(idx, 1);
     } else {
+      const pkgLimit = Math.max(0, parseInt(currentAlbum.packageIncluded, 10) || 0);
+      if (currentAlbum.extrasEnabled === false && pkgLimit > 0 && currentAlbum.selectedIds.length >= pkgLimit) {
+        showToast(`Limite do pacote atingido (${pkgLimit} fotos). Desmarque uma para trocar.`);
+        return;
+      }
       currentAlbum.selectedIds.push(photoId);
       const calc = window.AlbumsStore.calculateSelectionPricing(currentAlbum);
-      if (calc.extraCount === 1 && currentAlbum.selectedIds.length === calc.packageIncluded + 1) {
+      if (calc.hasExtras && calc.extraCount === 1 && currentAlbum.selectedIds.length === calc.packageIncluded + 1) {
         showToast(`Pacote completo (${calc.packageIncluded} fotos). Fotos extras adicionam ${formatBRL(calc.extraPhotoPrice)} cada.`);
       }
     }
@@ -614,57 +771,58 @@
   }
 
   /* ==========================================================================
-     6. LIGHTBOX & LENTE DE PROTEÇÃO INTERATIVA (SPOTLIGHT / HOLD-TO-REVEAL)
+     6. LIGHTBOX & FOCO INTERATIVO ATRELADO AO CURSOR / TOQUE
      ========================================================================== */
-  function applySpotlightAtPercent(xPct, yPct) {
-    if (!els.lbRevealImg) return;
-    const mask = `radial-gradient(circle 135px at ${xPct.toFixed(1)}% ${yPct.toFixed(1)}%, rgba(0,0,0,1) 0%, rgba(0,0,0,0.88) 56%, rgba(0,0,0,0) 100%)`; // taste-skill-ignore: functional mask-image for spotlight protection lens
+  function applyLightboxSpotlightAtPoint(clientX, clientY) {
+    if (!els.lbRevealImg || !els.lbGuard) return;
+    const rect = els.lbGuard.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const x = Math.max(0, Math.min(rect.width, clientX - rect.left));
+    const y = Math.max(0, Math.min(rect.height, clientY - rect.top));
+    const mask = `radial-gradient(circle 138px at ${x.toFixed(1)}px ${y.toFixed(1)}px, rgba(0,0,0,1) 0%, rgba(0,0,0,0.88) 56%, rgba(0,0,0,0) 100%)`; // taste-skill-ignore: functional mask-image for spotlight protection lens
     els.lbRevealImg.style.webkitMaskImage = mask;
     els.lbRevealImg.style.maskImage = mask;
+    els.lbRevealImg.style.opacity = '1';
+  }
+
+  function hideLightboxSpotlight() {
+    if (els.lbRevealImg) {
+      els.lbRevealImg.style.opacity = '0';
+    }
   }
 
   function setupLightboxProtectionLens() {
     if (!els.lbGuard) return;
 
-    const handleMove = (clientX, clientY) => {
-      if (!currentAlbum || currentAlbum.phase !== 'proofing') return;
-      if (currentAlbum.protectionLevel !== 'watermark_spotlight') return;
-      const rect = els.lbGuard.getBoundingClientRect();
-      if (!rect.width || !rect.height) return;
-      const xPct = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
-      const yPct = Math.max(0, Math.min(100, ((clientY - rect.top) / rect.height) * 100));
-      applySpotlightAtPercent(xPct, yPct);
-    };
+    const isSpotlightActive = () =>
+      currentAlbum && currentAlbum.phase === 'proofing' && currentAlbum.protectionLevel === 'watermark_spotlight';
 
-    els.lbGuard.addEventListener('pointermove', (e) => handleMove(e.clientX, e.clientY));
-    els.lbGuard.addEventListener('touchmove', (e) => {
-      const t = e.touches?.[0];
-      if (t) handleMove(t.clientX, t.clientY);
-    }, { passive: true });
-
-    // Nível 2 (watermark_blur): segurar para inspecionar nitidez com marca d'água
-    const startHold = () => {
-      if (currentAlbum?.phase === 'proofing' && currentAlbum.protectionLevel === 'watermark_blur') {
-        if (els.lbRevealImg) {
-          els.lbRevealImg.style.webkitMaskImage = 'none';
-          els.lbRevealImg.style.maskImage = 'none';
-          els.lbRevealImg.hidden = false;
-        }
-      }
-    };
-    const endHold = () => {
-      if (currentAlbum?.phase === 'proofing' && currentAlbum.protectionLevel === 'watermark_blur') {
-        if (els.lbRevealImg) els.lbRevealImg.hidden = true;
-      }
-    };
-
-    [els.btnHoldSharp, els.lbGuard].forEach((target) => {
-      if (!target) return;
-      target.addEventListener('pointerdown', startHold);
-      target.addEventListener('pointerup', endHold);
-      target.addEventListener('pointerleave', endHold);
-      target.addEventListener('pointercancel', endHold);
+    els.lbGuard.addEventListener('pointermove', (e) => {
+      if (!isSpotlightActive()) return;
+      applyLightboxSpotlightAtPoint(e.clientX, e.clientY);
     });
+    els.lbGuard.addEventListener('pointerleave', () => {
+      if (isSpotlightActive()) hideLightboxSpotlight();
+    });
+    els.lbGuard.addEventListener('pointercancel', () => {
+      if (isSpotlightActive()) hideLightboxSpotlight();
+    });
+    els.lbGuard.addEventListener('touchstart', (e) => {
+      if (!isSpotlightActive()) return;
+      const t = e.touches?.[0];
+      if (t) applyLightboxSpotlightAtPoint(t.clientX, t.clientY);
+    }, { passive: true });
+    els.lbGuard.addEventListener('touchmove', (e) => {
+      if (!isSpotlightActive()) return;
+      const t = e.touches?.[0];
+      if (t) applyLightboxSpotlightAtPoint(t.clientX, t.clientY);
+    }, { passive: true });
+    els.lbGuard.addEventListener('touchend', () => {
+      if (isSpotlightActive()) hideLightboxSpotlight();
+    }, { passive: true });
+    els.lbGuard.addEventListener('touchcancel', () => {
+      if (isSpotlightActive()) hideLightboxSpotlight();
+    }, { passive: true });
   }
 
   function openLightboxAt(idx, focusComment = false) {
@@ -716,30 +874,32 @@
     if (els.lbIndex) els.lbIndex.textContent = `${lightboxIdx + 1} / ${lightboxList.length}`;
     if (els.lbFilename) els.lbFilename.textContent = photo.filename || '';
 
-    // Configura camada de proteção interativa no Lightbox
+    if (els.btnHoldSharp) els.btnHoldSharp.hidden = true;
+
     if (isProof && level === 'watermark_spotlight') {
       if (els.lbRevealImg) {
         els.lbRevealImg.src = revealSrc;
         els.lbRevealImg.hidden = false;
-        applySpotlightAtPercent(50, 46);
+        els.lbRevealImg.style.opacity = '0';
       }
       if (els.lbAssistBox) els.lbAssistBox.hidden = false;
       if (els.lbAssistText) {
-        els.lbAssistText.textContent = 'Proteção de foco centralizado ativa: mova o cursor ou o dedo sobre a foto para inspecionar cada detalhe.';
+        els.lbAssistText.textContent = 'Passe o mouse ou deslize o dedo sobre a foto para focar exatamente onde deseja inspecionar.';
       }
-      if (els.btnHoldSharp) els.btnHoldSharp.hidden = true;
-    } else if (isProof && level === 'watermark_blur') {
+    } else if (isProof && level === 'watermark_lowres') {
       if (els.lbRevealImg) {
-        els.lbRevealImg.src = revealSrc;
         els.lbRevealImg.hidden = true;
+        els.lbRevealImg.style.opacity = '0';
       }
       if (els.lbAssistBox) els.lbAssistBox.hidden = false;
       if (els.lbAssistText) {
-        els.lbAssistText.textContent = 'Proteção anti-captura ativa: mantenha pressionado abaixo (ou sobre a imagem) para conferir a nitidez.';
+        els.lbAssistText.textContent = 'Prévia em baixa resolução para escolha. Suas fotos selecionadas serão entregues em alta definição.';
       }
-      if (els.btnHoldSharp) els.btnHoldSharp.hidden = false;
     } else {
-      if (els.lbRevealImg) els.lbRevealImg.hidden = true;
+      if (els.lbRevealImg) {
+        els.lbRevealImg.hidden = true;
+        els.lbRevealImg.style.opacity = '0';
+      }
       if (els.lbAssistBox) els.lbAssistBox.hidden = true;
     }
 
@@ -990,7 +1150,7 @@
      8. DOWNLOAD COM PIN (BLOQUEADO POR CÓDIGO SE NÃO FOR 'delivery')
      ========================================================================== */
   function isPinVerifiedForSession(album) {
-    if (!album.downloadPin) return true;
+    if (album.pinEnabled === false || !album.downloadPin) return true;
     try {
       return sessionStorage.getItem(`dl_pin_ok_${album.id}`) === album.downloadPin;
     } catch (_) {
@@ -999,7 +1159,6 @@
   }
 
   function openDownloadDialog(singlePhoto = null) {
-    // Trava absoluta de segurança: NUNCA permite download na fase de seleção!
     if (!currentAlbum || currentAlbum.phase !== 'delivery' || !els.dlDialog) return;
     pendingDownloadTarget = singlePhoto;
 
@@ -1223,6 +1382,7 @@
   async function boot() {
     hydrateBrandStrings();
     setupAntiCopyProtection();
+    setupGridTouchSpotlight();
     setupLightboxProtectionLens();
     bindEvents();
 
