@@ -1,0 +1,257 @@
+/* ==========================================================================
+   ESTILOS DO MÓDULO DE ÁLBUNS DE CLIENTES NO PAINEL /ADMIN
+   ========================================================================== */
+.alb-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.alb-kpi-card {
+  background: #FFFFFF;
+  border: 1px solid var(--cms-border, rgba(27, 39, 51, 0.12));
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.alb-kpi-card span {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--cms-muted, #627282);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.alb-kpi-card strong {
+  display: block;
+  font-size: 1.35rem;
+  margin-top: 4px;
+  color: var(--cms-text, #1B2733);
+  font-variant-numeric: tabular-nums;
+}
+
+.alb-top-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.alb-switcher-list {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin-bottom: 18px;
+}
+
+.alb-pill-item {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 205px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(27, 39, 51, 0.12);
+  background: #FFFFFF;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: all 0.16s ease;
+}
+
+.alb-pill-item.active {
+  border-color: #3B7293;
+  background: #F4F9FC;
+  box-shadow: 0 6px 18px rgba(59, 114, 147, 0.12);
+}
+
+.alb-pill-item strong {
+  font-size: 0.9rem;
+  color: #1B2733;
+}
+
+.alb-pill-meta {
+  font-size: 0.74rem;
+  color: #5A6978;
+}
+
+.alb-status-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.alb-status-tag.st-wait { background: #FFF4D9; color: #8A5B00; }
+.alb-status-tag.st-paid { background: #DFF5E8; color: #19613B; }
+.alb-status-tag.st-pix  { background: #FFE8D9; color: #9E4208; }
+.alb-status-tag.st-deliv { background: #E1EFF8; color: #245775; }
+
+.alb-phase-toggle-bar {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  background: #FDF6DF;
+  padding: 8px;
+  border-radius: 14px;
+  border: 1px solid rgba(231, 195, 120, 0.5);
+  margin-bottom: 16px;
+}
+
+.alb-phase-btn {
+  padding: 11px 12px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #5A6978;
+  cursor: pointer;
+}
+
+.alb-phase-btn.active {
+  background: #1B2733;
+  color: #FFFDF3;
+}
+
+.alb-section-box {
+  background: #FFFFFF;
+  border: 1px solid rgba(27, 39, 51, 0.10);
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin-bottom: 16px;
+}
+
+.alb-section-box h3 {
+  margin: 0 0 12px;
+  font-size: 0.95rem;
+  color: #1B2733;
+}
+
+.alb-lr-box {
+  background: #F7F9FB;
+  border: 1px dashed rgba(59, 114, 147, 0.4);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+}
+
+.alb-lr-code {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.alb-notes-list {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.alb-notes-list li {
+  background: #FFFDF3;
+  border-left: 3px solid #E7C378;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+}
+
+.alb-photos-admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.alb-adm-photo-card {
+  background: #FFFDF3;
+  border: 1px solid rgba(27, 39, 51, 0.12);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.alb-adm-photo-card.is-client-picked {
+  border: 2px solid #3B7293;
+}
+
+.alb-adm-thumb-wrap {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: #E9E5DA;
+}
+
+.alb-adm-thumb-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.alb-adm-picked-badge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  background: #3B7293;
+  color: #FFFFFF;
+  font-size: 0.66rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+}
+
+.alb-adm-cover-badge {
+  position: absolute;
+  bottom: 6px;
+  left: 6px;
+  background: #E7C378;
+  color: #1B2733;
+  font-size: 0.66rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+}
+
+.alb-adm-card-body {
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.75rem;
+}
+
+.alb-log-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 190px;
+  overflow-y: auto;
+}
+
+.alb-log-list li {
+  font-size: 0.78rem;
+  color: #465564;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(27, 39, 51, 0.06);
+}
+
+.alb-log-list time {
+  color: #8492A0;
+  font-size: 0.71rem;
+  margin-right: 6px;
+}
+

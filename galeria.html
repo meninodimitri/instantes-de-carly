@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Área do Cliente — Galeria &amp; Seleção | Instantes de Carly</title>
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%233B7293%22 stroke-width=%221.8%22><rect x=%222%22 y=%225%22 width=%2220%22 height=%2214%22 rx=%223%22/><circle cx=%2212%22 cy=%2212%22 r=%223.5%22/><circle cx=%2217%22 cy=%228%22 r=%221%22 fill=%22%23E7C378%22/></svg>" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="assets/css/galeria.css" />
+</head>
+<body>
+
+  <!-- ========================================================================
+       1. PORTAL DE ENTRADA (/galeria sem slug específico)
+       ======================================================================== -->
+  <section id="portal-view" class="portal-view" hidden>
+    <header class="portal-topbar">
+      <a href="index.html" class="portal-brand-link">
+        <img src="assets/images/logo-dark.png" alt="Instantes de Carly" class="portal-logo" />
+      </a>
+      <a href="index.html" class="gal-btn gal-btn-ghost">← Voltar ao Site</a>
+    </header>
+
+    <div class="portal-container">
+      <div class="portal-intro">
+        <span class="gal-kicker">Área Exclusiva do Cliente</span>
+        <h1 class="portal-title">Acesse seu Álbum de Seleção ou Entrega</h1>
+        <p class="portal-desc">
+          Digite o código do álbum enviado no seu WhatsApp ou acesse diretamente pelo link exclusivo recebido após o ensaio.
+        </p>
+
+        <form id="portal-code-form" class="portal-code-form">
+          <input
+            type="text"
+            id="portal-slug-input"
+            class="gal-input"
+            placeholder="Ex: ana-e-lucas ou marina-e-pedro"
+            autocomplete="off"
+            required
+          />
+          <button type="submit" class="gal-btn gal-btn-primary">Abrir Álbum →</button>
+        </form>
+        <p id="portal-error" class="gal-error-msg" hidden></p>
+      </div>
+
+      <!-- Lista rápida visível apenas em ambiente de validação local (localhost) -->
+      <div id="portal-demo-box" class="portal-demo-box" hidden>
+        <div class="portal-demo-header">
+          <span class="demo-pill">🧪 Ambiente Local de Validação</span>
+          <p>Álbuns disponíveis neste navegador para testar os fluxos Sineto Studio (Seleção + Extras) e Pixieset (Entrega em Alta):</p>
+        </div>
+        <div id="portal-albums-grid" class="portal-albums-grid"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       2. PORTÃO DE SENHA DO ÁLBUM
+       ======================================================================== -->
+  <section id="password-view" class="password-view" hidden>
+    <div id="password-bg" class="password-bg"></div>
+    <div class="password-overlay"></div>
+
+    <div class="password-card">
+      <a href="index.html" class="password-logo-wrap">
+        <img src="assets/images/logo-light.png" alt="Instantes de Carly" class="password-logo" />
+      </a>
+      <span id="pw-phase-badge" class="pw-phase-badge">Galeria Privada</span>
+      <h1 id="pw-album-title" class="pw-album-title">Carregando álbum...</h1>
+      <p id="pw-album-subtitle" class="pw-album-subtitle"></p>
+
+      <form id="password-form" class="password-form">
+        <input type="text" name="username" autocomplete="username" hidden />
+        <label for="pw-input" class="sr-only">Senha do álbum</label>
+        <input
+          type="password"
+          id="pw-input"
+          class="gal-input pw-input"
+          placeholder="Digite a senha do seu álbum"
+          autocomplete="current-password"
+          required
+        />
+        <button type="submit" class="gal-btn gal-btn-gold" style="width: 100%;">
+          Acessar Fotografias →
+        </button>
+      </form>
+
+      <p id="pw-error" class="pw-error" hidden>Senha incorreta. Confira a mensagem enviada no seu WhatsApp.</p>
+      <p id="pw-local-hint" class="pw-local-hint" hidden></p>
+
+      <a href="galeria" class="pw-switch-link">Trocar código de álbum</a>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       3. EXPERIÊNCIA PRINCIPAL DO ÁLBUM (SELEÇÃO SINETO OU ENTREGA PIXIESET)
+       ======================================================================== -->
+  <div id="album-view" class="album-view" hidden>
+
+    <!-- CAPA CINEMATOGRÁFICA ESTILO PIXIESET (Exibida no modo 'delivery') -->
+    <section id="delivery-hero" class="delivery-hero" hidden>
+      <img id="delivery-hero-img" src="" alt="" class="delivery-hero-img" />
+      <div class="delivery-hero-scrim"></div>
+
+      <header class="delivery-hero-topbar">
+        <a href="index.html" class="delivery-brand">
+          <img src="assets/images/logo-light.png" alt="Instantes de Carly" />
+        </a>
+        <span class="delivery-badge">Galeria Oficial em Alta Resolução</span>
+      </header>
+
+      <div class="delivery-hero-content">
+        <p id="delivery-hero-subtitle" class="delivery-hero-kicker"></p>
+        <h1 id="delivery-hero-title" class="delivery-hero-title"></h1>
+        <p id="delivery-hero-msg" class="delivery-hero-msg"></p>
+        <div class="delivery-hero-actions">
+          <button type="button" id="btn-scroll-gallery" class="gal-btn gal-btn-light">
+            Ver Álbum ↓
+          </button>
+          <button type="button" id="btn-hero-download-all" class="gal-btn gal-btn-outline-light">
+            ⬇️ Baixar Álbum Completo (.zip)
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- CABEÇALHO EDITORIAL DO MODO DE SELEÇÃO (Exibido no modo 'proofing') -->
+    <header id="proofing-header" class="proofing-header" hidden>
+      <div class="gal-container proofing-header-inner">
+        <div class="proofing-brand-row">
+          <a href="index.html" class="proofing-logo-link">
+            <img src="assets/images/logo-dark.png" alt="Instantes de Carly" />
+          </a>
+          <div class="proofing-badges">
+            <span class="badge-pill badge-blue">🔒 Galeria de Prova Protegida</span>
+            <span id="proofing-pkg-pill" class="badge-pill badge-gold"></span>
+          </div>
+        </div>
+
+        <div class="proofing-title-block">
+          <span id="proofing-subtitle" class="gal-kicker"></span>
+          <h1 id="proofing-title" class="proofing-title"></h1>
+          <p id="proofing-welcome" class="proofing-welcome"></p>
+        </div>
+
+        <!-- Banner exibido quando a seleção já foi concluída/enviada -->
+        <div id="proofing-locked-banner" class="proofing-locked-banner" hidden></div>
+      </div>
+    </header>
+
+    <!-- BARRA PEGAJOSA DE FILTROS, PASTAS E AÇÕES -->
+    <div id="gallery-toolbar" class="gallery-toolbar">
+      <div class="gal-container toolbar-inner">
+        <div id="toolbar-filters" class="toolbar-filters" role="tablist" aria-label="Filtros do álbum"></div>
+
+        <div class="toolbar-right">
+          <span id="toolbar-count-label" class="toolbar-count-label"></span>
+          <button type="button" id="btn-toolbar-download-zip" class="gal-btn gal-btn-primary gal-btn-sm" hidden>
+            ⬇️ Baixar Tudo (.zip)
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- GRADE DE FOTOGRAFIAS -->
+    <main class="gal-container gallery-main">
+      <div id="photos-loading" class="photos-loading" hidden>
+        <div class="spinner"></div>
+        <p>Preparando provas protegidas do seu ensaio...</p>
+      </div>
+
+      <div id="gallery-grid" class="gallery-grid"></div>
+
+      <div id="gallery-empty" class="gallery-empty" hidden>
+        <p>Nenhuma fotografia encontrada neste filtro.</p>
+      </div>
+    </main>
+
+    <!-- BARRA FLUTUANTE DE CONTAGEM DE PACOTE & EXTRAS (MODO SELEÇÃO SINETO) -->
+    <aside id="selection-dock" class="selection-dock" aria-live="polite" hidden>
+      <div class="gal-container selection-dock-inner">
+        <div class="dock-progress-col">
+          <div class="dock-stats-row">
+            <strong id="dock-main-stat" class="dock-main-stat">0 de 0 selecionadas</strong>
+            <span id="dock-extra-stat" class="dock-extra-stat"></span>
+          </div>
+          <div class="dock-bar-track">
+            <div id="dock-bar-fill" class="dock-bar-fill" style="width: 0%;"></div>
+          </div>
+        </div>
+
+        <div class="dock-actions-col">
+          <button type="button" id="btn-filter-selected-quick" class="gal-btn gal-btn-ghost gal-btn-sm">
+            Ver Escolhidas
+          </button>
+          <button type="button" id="btn-finish-selection" class="gal-btn gal-btn-primary">
+            Concluir Seleção →
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <footer class="gal-footer">
+      <div class="gal-container gal-footer-inner">
+        <span id="gal-footer-brand">Instantes de Carly — Fotografia Humanizada</span>
+        <a href="index.html">Visitar Portfólio Principal ↗</a>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ========================================================================
+       4. LIGHTBOX COMPARADOR E VISUALIZADOR EM TELA CHEIA
+       ======================================================================== -->
+  <dialog id="gal-lightbox" class="gal-lightbox" aria-label="Visualização ampliada">
+    <div class="lightbox-wrapper">
+      <button type="button" id="lb-close" class="lb-close-btn" aria-label="Fechar">✕</button>
+
+      <div class="lightbox-stage-col">
+        <div class="lightbox-media" id="lb-media-wrap">
+          <img id="lb-img" src="" alt="" draggable="false" />
+          <button type="button" id="lb-prev" class="lb-nav prev" aria-label="Foto anterior">‹</button>
+          <button type="button" id="lb-next" class="lb-nav next" aria-label="Próxima foto">›</button>
+        </div>
+        <div id="lb-filmstrip" class="lightbox-filmstrip"></div>
+      </div>
+
+      <aside class="lb-sidebar">
+        <div>
+          <div class="lb-meta-top">
+            <span id="lb-index" class="lb-counter">1 / 1</span>
+            <span id="lb-filename" class="lb-filename">IMG_0001.jpg</span>
+          </div>
+          <p id="lb-folder" class="lb-folder"></p>
+
+          <!-- Controles de Seleção + Comentário (Modo Proofing) -->
+          <div id="lb-proofing-controls" class="lb-controls-box" hidden>
+            <button type="button" id="lb-select-btn" class="gal-btn gal-btn-select-lg">
+              🤍 Selecionar esta foto
+            </button>
+            <p class="lb-shortcut-hint">Atalho no teclado: tecla <kbd>S</kbd> para selecionar e <kbd>←</kbd> <kbd>→</kbd> para navegar.</p>
+
+            <div id="lb-comment-wrap" class="lb-comment-wrap">
+              <label for="lb-comment-input" class="lb-label">Observação para edição (opcional)</label>
+              <textarea
+                id="lb-comment-input"
+                class="gal-textarea"
+                rows="3"
+                placeholder="Ex: Suavizar manchinha, versão P&B, clarear leve..."
+              ></textarea>
+              <button type="button" id="lb-save-comment" class="gal-btn gal-btn-ghost gal-btn-sm" style="margin-top: 8px;">
+                Salvar observação
+              </button>
+            </div>
+          </div>
+
+          <!-- Controles de Favoritar + Download (Modo Delivery Pixieset) -->
+          <div id="lb-delivery-controls" class="lb-controls-box" hidden>
+            <button type="button" id="lb-fav-btn" class="gal-btn gal-btn-ghost" style="width: 100%; margin-bottom: 10px;">
+              🤍 Salvar nas Favoritas
+            </button>
+            <button type="button" id="lb-download-single" class="gal-btn gal-btn-primary" style="width: 100%;">
+              ⬇️ Baixar esta Fotografia
+            </button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </dialog>
+
+  <!-- ========================================================================
+       5. MODAL DE REVISÃO DA SELEÇÃO & PAGAMENTO SEGURO DE FOTOS EXTRAS
+       ======================================================================== -->
+  <dialog id="checkout-dialog" class="gal-modal" closedby="any">
+    <div class="gal-modal-card">
+      <div class="gal-modal-header">
+        <div>
+          <span class="gal-kicker">Resumo Final da Seleção</span>
+          <h2 id="chk-title" class="gal-modal-title">Confirmar Fotografias Escolhidas</h2>
+        </div>
+        <button type="button" id="chk-close" class="gal-icon-close" aria-label="Fechar">✕</button>
+      </div>
+
+      <div class="gal-modal-body">
+        <!-- Resumo Numérico Transparente -->
+        <div class="chk-summary-box">
+          <div class="chk-row">
+            <span>Fotografias inclusas no seu pacote</span>
+            <strong id="chk-included-val">0 fotos (Incluso)</strong>
+          </div>
+          <div class="chk-row" id="chk-extra-row">
+            <span id="chk-extra-label">Fotografias extras adicionadas</span>
+            <strong id="chk-extra-val">R$ 0,00</strong>
+          </div>
+          <div class="chk-row chk-total-row">
+            <span>Total adicional a pagar agora</span>
+            <strong id="chk-total-val">R$ 0,00</strong>
+          </div>
+        </div>
+
+        <!-- Miniaturas das Fotos Escolhidas -->
+        <div class="chk-thumbs-section">
+          <span class="lb-label" id="chk-thumbs-label">Fotos selecionadas:</span>
+          <div id="chk-thumbs-strip" class="chk-thumbs-strip"></div>
+        </div>
+
+        <!-- Bloco quando NÃO há extras (Conclusão Direta Gratuita) -->
+        <div id="chk-no-extras-box" hidden>
+          <p class="chk-note">
+            Sua seleção está dentro do limite do pacote contratado. Ao confirmar, sua fotógrafa receberá imediatamente a lista final para iniciar o tratamento fino das imagens!
+          </p>
+          <button type="button" id="btn-confirm-free-selection" class="gal-btn gal-btn-primary" style="width: 100%;">
+            ✅ Confirmar e Enviar Seleção Final
+          </button>
+        </div>
+
+        <!-- Bloco quando HÁ FOTOS EXTRAS (Pagamento Seguro Mercado Pago ou Pix Direto) -->
+        <div id="chk-payment-box" hidden>
+          <div class="pay-tabs" role="tablist">
+            <button type="button" class="pay-tab active" data-pay-tab="mp">
+              ⚡ Pix Instantâneo / Cartão (Automático)
+            </button>
+            <button type="button" class="pay-tab" data-pay-tab="direct">
+              💠 Pix Direto Estúdio (Sem Taxa)
+            </button>
+          </div>
+
+          <!-- ABA 1: MERCADO PAGO (PIX DINÂMICO + CARTÃO + WEBHOOK) -->
+          <div id="pay-pane-mp" class="pay-pane">
+            <div class="security-seal">
+              <span>🔒</span>
+              <div>
+                <strong>Ambiente Seguro Mercado Pago</strong>
+                <p>Valor calculado no servidor pela quantidade de fotos extras. Liberação automática em segundos após o pagamento.</p>
+              </div>
+            </div>
+
+            <div class="pix-qr-layout">
+              <div class="qr-canvas-box">
+                <canvas id="mp-qr-canvas" width="180" height="180"></canvas>
+              </div>
+              <div class="pix-copy-col">
+                <label class="lb-label">Pix Copia e Cola (Mercado Pago):</label>
+                <div class="copy-input-row">
+                  <input type="text" id="mp-pix-code" class="gal-input" readonly />
+                  <button type="button" id="btn-copy-mp-pix" class="gal-btn gal-btn-primary gal-btn-sm">Copiar</button>
+                </div>
+                <button type="button" id="btn-mp-card-link" class="gal-btn gal-btn-outline" style="width: 100%; margin-top: 10px;">
+                  💳 Pagar com Cartão de Crédito (Até 12x)
+                </button>
+
+                <!-- Botão exclusivo de localhost para simular retorno do Webhook Mercado Pago -->
+                <div id="mp-local-webhook-sim" class="local-sim-box" hidden>
+                  <span>🧪 Modo Localhost:</span>
+                  <button type="button" id="btn-simulate-mp-webhook" class="gal-btn gal-btn-gold gal-btn-sm">
+                    Simular Pagamento Aprovado (Webhook MP) ✓
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ABA 2: PIX DIRETO PADRÃO BANCO CENTRAL + COMPROVANTE WHATSAPP -->
+          <div id="pay-pane-direct" class="pay-pane" hidden>
+            <div class="pix-qr-layout">
+              <div class="qr-canvas-box">
+                <canvas id="direct-qr-canvas" width="180" height="180"></canvas>
+              </div>
+              <div class="pix-copy-col">
+                <p class="chk-note" style="margin-top: 0;">
+                  Chave Pix Oficial: <strong id="direct-pix-key-label"></strong>
+                </p>
+                <label class="lb-label">Código Pix Copia e Cola (Valor Exato):</label>
+                <div class="copy-input-row">
+                  <input type="text" id="direct-pix-code" class="gal-input" readonly />
+                  <button type="button" id="btn-copy-direct-pix" class="gal-btn gal-btn-primary gal-btn-sm">Copiar</button>
+                </div>
+                <button type="button" id="btn-confirm-direct-pix" class="gal-btn gal-btn-gold" style="width: 100%; margin-top: 12px;">
+                  ✅ Já fiz o Pix • Enviar Comprovante e Concluir
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ========================================================================
+       6. MODAL DE DOWNLOAD & PIN DE 4 DÍGITOS (ESTILO PIXIESET)
+       ======================================================================== -->
+  <dialog id="download-dialog" class="gal-modal" closedby="any">
+    <div class="gal-modal-card" style="max-width: 500px;">
+      <div class="gal-modal-header">
+        <div>
+          <span class="gal-kicker">Entrega Digital Segura</span>
+          <h2 id="dl-modal-title" class="gal-modal-title">Baixar Fotografias</h2>
+        </div>
+        <button type="button" id="dl-close" class="gal-icon-close" aria-label="Fechar">✕</button>
+      </div>
+
+      <div class="gal-modal-body">
+        <div id="dl-pin-group" class="dl-pin-group">
+          <label for="dl-pin-input" class="lb-label">PIN de Download (4 dígitos enviado pela fotógrafa)</label>
+          <input
+            type="text"
+            id="dl-pin-input"
+            inputmode="numeric"
+            maxlength="6"
+            class="gal-input dl-pin-input"
+            placeholder="••••"
+          />
+          <p id="dl-pin-hint" class="pw-local-hint" style="color: var(--gal-blue); margin-top: 6px;" hidden></p>
+          <p id="dl-pin-error" class="gal-error-msg" hidden>PIN de download inválido.</p>
+        </div>
+
+        <div class="dl-size-options">
+          <label class="dl-radio-card active">
+            <input type="radio" name="dl-res" value="high" checked />
+            <div>
+              <strong>✨ Alta Resolução (Original)</strong>
+              <span>Ideal para revelar, imprimir quadros, fotolivros e guardar em backup.</span>
+            </div>
+          </label>
+          <label class="dl-radio-card">
+            <input type="radio" name="dl-res" value="web" />
+            <div>
+              <strong>📱 Tamanho Web &amp; Redes Sociais (1600px)</strong>
+              <span>Arquivos mais leves e nítidos para Instagram e WhatsApp.</span>
+            </div>
+          </label>
+        </div>
+
+        <div id="dl-progress-box" class="dl-progress-box" hidden>
+          <span id="dl-progress-text">Compactando fotografias...</span>
+          <div class="dock-bar-track" style="margin-top: 6px;">
+            <div id="dl-progress-bar" class="dock-bar-fill" style="width: 0%;"></div>
+          </div>
+        </div>
+
+        <button type="button" id="btn-start-download" class="gal-btn gal-btn-primary" style="width: 100%; margin-top: 16px;">
+          ⬇️ Iniciar Download Agora
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <div id="gal-toast" class="gal-toast" hidden></div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/albums-store.js"></script>
+  <script src="assets/js/galeria.js"></script>
+</body>
+</html>
+

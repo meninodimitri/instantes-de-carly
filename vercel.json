@@ -16,7 +16,7 @@
       ]
     },
     {
-      "source": "/(|index\\.html|admin|admin\\.html)",
+      "source": "/(|index\\.html|admin|admin\\.html|galeria|galeria\\.html)",
       "headers": [
         {
           "key": "Cache-Control",
