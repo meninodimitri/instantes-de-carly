@@ -840,6 +840,70 @@ function packEditorialRows(photos) {
   return packed;
 }
 
+function getAcervoCoverPhotos(allItems, categories) {
+  const orderedCats = (categories || []).filter((c) => c.id && c.id !== 'todos');
+  const covers = [];
+  const coveredCats = new Set();
+
+  orderedCats.forEach((cat) => {
+    const catItems = allItems.filter((p) => p.category === cat.id);
+    if (!catItems.length) return;
+    const chosen = catItems.find((p) => p.isAcervoCover === true) || catItems[0];
+    covers.push(chosen);
+    coveredCats.add(cat.id);
+  });
+
+  // Fallback para categorias presentes nas fotos mas ausentes na lista
+  allItems.forEach((p) => {
+    if (p.category && !coveredCats.has(p.category)) {
+      const catItems = allItems.filter((item) => item.category === p.category);
+      const chosen = catItems.find((item) => item.isAcervoCover === true) || catItems[0];
+      covers.push(chosen);
+      coveredCats.add(p.category);
+    }
+  });
+
+  return covers;
+}
+
+function selectPortfolioCategory(categoryId, { scrollToFilters = false } = {}) {
+  const filtersContainer = document.getElementById('portfolio-filters');
+  const categories = SITE_DATA.categories || [];
+  const exists = categories.some((c) => c.id === categoryId);
+  currentCategory = exists ? categoryId : 'todos';
+
+  if (filtersContainer) {
+    let activeBtn = null;
+    filtersContainer.querySelectorAll('.filter-btn').forEach((b) => {
+      const isMatch = b.getAttribute('data-category') === currentCategory;
+      b.classList.toggle('active', isMatch);
+      b.setAttribute('aria-selected', isMatch ? 'true' : 'false');
+      if (isMatch) activeBtn = b;
+    });
+
+    if (activeBtn && filtersContainer.scrollWidth > filtersContainer.clientWidth) {
+      const targetLeft = activeBtn.offsetLeft - (filtersContainer.clientWidth / 2) + (activeBtn.offsetWidth / 2);
+      filtersContainer.scrollTo({ left: Math.max(0, targetLeft), behavior: 'smooth' });
+    }
+  }
+
+  const updateGrid = () => renderPortfolioGrid(currentCategory);
+  if (document.startViewTransition) {
+    document.startViewTransition(updateGrid);
+  } else {
+    updateGrid();
+  }
+
+  if (scrollToFilters && filtersContainer) {
+    const headerHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-height'), 10) || 86;
+    const rect = filtersContainer.getBoundingClientRect();
+    if (rect.top < headerHeight || rect.top > window.innerHeight * 0.55) {
+      const targetY = window.scrollY + rect.top - headerHeight - 20;
+      window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
+    }
+  }
+}
+
 function renderPortfolioFiltersAndGrid(activeCat = 'todos') {
   const filtersContainer = document.getElementById('portfolio-filters');
   if (!filtersContainer) return;
@@ -873,21 +937,7 @@ function initPortfolio() {
   filtersContainer.addEventListener('click', (e) => {
     const btn = e.target.closest('.filter-btn');
     if (!btn) return;
-
-    document.querySelectorAll('.filter-btn').forEach((b) => {
-      b.classList.remove('active');
-      b.setAttribute('aria-selected', 'false');
-    });
-    btn.classList.add('active');
-    btn.setAttribute('aria-selected', 'true');
-
-    currentCategory = btn.getAttribute('data-category');
-
-    if (document.startViewTransition) {
-      document.startViewTransition(() => renderPortfolioGrid(currentCategory));
-    } else {
-      renderPortfolioGrid(currentCategory);
-    }
+    selectPortfolioCategory(btn.getAttribute('data-category'));
   });
 
   renderPortfolioFiltersAndGrid('todos');
@@ -899,18 +949,24 @@ function renderPortfolioGrid(category) {
   if (!gridContainer) return;
 
   const allItems = SITE_DATA.portfolio || [];
-  const rawFiltered = category === 'todos'
-    ? allItems
+  const isOverview = category === 'todos';
+  const rawFiltered = isOverview
+    ? getAcervoCoverPhotos(allItems, SITE_DATA.categories)
     : allItems.filter((p) => p.category === category);
 
   const packedRows = packEditorialRows(rawFiltered);
   visiblePhotos = packedRows.map((entry) => entry.photo);
 
-  gridContainer.classList.toggle('is-filtered', category !== 'todos');
+  gridContainer.classList.toggle('is-filtered', !isOverview);
+  gridContainer.classList.toggle('is-acervo-overview', isOverview);
   gridContainer.setAttribute('data-filtered-count', visiblePhotos.length.toString());
 
   if (countIndicator) {
-    countIndicator.textContent = `CURADORIA AUTORAL • ${visiblePhotos.length} ${visiblePhotos.length === 1 ? 'OBRA' : 'OBRAS'}`;
+    if (isOverview) {
+      countIndicator.textContent = `COLEÇÕES AUTORAIS • ${visiblePhotos.length} ${visiblePhotos.length === 1 ? 'CATEGORIA' : 'CATEGORIAS'} (${allItems.length} ${allItems.length === 1 ? 'OBRA' : 'OBRAS'})`;
+    } else {
+      countIndicator.textContent = `CURADORIA AUTORAL • ${visiblePhotos.length} ${visiblePhotos.length === 1 ? 'OBRA' : 'OBRAS'}`;
+    }
   }
 
   if (packedRows.length === 0) {
@@ -928,16 +984,30 @@ function renderPortfolioGrid(category) {
     const shortLocation = (photo.location || 'Fortaleza').split(',')[0];
     const objPos = photo.objectPosition || 'center 25%';
     const catObj = (SITE_DATA.categories || []).find((c) => c.id === photo.category);
-    const catLabel = photo.categoryName || (catObj ? catObj.name : photo.category);
+    const catLabel = catObj ? catObj.name : (photo.categoryName || photo.category);
+    const catCount = allItems.filter((p) => p.category === photo.category).length;
+
+    const hoverCtaText = isOverview
+      ? `Ver ensaios de ${escapeHtml(catLabel)} (${catCount} ${catCount === 1 ? 'foto' : 'fotos'}) →`
+      : 'Abrir na sala de exibição ↗';
+
+    const ariaLabel = isOverview
+      ? `Abrir categoria ${escapeHtml(catLabel)} (${catCount} ${catCount === 1 ? 'foto' : 'fotos'})`
+      : `Ampliar fotografia ${escapeHtml(photo.title)}`;
+
+    const collectionBadgeHtml = isOverview
+      ? `<span class="work-collection-pill"><span>${escapeHtml(catLabel)}</span><span class="work-collection-count">${catCount} ${catCount === 1 ? 'foto' : 'fotos'} →</span></span>`
+      : '';
 
     return `
-      <article class="work-item" data-index="${index}" data-category="${escapeHtml(photo.category)}" data-aspect="${escapeHtml(photo.aspect || 'landscape')}" data-col-span="${entry.colSpan}" data-row-aspect="${entry.rowAspect}" tabindex="0" role="button" aria-label="Ampliar fotografia ${escapeHtml(photo.title)}">
+      <article class="work-item" data-index="${index}" data-category="${escapeHtml(photo.category)}" data-aspect="${escapeHtml(photo.aspect || 'landscape')}" data-col-span="${entry.colSpan}" data-row-aspect="${entry.rowAspect}" tabindex="0" role="button" aria-label="${ariaLabel}">
         <div class="work-frame">
           <div class="work-img-box">
             <img class="work-img" src="${escapeHtml(photo.image)}" alt="${escapeHtml(photo.title)} — ${escapeHtml(photo.location || '')}" loading="lazy" style="object-position: ${escapeHtml(objPos)};" />
+            ${collectionBadgeHtml}
             <div class="work-hover-veil">
               <p class="work-hover-quote">“${escapeHtml(photo.caption || '')}”</p>
-              <span class="work-hover-cta">Abrir na sala de exibição ↗</span>
+              <span class="work-hover-cta">${hoverCtaText}</span>
             </div>
           </div>
         </div>
@@ -953,16 +1023,23 @@ function renderPortfolioGrid(category) {
   }).join('');
 
   gridContainer.querySelectorAll('.work-item').forEach((card) => {
-    const openCard = () => {
+    const activateCard = () => {
+      if (isOverview) {
+        const targetCat = card.getAttribute('data-category');
+        if (targetCat) {
+          selectPortfolioCategory(targetCat, { scrollToFilters: true });
+        }
+        return;
+      }
       const idx = parseInt(card.getAttribute('data-index'), 10);
       openLightbox(idx);
     };
 
-    card.addEventListener('click', openCard);
+    card.addEventListener('click', activateCard);
     card.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        openCard();
+        activateCard();
       }
     });
   });

@@ -492,6 +492,14 @@ function renderAdminPortfolioFilterPills() {
   });
 }
 
+function isEffectiveAcervoCover(photo, portfolio) {
+  if (!photo || !photo.category) return false;
+  const catItems = (portfolio || []).filter((p) => p.category === photo.category);
+  const explicitCover = catItems.find((p) => p.isAcervoCover === true);
+  if (explicitCover) return explicitCover === photo;
+  return catItems[0] === photo;
+}
+
 function renderPortfolioAdmin() {
   populateUploadCategorySelect();
   renderAdminPortfolioFilterPills();
@@ -525,12 +533,14 @@ function renderPortfolioAdmin() {
     const focalPct = parseFocalPercent(photo.objectPosition);
     const isUploadedNew = String(photo.image || '').startsWith('data:image/');
     const numStr = (realIdx + 1).toString().padStart(2, '0');
+    const isAcervoCover = isEffectiveAcervoCover(photo, cmsData.portfolio);
 
     return `
       <article class="photo-editor-card" data-real-idx="${realIdx}">
         <div class="photo-preview-col">
           <div class="photo-thumb-frame" data-aspect="${escapeAttr(photo.aspect || 'landscape')}">
             <span class="photo-num-tag">Nº ${numStr}</span>
+            ${isAcervoCover ? '<span class="photo-badge-acervo-cover">★ Capa Acervo</span>' : ''}
             ${isUploadedNew ? '<span class="photo-badge-uploaded">Nova Foto</span>' : ''}
             <img src="${escapeAttr(photo.image)}" alt="${escapeAttr(photo.title)}" style="object-position: center ${focalPct}%;" />
           </div>
@@ -548,8 +558,11 @@ function renderPortfolioAdmin() {
             <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-port-replace-btn" style="flex: 1;">
               Trocar Foto
             </button>
-            <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-port-send-hero" title="Adicionar esta foto também na Capa do Site">
+            <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-port-send-hero" title="Adicionar esta foto na Capa Principal (topo do site)">
               + Capa
+            </button>
+            <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-port-acervo-cover ${isAcervoCover ? 'is-active-cover' : ''}" style="flex: 1 1 100%;" title="Definir como foto representante desta categoria na aba Acervo Completo">
+              ${isAcervoCover ? '★ Capa do Acervo Completo' : '☆ Usar na Capa do Acervo'}
             </button>
           </div>
         </div>
@@ -631,10 +644,16 @@ function renderPortfolioAdmin() {
     card.querySelector('.js-port-category')?.addEventListener('change', (e) => {
       const newCatId = e.target.value;
       const catObj = (cmsData.categories || []).find((c) => c.id === newCatId);
+      const targetHasExplicitCover = (cmsData.portfolio || []).some(
+        (p) => p !== item && p.category === newCatId && p.isAcervoCover === true
+      );
       item.category = newCatId;
       item.categoryName = catObj ? catObj.name : newCatId;
+      if (targetHasExplicitCover) {
+        item.isAcervoCover = false;
+      }
       markDirtyAndSync(true);
-      renderAdminPortfolioFilterPills();
+      renderPortfolioAdmin();
     });
 
     card.querySelector('.js-port-aspect')?.addEventListener('change', (e) => {
@@ -683,6 +702,20 @@ function renderPortfolioAdmin() {
       });
       markDirtyAndSync(true);
       showToast(`"${item.title}" adicionada à Capa do Site!`, 'success');
+    });
+
+    // Definir como Capa da Categoria no Acervo Completo
+    card.querySelector('.js-port-acervo-cover')?.addEventListener('click', () => {
+      (cmsData.portfolio || []).forEach((p) => {
+        if (p.category === item.category) {
+          p.isAcervoCover = (p === item);
+        }
+      });
+      const catObj = (cmsData.categories || []).find((c) => c.id === item.category);
+      const catLabel = catObj ? catObj.name : (item.categoryName || item.category);
+      markDirtyAndSync(true);
+      renderPortfolioAdmin();
+      showToast(`"${item.title || 'Fotografia'}" definida como capa de "${catLabel}" no Acervo Completo!`, 'success');
     });
 
     // Subir / Descer / Excluir

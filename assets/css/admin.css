@@ -783,6 +783,27 @@ button, input, select, textarea {
   letter-spacing: 0.06em;
 }
 
+.photo-badge-acervo-cover {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background-color: var(--cms-gold);
+  color: var(--cms-navy-deep);
+  font-size: 0.66rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.03em;
+  box-shadow: 0 2px 6px rgba(18, 27, 36, 0.28);
+}
+
+.photo-thumb-actions .js-port-acervo-cover.is-active-cover {
+  background-color: var(--cms-gold-soft);
+  border-color: var(--cms-gold-dark);
+  color: var(--cms-gold-dark);
+  font-weight: 700;
+}
+
 .photo-badge-uploaded {
   position: absolute;
   bottom: 8px;

@@ -1195,6 +1195,42 @@ p, .lead-editorial, .proposta-text, .sobre-text {
   transform: scale(1.035);
 }
 
+/* Selo de Coleção na Vitrine do Acervo Completo */
+.work-collection-pill {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: calc(100% - 28px);
+  padding: 6px 12px;
+  background-color: rgba(22, 32, 42, 0.76);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(231, 195, 120, 0.42);
+  border-radius: var(--radius-xs);
+  color: #FFFDF3;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  pointer-events: none;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.work-collection-pill .work-collection-count {
+  color: var(--color-gold);
+  font-weight: 700;
+}
+
+.work-item:hover .work-collection-pill {
+  background-color: rgba(22, 32, 42, 0.92);
+  border-color: var(--color-gold);
+}
+
 /* Véu poético sutil no hover da obra */
 .work-hover-veil {
   position: absolute;
