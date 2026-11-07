@@ -95,3 +95,4 @@ Caso Yan decida migrar para a Versão 2 ou continuar seu refinamento:
 2. **Visualizar Localmente**:
    - Abra `http://localhost:4173/` no navegador.
    - Todo o código, estilos e suíte de testes estarão imediatamente operacionais exatamente onde paramos.
+
