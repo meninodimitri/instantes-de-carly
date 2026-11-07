@@ -39,6 +39,7 @@ const IGNORE_LIST = [
   '.gemini',
   '.claude',
   '.playwright-cli',
+  '.taste-skill',
   'skills-lock.json',
   'package-lock.json',
   'REDESIGN_V2_SUMMARY.md',

@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * ÁREA DO CLIENTE — GALERIA DE SELEÇÃO (SINETO) & ENTREGA (PIXIESET)
+ * ÁREA DO CLIENTE V2 — GALERIA DE SELEÇÃO (SINETO) & ENTREGA (PIXIESET)
  * ============================================================================
  */
 (function () {
@@ -13,51 +13,59 @@
   const initialSlug = (params.get('id') || params.get('album') || hashSlug || '').trim().toLowerCase();
   const isAdminPreview = params.get('preview') === '1';
 
+  const SVG_HEART_OUTLINE = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
+  const SVG_HEART_SOLID = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
+  const SVG_COMMENT = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
+  const SVG_DOWNLOAD = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
+
   let rootState = null;
   let currentAlbum = null;
-  let activeFilter = 'all'; // 'all' | 'selected' | 'unselected' | 'commented' | 'favorites' | 'folder:<name>'
+  let activeFilter = 'all'; // 'all' | 'selected' | 'unselected' | 'commented' | 'favorites'
   let lightboxList = [];
   let lightboxIdx = 0;
-  let pendingDownloadTarget = null; // null = full zip, or photo object
+  let pendingDownloadTarget = null;
+
+  // Cache em memória da sessão para os bundles protegidos (primarySrc + revealSrc)
+  const runtimeProofMap = new Map();
 
   const els = {
     portalView: document.getElementById('portal-view'),
     portalForm: document.getElementById('portal-code-form'),
     portalSlugIn: document.getElementById('portal-slug-input'),
     portalError: document.getElementById('portal-error'),
-    portalDemoBox: document.getElementById('portal-demo-box'),
-    portalAlbumsGrid: document.getElementById('portal-albums-grid'),
 
     pwView: document.getElementById('password-view'),
-    pwBg: document.getElementById('password-bg'),
-    pwBadge: document.getElementById('pw-phase-badge'),
+    pwCoverImg: document.getElementById('pw-cover-img'),
     pwTitle: document.getElementById('pw-album-title'),
     pwSubtitle: document.getElementById('pw-album-subtitle'),
     pwForm: document.getElementById('password-form'),
     pwInput: document.getElementById('pw-input'),
     pwError: document.getElementById('pw-error'),
-    pwHint: document.getElementById('pw-local-hint'),
 
     albumView: document.getElementById('album-view'),
     deliveryHero: document.getElementById('delivery-hero'),
     deliveryHeroImg: document.getElementById('delivery-hero-img'),
-    deliveryHeroSub: document.getElementById('delivery-hero-subtitle'),
+    deliveryHeroDate: document.getElementById('delivery-hero-date'),
     deliveryHeroTitle: document.getElementById('delivery-hero-title'),
     deliveryHeroMsg: document.getElementById('delivery-hero-msg'),
     btnScrollGallery: document.getElementById('btn-scroll-gallery'),
-    btnHeroDownloadAll: document.getElementById('btn-hero-download-all'),
 
-    proofingHeader: document.getElementById('proofing-header'),
-    proofingPkgPill: document.getElementById('proofing-pkg-pill'),
-    proofingSub: document.getElementById('proofing-subtitle'),
+    topbar: document.getElementById('gallery-topbar'),
     proofingTitle: document.getElementById('proofing-title'),
-    proofingWelcome: document.getElementById('proofing-welcome'),
-    proofingLockedBanner: document.getElementById('proofing-locked-banner'),
+    deliveryTopbarTitle: document.getElementById('delivery-topbar-title'),
+    proofingPkgMeta: document.getElementById('proofing-pkg-meta'),
+    topbarProofingActions: document.getElementById('topbar-proofing-actions'),
+    topSelStat: document.getElementById('top-sel-stat'),
+    topExtraStat: document.getElementById('top-extra-stat'),
+    btnFinishTop: document.getElementById('btn-finish-selection-top'),
+    topbarDeliveryActions: document.getElementById('topbar-delivery-actions'),
+    btnDeliveryZip: document.getElementById('btn-delivery-download-zip'),
 
-    toolbar: document.getElementById('gallery-toolbar'),
     toolbarFilters: document.getElementById('toolbar-filters'),
     toolbarCount: document.getElementById('toolbar-count-label'),
-    btnToolbarZip: document.getElementById('btn-toolbar-download-zip'),
+
+    lockedWrap: document.getElementById('proofing-locked-wrap'),
+    lockedBanner: document.getElementById('proofing-locked-banner'),
 
     loadingBox: document.getElementById('photos-loading'),
     grid: document.getElementById('gallery-grid'),
@@ -66,22 +74,23 @@
     dock: document.getElementById('selection-dock'),
     dockMainStat: document.getElementById('dock-main-stat'),
     dockExtraStat: document.getElementById('dock-extra-stat'),
-    dockBarFill: document.getElementById('dock-bar-fill'),
-    btnFilterSelectedQuick: document.getElementById('btn-filter-selected-quick'),
-    btnFinishSelection: document.getElementById('btn-finish-selection'),
+    btnFinishDock: document.getElementById('btn-finish-selection'),
 
     lbDialog: document.getElementById('gal-lightbox'),
     lbClose: document.getElementById('lb-close'),
+    lbGuard: document.getElementById('lb-canvas-guard'),
     lbImg: document.getElementById('lb-img'),
+    lbRevealImg: document.getElementById('lb-reveal-img'),
     lbPrev: document.getElementById('lb-prev'),
     lbNext: document.getElementById('lb-next'),
     lbStrip: document.getElementById('lb-filmstrip'),
     lbIndex: document.getElementById('lb-index'),
     lbFilename: document.getElementById('lb-filename'),
-    lbFolder: document.getElementById('lb-folder'),
+    lbAssistBox: document.getElementById('lb-protection-assist'),
+    lbAssistText: document.getElementById('lb-protection-hint'),
+    btnHoldSharp: document.getElementById('btn-hold-sharp'),
     lbProofControls: document.getElementById('lb-proofing-controls'),
     lbSelectBtn: document.getElementById('lb-select-btn'),
-    lbCommentWrap: document.getElementById('lb-comment-wrap'),
     lbCommentIn: document.getElementById('lb-comment-input'),
     lbSaveComment: document.getElementById('lb-save-comment'),
     lbDeliveryControls: document.getElementById('lb-delivery-controls'),
@@ -118,7 +127,6 @@
     dlTitle: document.getElementById('dl-modal-title'),
     dlPinGroup: document.getElementById('dl-pin-group'),
     dlPinInput: document.getElementById('dl-pin-input'),
-    dlPinHint: document.getElementById('dl-pin-hint'),
     dlPinError: document.getElementById('dl-pin-error'),
     dlProgressBox: document.getElementById('dl-progress-box'),
     dlProgressText: document.getElementById('dl-progress-text'),
@@ -154,7 +162,7 @@
   function hydrateBrandStrings() {
     const brand = window.AlbumsStore.getBrandDefaults();
     const footerBrand = document.getElementById('gal-footer-brand');
-    if (footerBrand) footerBrand.textContent = `${brand.studioName} — Fotografia Autoral & Humanizada`;
+    if (footerBrand) footerBrand.textContent = brand.studioName;
     document.querySelectorAll('img[alt="Instantes de Carly"]').forEach((img) => {
       img.alt = brand.studioName;
     });
@@ -166,9 +174,9 @@
   function setupAntiCopyProtection() {
     document.addEventListener('contextmenu', (e) => {
       if (currentAlbum && currentAlbum.phase === 'proofing') {
-        if (e.target.closest('.gallery-grid, .gal-lightbox')) {
+        if (e.target.closest('.masonry-wall, .gal-lightbox')) {
           e.preventDefault();
-          showToast('🔒 Fotografia em modo de prova protegida.');
+          showToast('Fotografia protegida em modo de seleção.');
         }
       }
     });
@@ -178,67 +186,22 @@
         e.preventDefault();
       }
     });
-  }
 
-  /* ==========================================================================
-     2. DESENHO VISUAL DE QR CODE PIX EM CANVAS (ESTÉTICA NÍTIDA DE CHECKOUT)
-     ========================================================================== */
-  function renderVisualQrCanvas(canvas, payloadStr) {
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const size = canvas.width;
-    const modules = 29;
-    const pad = 12;
-    const cell = (size - pad * 2) / modules;
-
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillRect(0, 0, size, size);
-    ctx.fillStyle = '#1B2733';
-
-    function drawFinder(mx, my) {
-      ctx.fillStyle = '#1B2733';
-      ctx.fillRect(pad + mx * cell, pad + my * cell, 7 * cell, 7 * cell);
-      ctx.fillStyle = '#FFFFFF';
-      ctx.fillRect(pad + (mx + 1) * cell, pad + (my + 1) * cell, 5 * cell, 5 * cell);
-      ctx.fillStyle = '#1B2733';
-      ctx.fillRect(pad + (mx + 2) * cell, pad + (my + 2) * cell, 3 * cell, 3 * cell);
-    }
-
-    drawFinder(0, 0);
-    drawFinder(modules - 7, 0);
-    drawFinder(0, modules - 7);
-
-    // Hash determinístico a partir do BRCode Pix para compor matriz visual consistente
-    let seed = 2166136261;
-    for (let i = 0; i < payloadStr.length; i++) {
-      seed ^= payloadStr.charCodeAt(i);
-      seed = Math.imul(seed, 16777619) >>> 0;
-    }
-
-    ctx.fillStyle = '#1B2733';
-    for (let r = 0; r < modules; r++) {
-      for (let c = 0; c < modules; c++) {
-        const inFinderTL = r < 8 && c < 8;
-        const inFinderTR = r < 8 && c >= modules - 8;
-        const inFinderBL = r >= modules - 8 && c < 8;
-        if (inFinderTL || inFinderTR || inFinderBL) continue;
-
-        seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
-        const bit = ((seed >>> 16) ^ payloadStr.charCodeAt((r * modules + c) % payloadStr.length)) & 1;
-        if (bit) {
-          ctx.fillRect(
-            Math.round(pad + c * cell),
-            Math.round(pad + r * cell),
-            Math.ceil(cell),
-            Math.ceil(cell)
-          );
-        }
+    // Oculta imediatamente a camada de nitidez caso o cliente mude de janela ou tente atalho de captura
+    const hideHoldReveal = () => {
+      if (currentAlbum?.phase === 'proofing' && currentAlbum.protectionLevel === 'watermark_blur') {
+        if (els.lbRevealImg) els.lbRevealImg.hidden = true;
       }
-    }
+    };
+    window.addEventListener('blur', hideHoldReveal);
+    document.addEventListener('visibilitychange', hideHoldReveal);
+    document.addEventListener('keyup', (e) => {
+      if (e.key === 'PrintScreen') hideHoldReveal();
+    });
   }
 
   /* ==========================================================================
-     3. ROTEAMENTO: PORTAL -> SENHA -> ÁLBUM
+     2. CONTROLE ESTRITO DAS 3 TELAS (APENAS 1 VISÍVEL POR VEZ)
      ========================================================================== */
   function showOnlySection(target) {
     [els.portalView, els.pwView, els.albumView].forEach((sec) => {
@@ -247,30 +210,10 @@
   }
 
   function renderPortalView() {
+    currentAlbum = null;
     showOnlySection(els.portalView);
     document.body.classList.remove('is-proofing-protected');
-
-    if (isLocalEnv && els.portalDemoBox && els.portalAlbumsGrid) {
-      els.portalDemoBox.hidden = false;
-      const albums = rootState.albums || [];
-      els.portalAlbumsGrid.innerHTML = albums.map((alb) => {
-        const isProof = alb.phase === 'proofing';
-        const badge = isProof
-          ? `🔍 Fase 1: Seleção de Provas (${alb.packageIncluded} no pacote • Extra ${formatBRL(alb.extraPhotoPrice)})`
-          : `✨ Fase 2: Galeria de Entrega em Alta (${(alb.photos || []).length} fotos)`;
-        return `
-          <a href="${galeriaRoute}?id=${encodeURIComponent(alb.slug)}" class="portal-album-card">
-            <img src="${escapeHtml(alb.coverSrc || alb.photos?.[0]?.originalSrc || '')}" alt="${escapeHtml(alb.clientName)}" class="portal-album-thumb" />
-            <div class="portal-album-body">
-              <span class="demo-pill">${escapeHtml(badge)}</span>
-              <h3>${escapeHtml(alb.clientName)}</h3>
-              <p>${escapeHtml(alb.subtitle || alb.title)} • Código: <strong>${escapeHtml(alb.slug)}</strong></p>
-              <span class="gal-btn gal-btn-primary gal-btn-sm">Testar este Álbum →</span>
-            </div>
-          </a>
-        `;
-      }).join('');
-    }
+    document.title = `Área do Cliente — ${window.AlbumsStore.getBrandDefaults().studioName}`;
   }
 
   function isAlbumUnlocked(album) {
@@ -290,57 +233,83 @@
 
   function renderPasswordGate(album) {
     showOnlySection(els.pwView);
-    const cover = album.coverSrc || album.photos?.[0]?.originalSrc || '';
-    if (els.pwBg) els.pwBg.style.backgroundImage = `url("${cover}")`;
-    if (els.pwBadge) {
-      els.pwBadge.textContent = album.phase === 'proofing'
-        ? 'Galeria Privada de Seleção'
-        : 'Galeria Oficial de Entrega';
+    document.body.classList.remove('is-proofing-protected');
+    const cover = album.coverSrc || album.photos?.[0]?.originalSrc || 'assets/images/real/IMG_7513.jpg';
+    if (els.pwCoverImg) {
+      els.pwCoverImg.src = cover;
+      els.pwCoverImg.style.objectPosition = album.coverFocal || 'center 34%';
     }
     if (els.pwTitle) els.pwTitle.textContent = album.title || album.clientName;
-    if (els.pwSubtitle) els.pwSubtitle.textContent = album.subtitle || '';
+    if (els.pwSubtitle) {
+      els.pwSubtitle.textContent = album.subtitle
+        ? `${album.subtitle} — Digite a senha enviada pela sua fotógrafa para abrir o álbum.`
+        : 'Digite a senha enviada pela sua fotógrafa para abrir o álbum.';
+    }
     if (els.pwError) els.pwError.hidden = true;
     if (els.pwInput) els.pwInput.value = '';
-
-    if (isLocalEnv && els.pwHint && album.password) {
-      els.pwHint.hidden = false;
-      els.pwHint.textContent = `🧪 Dica ambiente local: a senha deste álbum é "${album.password}"`;
-    }
+    document.title = `${album.clientName} — Acesso Privado`;
   }
 
   /* ==========================================================================
-     4. GARANTIR MARCA D'ÁGUA REAL NAS PROVAS ANTES DE EXIBIR
+     3. GERAÇÃO E CACHE DOS 3 NÍVEIS DE PROTEÇÃO DE IMAGEM
      ========================================================================== */
-  async function ensureProofWatermarksReady(album) {
-    if (album.phase !== 'proofing' || album.watermarkEnabled === false) return;
-    const missing = (album.photos || []).filter((p) => !p.proofSrc && p.originalSrc);
-    if (missing.length === 0) return;
+  function getProofKey(album, photo) {
+    const sig = window.AlbumsStore.getWatermarkSignature(
+      rootState.watermarkConfig,
+      album.protectionLevel || 'watermark'
+    );
+    return `${photo.id}::${sig}`;
+  }
+
+  async function ensureProtectedProofsReady(album) {
+    if (album.phase !== 'proofing') return;
+    const photos = album.photos || [];
+    const level = album.protectionLevel || 'watermark';
+    const wmCfg = rootState.watermarkConfig || {};
+
+    const pending = photos.filter((p) => !runtimeProofMap.has(getProofKey(album, p)));
+    if (!pending.length) return;
 
     if (els.loadingBox) els.loadingBox.hidden = false;
     if (els.grid) els.grid.innerHTML = '';
 
-    const label = album.watermarkText || window.AlbumsStore.getBrandDefaults().studioName;
-    await Promise.all(missing.map(async (photo) => {
+    await Promise.all(pending.map(async (photo) => {
       try {
-        photo.proofSrc = await window.AlbumsStore.burnProofWatermark(photo.originalSrc, label);
+        const bundle = await window.AlbumsStore.generateProtectedProofBundle(
+          photo.originalSrc,
+          wmCfg,
+          level
+        );
+        runtimeProofMap.set(getProofKey(album, photo), bundle);
       } catch (_) {
-        photo.proofSrc = photo.originalSrc;
+        runtimeProofMap.set(getProofKey(album, photo), {
+          primarySrc: photo.originalSrc,
+          revealSrc: photo.originalSrc
+        });
       }
     }));
 
-    await window.AlbumsStore.saveState(rootState, { silent: true });
     if (els.loadingBox) els.loadingBox.hidden = true;
   }
 
-  function getDisplaySrc(album, photo) {
-    if (album.phase === 'proofing' && album.watermarkEnabled !== false) {
-      return photo.proofSrc || photo.originalSrc;
+  function getPhotoPrimarySrc(album, photo) {
+    if (album.phase === 'proofing') {
+      const hit = runtimeProofMap.get(getProofKey(album, photo));
+      return hit ? hit.primarySrc : '';
+    }
+    return photo.originalSrc;
+  }
+
+  function getPhotoRevealSrc(album, photo) {
+    if (album.phase === 'proofing') {
+      const hit = runtimeProofMap.get(getProofKey(album, photo));
+      return hit ? hit.revealSrc : '';
     }
     return photo.originalSrc;
   }
 
   /* ==========================================================================
-     5. RENDERIZAÇÃO DO ÁLBUM (SELEÇÃO SINETO OU ENTREGA PIXIESET)
+     4. EXPERIÊNCIA DA GALERIA (SELEÇÃO SINETO OU ENTREGA PIXIESET)
      ========================================================================== */
   async function openAlbumExperience(album) {
     currentAlbum = album;
@@ -350,59 +319,116 @@
     const isProof = album.phase === 'proofing';
     document.body.classList.toggle('is-proofing-protected', isProof);
 
+    // Garante que apenas os elementos da fase correta existam visualmente
     if (els.deliveryHero) els.deliveryHero.hidden = isProof;
-    if (els.proofingHeader) els.proofingHeader.hidden = !isProof;
-    if (els.btnToolbarZip) els.btnToolbarZip.hidden = isProof;
-    if (els.dock) els.dock.hidden = !isProof;
+    if (els.proofingTitle) els.proofingTitle.hidden = !isProof;
+    if (els.deliveryTopbarTitle) els.deliveryTopbarTitle.hidden = isProof;
+    if (els.topbarProofingActions) els.topbarProofingActions.hidden = !isProof;
+    if (els.topbarDeliveryActions) els.topbarDeliveryActions.hidden = isProof;
+    if (els.dock) els.dock.hidden = !isProof || Boolean(album.selectionLocked);
+
+    // Reseta filtro inválido ao trocar de fase
+    if (isProof && activeFilter === 'favorites') activeFilter = 'all';
+    if (!isProof && ['selected', 'unselected', 'commented'].includes(activeFilter)) activeFilter = 'all';
 
     if (isProof) {
-      renderProofingHeader(album);
-      await ensureProofWatermarksReady(album);
+      updateProofingChrome(album);
+      await ensureProtectedProofsReady(album);
     } else {
-      renderDeliveryHero(album);
+      updateDeliveryChrome(album);
+      if (els.lockedWrap) els.lockedWrap.hidden = true;
     }
 
-    renderToolbarFilters(album);
-    renderPhotosGrid(album);
-    if (isProof) updateSelectionDock(album);
+    renderFilterTabs(album);
+    renderMasonryWall(album);
   }
 
-  function renderProofingHeader(album) {
-    if (els.proofingPkgPill) {
-      els.proofingPkgPill.textContent = `${album.packageName || 'Seu Pacote'}: ${album.packageIncluded} fotos inclusas • Foto extra ${formatBRL(album.extraPhotoPrice)}`;
-    }
-    if (els.proofingSub) els.proofingSub.textContent = album.subtitle || 'Seleção de Fotografias';
+  function updateProofingChrome(album) {
     if (els.proofingTitle) els.proofingTitle.textContent = album.title || album.clientName;
-    if (els.proofingWelcome) els.proofingWelcome.textContent = album.welcomeMessage || '';
+    if (els.proofingPkgMeta) {
+      els.proofingPkgMeta.textContent = `${album.packageName || 'Pacote'}: ${album.packageIncluded} fotos inclusas · Foto extra ${formatBRL(album.extraPhotoPrice)}`;
+    }
 
-    if (els.proofingLockedBanner) {
-      if (album.selectionLocked) {
-        els.proofingLockedBanner.hidden = false;
-        const calc = window.AlbumsStore.calculateSelectionPricing(album);
-        let statusLine = '✅ <strong>Seleção Finalizada e Enviada!</strong> Sua fotógrafa já recebeu suas escolhas para iniciar a edição final.';
-        if (album.status === 'selection_paid' && album.paymentOrder) {
-          statusLine = `✅ <strong>Seleção Confirmada &amp; Fotos Extras Pagas (${formatBRL(album.paymentOrder.totalAmount)})!</strong> Total de ${calc.selectedCount} fotografias liberadas para edição final.`;
-        } else if (album.status === 'awaiting_pix_confirm' && album.paymentOrder) {
-          statusLine = `⏳ <strong>Seleção Registrada (${calc.selectedCount} fotos)!</strong> Aguardando confirmação do seu Pix de ${formatBRL(album.paymentOrder.totalAmount)} pela fotógrafa.`;
-        }
-        els.proofingLockedBanner.innerHTML = statusLine;
+    const calc = window.AlbumsStore.calculateSelectionPricing(album);
+
+    if (els.topSelStat) {
+      els.topSelStat.textContent = `Selecionadas: ${calc.selectedCount} / ${calc.packageIncluded}`;
+    }
+    if (els.topExtraStat) {
+      if (calc.hasExtras) {
+        els.topExtraStat.hidden = false;
+        els.topExtraStat.textContent = `+${calc.extraCount} ${calc.extraCount === 1 ? 'extra' : 'extras'} (${formatBRL(calc.extraTotal)})`;
       } else {
-        els.proofingLockedBanner.hidden = true;
+        els.topExtraStat.hidden = true;
+      }
+    }
+
+    if (els.btnFinishTop) {
+      if (album.selectionLocked) {
+        els.btnFinishTop.disabled = true;
+        els.btnFinishTop.textContent = 'Seleção concluída';
+      } else {
+        els.btnFinishTop.disabled = calc.selectedCount === 0;
+        els.btnFinishTop.textContent = calc.hasExtras
+          ? `Concluir e pagar extras (${formatBRL(calc.extraTotal)})`
+          : 'Concluir seleção';
+      }
+    }
+
+    if (els.dock) {
+      els.dock.hidden = Boolean(album.selectionLocked);
+      if (els.dockMainStat) {
+        els.dockMainStat.textContent = `Selecionadas: ${calc.selectedCount} / ${calc.packageIncluded}`;
+      }
+      if (els.dockExtraStat) {
+        els.dockExtraStat.textContent = calc.hasExtras
+          ? `+${calc.extraCount} extras · ${formatBRL(calc.extraTotal)}`
+          : `${calc.remainingInPackage} restantes no pacote`;
+      }
+      if (els.btnFinishDock) {
+        els.btnFinishDock.disabled = calc.selectedCount === 0;
+        els.btnFinishDock.textContent = calc.hasExtras
+          ? `Pagar extras (${formatBRL(calc.extraTotal)})`
+          : 'Concluir';
+      }
+    }
+
+    if (els.lockedWrap && els.lockedBanner) {
+      if (album.selectionLocked) {
+        els.lockedWrap.hidden = false;
+        if (album.status === 'selection_paid' && album.paymentOrder) {
+          els.lockedBanner.textContent = `Seleção confirmada e pagamento de ${formatBRL(album.paymentOrder.totalAmount)} aprovado. Total de ${calc.selectedCount} fotografias liberadas para edição final.`;
+        } else if (album.status === 'awaiting_pix_confirm' && album.paymentOrder) {
+          els.lockedBanner.textContent = `Seleção registrada (${calc.selectedCount} fotografias). Aguardando confirmação do Pix de ${formatBRL(album.paymentOrder.totalAmount)} pelo estúdio.`;
+        } else {
+          els.lockedBanner.textContent = `Seleção finalizada (${calc.selectedCount} fotografias). Sua fotógrafa já recebeu sua lista para edição final.`;
+        }
+      } else {
+        els.lockedWrap.hidden = true;
       }
     }
   }
 
-  function renderDeliveryHero(album) {
+  function updateDeliveryChrome(album) {
     const cover = album.coverSrc || album.photos?.[0]?.originalSrc || '';
     if (els.deliveryHeroImg) {
       els.deliveryHeroImg.src = cover;
-      els.deliveryHeroImg.style.objectPosition = album.coverFocal || 'center 35%';
+      els.deliveryHeroImg.alt = album.title || album.clientName;
+      els.deliveryHeroImg.style.objectPosition = album.coverFocal || 'center 36%';
     }
-    if (els.deliveryHeroSub) els.deliveryHeroSub.textContent = album.subtitle || '';
+    if (els.deliveryHeroDate) els.deliveryHeroDate.textContent = album.subtitle || '';
     if (els.deliveryHeroTitle) els.deliveryHeroTitle.textContent = album.title || album.clientName;
     if (els.deliveryHeroMsg) els.deliveryHeroMsg.textContent = album.welcomeMessage || '';
+
+    if (els.deliveryTopbarTitle) els.deliveryTopbarTitle.textContent = album.clientName;
+    if (els.proofingPkgMeta) {
+      els.proofingPkgMeta.textContent = `${(album.photos || []).length} fotografias em alta resolução`;
+    }
   }
 
+  /* ==========================================================================
+     5. FILTROS LIMPOS (APENAS OS SOLICITADOS PELO YAN) & PAREDE MASONRY
+     ========================================================================== */
   function getFilteredPhotos(album) {
     const photos = album.photos || [];
     const selectedSet = new Set(album.selectedIds || []);
@@ -413,68 +439,58 @@
     if (activeFilter === 'unselected') return photos.filter((p) => !selectedSet.has(p.id));
     if (activeFilter === 'commented') return photos.filter((p) => Boolean(comments[p.id]?.trim()));
     if (activeFilter === 'favorites') return photos.filter((p) => favSet.has(p.id));
-    if (activeFilter.startsWith('folder:')) {
-      const folderName = activeFilter.slice(7);
-      return photos.filter((p) => (p.folder || 'Geral') === folderName);
-    }
     return photos;
   }
 
-  function renderToolbarFilters(album) {
+  function renderFilterTabs(album) {
     if (!els.toolbarFilters) return;
     const photos = album.photos || [];
-    const folders = [...new Set(photos.map((p) => p.folder).filter(Boolean))];
-    const chips = [];
+    let tabs = [];
 
     if (album.phase === 'proofing') {
       const selCount = (album.selectedIds || []).length;
       const unselCount = Math.max(0, photos.length - selCount);
       const noteCount = Object.values(album.photoComments || {}).filter((v) => String(v || '').trim()).length;
 
-      chips.push({ id: 'all', label: `Todas (${photos.length})` });
-      chips.push({ id: 'selected', label: `Selecionadas ❤️ (${selCount})` });
-      chips.push({ id: 'unselected', label: `Não Selecionadas (${unselCount})` });
-      if (noteCount > 0 || activeFilter === 'commented') {
-        chips.push({ id: 'commented', label: `Com Observação 💬 (${noteCount})` });
-      }
-      folders.forEach((f) => {
-        const c = photos.filter((p) => p.folder === f).length;
-        chips.push({ id: `folder:${f}`, label: `${f} (${c})` });
-      });
+      tabs = [
+        { id: 'all', label: `Todas (${photos.length})` },
+        { id: 'selected', label: `Selecionadas (${selCount})` },
+        { id: 'unselected', label: `Não selecionadas (${unselCount})` },
+        { id: 'commented', label: `Com observação (${noteCount})` }
+      ];
     } else {
       const favCount = (album.deliveryFavorites || []).length;
-      chips.push({ id: 'all', label: `Todas (${photos.length})` });
-      folders.forEach((f) => {
-        const c = photos.filter((p) => p.folder === f).length;
-        chips.push({ id: `folder:${f}`, label: `${f} (${c})` });
-      });
-      chips.push({ id: 'favorites', label: `Favoritas ❤️ (${favCount})` });
+      tabs = [
+        { id: 'all', label: `Todas (${photos.length})` },
+        { id: 'favorites', label: `Favoritas (${favCount})` }
+      ];
     }
 
-    els.toolbarFilters.innerHTML = chips.map((c) => `
-      <button type="button" class="filter-chip ${activeFilter === c.id ? 'active' : ''}" data-filter="${escapeHtml(c.id)}">
-        ${escapeHtml(c.label)}
-      </button>
+    els.toolbarFilters.innerHTML = tabs.map((t) => `
+      <button
+        type="button"
+        class="filter-tab ${activeFilter === t.id ? 'active' : ''}"
+        data-filter="${escapeHtml(t.id)}"
+      >${escapeHtml(t.label)}</button>
     `).join('');
 
-    els.toolbarFilters.querySelectorAll('.filter-chip').forEach((btn) => {
+    els.toolbarFilters.querySelectorAll('.filter-tab').forEach((btn) => {
       btn.addEventListener('click', () => {
         activeFilter = btn.getAttribute('data-filter') || 'all';
-        renderToolbarFilters(currentAlbum);
-        renderPhotosGrid(currentAlbum);
+        renderFilterTabs(currentAlbum);
+        renderMasonryWall(currentAlbum);
       });
     });
   }
 
-  function renderPhotosGrid(album) {
+  function renderMasonryWall(album) {
     if (!els.grid) return;
     const filtered = getFilteredPhotos(album);
     lightboxList = filtered;
 
     if (els.toolbarCount) {
-      els.toolbarCount.textContent = `${filtered.length} ${filtered.length === 1 ? 'fotografia' : 'fotografias'}`;
+      els.toolbarCount.textContent = `${filtered.length} ${filtered.length === 1 ? 'foto' : 'fotos'}`;
     }
-
     if (els.emptyBox) els.emptyBox.hidden = filtered.length > 0;
 
     const isProof = album.phase === 'proofing';
@@ -485,127 +501,85 @@
     const pkgLimit = Math.max(0, parseInt(album.packageIncluded, 10) || 0);
 
     els.grid.innerHTML = filtered.map((photo, idx) => {
-      const globalIdx = (album.photos || []).findIndex((p) => p.id === photo.id);
-      const numStr = String(globalIdx + 1).padStart(2, '0');
-      const src = getDisplaySrc(album, photo);
+      const src = getPhotoPrimarySrc(album, photo);
 
       if (isProof) {
         const isSel = selectedSet.has(photo.id);
         const selPos = selectedOrder.indexOf(photo.id);
-        const isExtraPhoto = isSel && selPos >= pkgLimit;
+        const isExtra = isSel && selPos >= pkgLimit;
         const hasNote = Boolean(comments[photo.id]?.trim());
 
         return `
-          <article class="photo-item ${isSel ? 'is-selected' : ''}" data-photo-id="${escapeHtml(photo.id)}">
-            <div class="photo-thumb-wrap js-open-lb" data-lb-idx="${idx}">
+          <figure class="masonry-tile ${isSel ? 'is-selected' : ''}" data-photo-id="${escapeHtml(photo.id)}">
+            <button type="button" class="masonry-img-btn js-open-lb" data-lb-idx="${idx}" aria-label="Ampliar foto ${escapeHtml(photo.filename)}">
               <img src="${escapeHtml(src)}" alt="${escapeHtml(photo.filename)}" loading="lazy" draggable="false" />
-              <span class="photo-num-tag">#${numStr} • ${escapeHtml(photo.filename)}</span>
-              ${isExtraPhoto ? `<span class="photo-extra-tag">+ Extra (${formatBRL(album.extraPhotoPrice)})</span>` : ''}
-            </div>
-            <div class="photo-card-bar">
-              <button
-                type="button"
-                class="btn-select-toggle ${isSel ? 'active' : ''} js-toggle-select"
-                data-photo-id="${escapeHtml(photo.id)}"
-                ${album.selectionLocked ? 'disabled' : ''}
-              >
-                <span>${isSel ? '❤️ Selecionada' : '🤍 Selecionar'}</span>
-              </button>
-              <button
-                type="button"
-                class="btn-icon-action ${hasNote ? 'has-note' : ''} js-open-note"
-                data-lb-idx="${idx}"
-                title="Adicionar observação de edição"
-              >
-                💬 ${hasNote ? 'Nota' : ''}
-              </button>
-            </div>
-          </article>
+            </button>
+            ${isExtra ? `<span class="tile-extra-flag">Extra · ${formatBRL(album.extraPhotoPrice)}</span>` : ''}
+            <span class="tile-code-label">${escapeHtml(photo.filename)}</span>
+            <button
+              type="button"
+              class="tile-heart-btn ${isSel ? 'active' : ''} js-toggle-select"
+              data-photo-id="${escapeHtml(photo.id)}"
+              aria-label="${isSel ? 'Remover seleção' : 'Selecionar foto'}"
+              ${album.selectionLocked ? 'disabled' : ''}
+            >${isSel ? SVG_HEART_SOLID : SVG_HEART_OUTLINE}</button>
+            <button
+              type="button"
+              class="tile-action-btn ${hasNote ? 'has-note' : ''} js-open-note"
+              data-lb-idx="${idx}"
+              aria-label="Observação de edição"
+              title="Observação de edição"
+            >${SVG_COMMENT}</button>
+          </figure>
         `;
       }
 
       const isFav = favSet.has(photo.id);
       return `
-        <article class="photo-item ${isFav ? 'is-selected' : ''}" data-photo-id="${escapeHtml(photo.id)}">
-          <div class="photo-thumb-wrap js-open-lb" data-lb-idx="${idx}">
+        <figure class="masonry-tile ${isFav ? 'is-selected' : ''}" data-photo-id="${escapeHtml(photo.id)}">
+          <button type="button" class="masonry-img-btn js-open-lb" data-lb-idx="${idx}" aria-label="Ampliar foto ${escapeHtml(photo.filename)}">
             <img src="${escapeHtml(src)}" alt="${escapeHtml(photo.filename)}" loading="lazy" />
-            <span class="photo-num-tag">#${numStr}</span>
-          </div>
-          <div class="photo-card-bar">
-            <button type="button" class="btn-select-toggle ${isFav ? 'active' : ''} js-toggle-fav" data-photo-id="${escapeHtml(photo.id)}">
-              <span>${isFav ? '❤️ Favorita' : '🤍 Favoritar'}</span>
-            </button>
-            <button type="button" class="btn-icon-action js-download-one" data-photo-id="${escapeHtml(photo.id)}" title="Baixar esta foto">
-              ⬇️ Baixar
-            </button>
-          </div>
-        </article>
+          </button>
+          <button
+            type="button"
+            class="tile-heart-btn ${isFav ? 'active' : ''} js-toggle-fav"
+            data-photo-id="${escapeHtml(photo.id)}"
+            aria-label="${isFav ? 'Remover das favoritas' : 'Adicionar às favoritas'}"
+          >${isFav ? SVG_HEART_SOLID : SVG_HEART_OUTLINE}</button>
+          <button
+            type="button"
+            class="tile-action-btn js-download-one"
+            data-photo-id="${escapeHtml(photo.id)}"
+            aria-label="Baixar esta foto"
+            title="Baixar esta foto"
+          >${SVG_DOWNLOAD}</button>
+        </figure>
       `;
     }).join('');
 
-    els.grid.querySelectorAll('.js-open-lb').forEach((el) => {
-      el.addEventListener('click', () => openLightboxAt(Number(el.getAttribute('data-lb-idx')) || 0, false));
+    els.grid.querySelectorAll('.js-open-lb').forEach((btn) => {
+      btn.addEventListener('click', () => openLightboxAt(Number(btn.getAttribute('data-lb-idx')) || 0, false));
     });
-
-    els.grid.querySelectorAll('.js-open-note').forEach((el) => {
-      el.addEventListener('click', () => openLightboxAt(Number(el.getAttribute('data-lb-idx')) || 0, true));
+    els.grid.querySelectorAll('.js-open-note').forEach((btn) => {
+      btn.addEventListener('click', () => openLightboxAt(Number(btn.getAttribute('data-lb-idx')) || 0, true));
     });
-
     els.grid.querySelectorAll('.js-toggle-select').forEach((btn) => {
       btn.addEventListener('click', () => togglePhotoSelection(btn.getAttribute('data-photo-id')));
     });
-
     els.grid.querySelectorAll('.js-toggle-fav').forEach((btn) => {
       btn.addEventListener('click', () => toggleDeliveryFavorite(btn.getAttribute('data-photo-id')));
     });
-
     els.grid.querySelectorAll('.js-download-one').forEach((btn) => {
       btn.addEventListener('click', () => {
+        if (currentAlbum?.phase !== 'delivery') return;
         const p = (currentAlbum.photos || []).find((x) => x.id === btn.getAttribute('data-photo-id'));
         if (p) openDownloadDialog(p);
       });
     });
   }
 
-  function updateSelectionDock(album) {
-    if (!els.dock) return;
-    if (album.selectionLocked) {
-      els.dock.hidden = true;
-      return;
-    }
-    els.dock.hidden = false;
-
-    const calc = window.AlbumsStore.calculateSelectionPricing(album);
-    const pct = calc.packageIncluded > 0
-      ? Math.min(100, Math.round((calc.includedSelected / calc.packageIncluded) * 100))
-      : 100;
-
-    if (els.dockBarFill) els.dockBarFill.style.width = `${pct}%`;
-
-    if (els.dockMainStat) {
-      els.dockMainStat.textContent = `${calc.includedSelected} de ${calc.packageIncluded} fotos do pacote escolhidas`;
-    }
-
-    if (els.dockExtraStat) {
-      if (calc.hasExtras) {
-        els.dockExtraStat.textContent = `+ ${calc.extraCount} ${calc.extraCount === 1 ? 'foto extra' : 'fotos extras'} (${calc.extraCount} × ${formatBRL(calc.extraPhotoPrice)} = ${formatBRL(calc.extraTotal)})`;
-      } else if (calc.remainingInPackage > 0) {
-        els.dockExtraStat.textContent = `Você ainda pode escolher mais ${calc.remainingInPackage} sem custo adicional`;
-      } else {
-        els.dockExtraStat.textContent = `Pacote completo! Se desejar mais fotos, cada extra custa ${formatBRL(calc.extraPhotoPrice)}`;
-      }
-    }
-
-    if (els.btnFinishSelection) {
-      els.btnFinishSelection.disabled = calc.selectedCount === 0;
-      els.btnFinishSelection.textContent = calc.hasExtras
-        ? `Revisar & Pagar Extras (${formatBRL(calc.extraTotal)}) →`
-        : `Concluir Seleção (${calc.selectedCount}) →`;
-    }
-  }
-
   async function togglePhotoSelection(photoId) {
-    if (!currentAlbum || currentAlbum.selectionLocked) return;
+    if (!currentAlbum || currentAlbum.phase !== 'proofing' || currentAlbum.selectionLocked) return;
     if (!Array.isArray(currentAlbum.selectedIds)) currentAlbum.selectedIds = [];
 
     const idx = currentAlbum.selectedIds.indexOf(photoId);
@@ -615,35 +589,84 @@
       currentAlbum.selectedIds.push(photoId);
       const calc = window.AlbumsStore.calculateSelectionPricing(currentAlbum);
       if (calc.extraCount === 1 && currentAlbum.selectedIds.length === calc.packageIncluded + 1) {
-        showToast(`✨ Limite do pacote atingido! Fotos adicionais custam ${formatBRL(calc.extraPhotoPrice)} cada.`);
+        showToast(`Pacote completo (${calc.packageIncluded} fotos). Fotos extras adicionam ${formatBRL(calc.extraPhotoPrice)} cada.`);
       }
     }
 
     await window.AlbumsStore.saveState(rootState);
-    renderToolbarFilters(currentAlbum);
-    renderPhotosGrid(currentAlbum);
-    updateSelectionDock(currentAlbum);
+    updateProofingChrome(currentAlbum);
+    renderFilterTabs(currentAlbum);
+    renderMasonryWall(currentAlbum);
     if (els.lbDialog?.open) refreshLightboxUI();
   }
 
   async function toggleDeliveryFavorite(photoId) {
-    if (!currentAlbum) return;
+    if (!currentAlbum || currentAlbum.phase !== 'delivery') return;
     if (!Array.isArray(currentAlbum.deliveryFavorites)) currentAlbum.deliveryFavorites = [];
     const idx = currentAlbum.deliveryFavorites.indexOf(photoId);
-    if (idx >= 0) {
-      currentAlbum.deliveryFavorites.splice(idx, 1);
-    } else {
-      currentAlbum.deliveryFavorites.push(photoId);
-    }
+    if (idx >= 0) currentAlbum.deliveryFavorites.splice(idx, 1);
+    else currentAlbum.deliveryFavorites.push(photoId);
+
     await window.AlbumsStore.saveState(rootState);
-    renderToolbarFilters(currentAlbum);
-    renderPhotosGrid(currentAlbum);
+    renderFilterTabs(currentAlbum);
+    renderMasonryWall(currentAlbum);
     if (els.lbDialog?.open) refreshLightboxUI();
   }
 
   /* ==========================================================================
-     6. LIGHTBOX COMPARADOR (COM SCROLLTO SEGURO NA FILMSTRIP)
+     6. LIGHTBOX & LENTE DE PROTEÇÃO INTERATIVA (SPOTLIGHT / HOLD-TO-REVEAL)
      ========================================================================== */
+  function applySpotlightAtPercent(xPct, yPct) {
+    if (!els.lbRevealImg) return;
+    const mask = `radial-gradient(circle 135px at ${xPct.toFixed(1)}% ${yPct.toFixed(1)}%, rgba(0,0,0,1) 0%, rgba(0,0,0,0.88) 56%, rgba(0,0,0,0) 100%)`; // taste-skill-ignore: functional mask-image for spotlight protection lens
+    els.lbRevealImg.style.webkitMaskImage = mask;
+    els.lbRevealImg.style.maskImage = mask;
+  }
+
+  function setupLightboxProtectionLens() {
+    if (!els.lbGuard) return;
+
+    const handleMove = (clientX, clientY) => {
+      if (!currentAlbum || currentAlbum.phase !== 'proofing') return;
+      if (currentAlbum.protectionLevel !== 'watermark_spotlight') return;
+      const rect = els.lbGuard.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const xPct = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
+      const yPct = Math.max(0, Math.min(100, ((clientY - rect.top) / rect.height) * 100));
+      applySpotlightAtPercent(xPct, yPct);
+    };
+
+    els.lbGuard.addEventListener('pointermove', (e) => handleMove(e.clientX, e.clientY));
+    els.lbGuard.addEventListener('touchmove', (e) => {
+      const t = e.touches?.[0];
+      if (t) handleMove(t.clientX, t.clientY);
+    }, { passive: true });
+
+    // Nível 2 (watermark_blur): segurar para inspecionar nitidez com marca d'água
+    const startHold = () => {
+      if (currentAlbum?.phase === 'proofing' && currentAlbum.protectionLevel === 'watermark_blur') {
+        if (els.lbRevealImg) {
+          els.lbRevealImg.style.webkitMaskImage = 'none';
+          els.lbRevealImg.style.maskImage = 'none';
+          els.lbRevealImg.hidden = false;
+        }
+      }
+    };
+    const endHold = () => {
+      if (currentAlbum?.phase === 'proofing' && currentAlbum.protectionLevel === 'watermark_blur') {
+        if (els.lbRevealImg) els.lbRevealImg.hidden = true;
+      }
+    };
+
+    [els.btnHoldSharp, els.lbGuard].forEach((target) => {
+      if (!target) return;
+      target.addEventListener('pointerdown', startHold);
+      target.addEventListener('pointerup', endHold);
+      target.addEventListener('pointerleave', endHold);
+      target.addEventListener('pointercancel', endHold);
+    });
+  }
+
   function openLightboxAt(idx, focusComment = false) {
     if (!lightboxList.length || !els.lbDialog) return;
     lightboxIdx = Math.max(0, Math.min(idx, lightboxList.length - 1));
@@ -651,7 +674,7 @@
     refreshLightboxUI();
     if (!els.lbDialog.open) els.lbDialog.showModal();
     if (focusComment && els.lbCommentIn) {
-      setTimeout(() => els.lbCommentIn.focus(), 80);
+      setTimeout(() => els.lbCommentIn.focus(), 60);
     }
   }
 
@@ -659,8 +682,10 @@
     if (!els.lbStrip) return;
     els.lbStrip.innerHTML = lightboxList.map((p, i) => `
       <img
-        src="${escapeHtml(getDisplaySrc(currentAlbum, p))}"
+        src="${escapeHtml(getPhotoPrimarySrc(currentAlbum, p))}"
         alt=""
+        width="50"
+        height="50"
         class="lb-strip-thumb ${i === lightboxIdx ? 'active' : ''}"
         data-strip-idx="${i}"
         draggable="false"
@@ -679,12 +704,45 @@
     const photo = lightboxList[lightboxIdx];
     if (!photo || !currentAlbum) return;
 
-    if (els.lbImg) els.lbImg.src = getDisplaySrc(currentAlbum, photo);
+    const primarySrc = getPhotoPrimarySrc(currentAlbum, photo);
+    const revealSrc = getPhotoRevealSrc(currentAlbum, photo);
+    const isProof = currentAlbum.phase === 'proofing';
+    const level = currentAlbum.protectionLevel || 'watermark';
+
+    if (els.lbImg) {
+      els.lbImg.src = primarySrc;
+      els.lbImg.alt = photo.filename || '';
+    }
     if (els.lbIndex) els.lbIndex.textContent = `${lightboxIdx + 1} / ${lightboxList.length}`;
     if (els.lbFilename) els.lbFilename.textContent = photo.filename || '';
-    if (els.lbFolder) els.lbFolder.textContent = photo.folder ? `Momento: ${photo.folder}` : '';
 
-    const isProof = currentAlbum.phase === 'proofing';
+    // Configura camada de proteção interativa no Lightbox
+    if (isProof && level === 'watermark_spotlight') {
+      if (els.lbRevealImg) {
+        els.lbRevealImg.src = revealSrc;
+        els.lbRevealImg.hidden = false;
+        applySpotlightAtPercent(50, 46);
+      }
+      if (els.lbAssistBox) els.lbAssistBox.hidden = false;
+      if (els.lbAssistText) {
+        els.lbAssistText.textContent = 'Proteção de foco centralizado ativa: mova o cursor ou o dedo sobre a foto para inspecionar cada detalhe.';
+      }
+      if (els.btnHoldSharp) els.btnHoldSharp.hidden = true;
+    } else if (isProof && level === 'watermark_blur') {
+      if (els.lbRevealImg) {
+        els.lbRevealImg.src = revealSrc;
+        els.lbRevealImg.hidden = true;
+      }
+      if (els.lbAssistBox) els.lbAssistBox.hidden = false;
+      if (els.lbAssistText) {
+        els.lbAssistText.textContent = 'Proteção anti-captura ativa: mantenha pressionado abaixo (ou sobre a imagem) para conferir a nitidez.';
+      }
+      if (els.btnHoldSharp) els.btnHoldSharp.hidden = false;
+    } else {
+      if (els.lbRevealImg) els.lbRevealImg.hidden = true;
+      if (els.lbAssistBox) els.lbAssistBox.hidden = true;
+    }
+
     if (els.lbProofControls) els.lbProofControls.hidden = !isProof;
     if (els.lbDeliveryControls) els.lbDeliveryControls.hidden = isProof;
 
@@ -693,7 +751,7 @@
       if (els.lbSelectBtn) {
         els.lbSelectBtn.disabled = Boolean(currentAlbum.selectionLocked);
         els.lbSelectBtn.classList.toggle('active', isSel);
-        els.lbSelectBtn.textContent = isSel ? '❤️ Foto Selecionada (Clique p/ remover)' : '🤍 Selecionar esta fotografia';
+        els.lbSelectBtn.textContent = isSel ? 'Fotografia selecionada (remover)' : 'Selecionar fotografia';
       }
       if (els.lbCommentIn) {
         els.lbCommentIn.disabled = Boolean(currentAlbum.selectionLocked);
@@ -702,11 +760,11 @@
     } else {
       const isFav = (currentAlbum.deliveryFavorites || []).includes(photo.id);
       if (els.lbFavBtn) {
-        els.lbFavBtn.textContent = isFav ? '❤️ Salva nas Favoritas' : '🤍 Salvar nas Favoritas';
+        els.lbFavBtn.textContent = isFav ? 'Remover das favoritas' : 'Marcar como favorita';
       }
     }
 
-    // Sincroniza miniatura ativa com scrollTo (NUNCA scrollIntoView)
+    // Sincroniza fita de miniaturas com scrollTo (nunca scrollIntoView)
     if (els.lbStrip) {
       const thumbs = els.lbStrip.querySelectorAll('.lb-strip-thumb');
       thumbs.forEach((t, i) => t.classList.toggle('active', i === lightboxIdx));
@@ -721,31 +779,73 @@
   /* ==========================================================================
      7. CHECKOUT SEGURO DE FOTOS EXTRAS (MERCADO PAGO + PIX DIRETO)
      ========================================================================== */
+  function renderQrMatrix(canvas, payloadStr) {
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const size = canvas.width;
+    const modules = 29;
+    const pad = 10;
+    const cell = (size - pad * 2) / modules;
+
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, size, size);
+
+    const drawFinder = (mx, my) => {
+      ctx.fillStyle = '#1B2733';
+      ctx.fillRect(pad + mx * cell, pad + my * cell, 7 * cell, 7 * cell);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(pad + (mx + 1) * cell, pad + (my + 1) * cell, 5 * cell, 5 * cell);
+      ctx.fillStyle = '#1B2733';
+      ctx.fillRect(pad + (mx + 2) * cell, pad + (my + 2) * cell, 3 * cell, 3 * cell);
+    };
+
+    drawFinder(0, 0);
+    drawFinder(modules - 7, 0);
+    drawFinder(0, modules - 7);
+
+    let seed = 2166136261;
+    for (let i = 0; i < payloadStr.length; i++) {
+      seed ^= payloadStr.charCodeAt(i);
+      seed = Math.imul(seed, 16777619) >>> 0;
+    }
+
+    ctx.fillStyle = '#1B2733';
+    for (let r = 0; r < modules; r++) {
+      for (let c = 0; c < modules; c++) {
+        if ((r < 8 && c < 8) || (r < 8 && c >= modules - 8) || (r >= modules - 8 && c < 8)) continue;
+        seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+        if (((seed >>> 16) ^ payloadStr.charCodeAt((r * modules + c) % payloadStr.length)) & 1) {
+          ctx.fillRect(Math.round(pad + c * cell), Math.round(pad + r * cell), Math.ceil(cell), Math.ceil(cell));
+        }
+      }
+    }
+  }
+
   function openCheckoutModal() {
-    if (!currentAlbum || !els.chkDialog) return;
+    if (!currentAlbum || currentAlbum.phase !== 'proofing' || !els.chkDialog) return;
     const calc = window.AlbumsStore.calculateSelectionPricing(currentAlbum);
     if (calc.selectedCount === 0) {
-      showToast('Selecione ao menos 1 fotografia antes de concluir.');
+      showToast('Selecione ao menos uma fotografia antes de concluir.');
       return;
     }
 
     if (els.chkIncludedVal) {
-      els.chkIncludedVal.textContent = `${calc.includedSelected} de ${calc.packageIncluded} fotos (Incluso no pacote)`;
+      els.chkIncludedVal.textContent = `${calc.includedSelected} de ${calc.packageIncluded} fotos (incluso)`;
     }
     if (els.chkExtraLabel) {
       els.chkExtraLabel.textContent = calc.hasExtras
-        ? `Fotos extras (${calc.extraCount} × ${formatBRL(calc.extraPhotoPrice)})`
-        : 'Fotos extras adicionadas';
+        ? `Fotografias extras (${calc.extraCount} × ${formatBRL(calc.extraPhotoPrice)})`
+        : 'Fotografias extras';
     }
     if (els.chkExtraVal) els.chkExtraVal.textContent = formatBRL(calc.extraTotal);
     if (els.chkTotalVal) els.chkTotalVal.textContent = formatBRL(calc.extraTotal);
-    if (els.chkThumbsLabel) els.chkThumbsLabel.textContent = `Suas ${calc.selectedCount} fotografias escolhidas:`;
+    if (els.chkThumbsLabel) els.chkThumbsLabel.textContent = `Fotografias escolhidas (${calc.selectedCount})`;
 
     const selectedSet = new Set(calc.selectedIds);
-    const chosenPhotos = (currentAlbum.photos || []).filter((p) => selectedSet.has(p.id));
+    const chosen = (currentAlbum.photos || []).filter((p) => selectedSet.has(p.id));
     if (els.chkThumbsStrip) {
-      els.chkThumbsStrip.innerHTML = chosenPhotos.map((p) => `
-        <img src="${escapeHtml(getDisplaySrc(currentAlbum, p))}" alt="${escapeHtml(p.filename)}" title="${escapeHtml(p.filename)}" />
+      els.chkThumbsStrip.innerHTML = chosen.map((p) => `
+        <img src="${escapeHtml(getPhotoPrimarySrc(currentAlbum, p))}" alt="${escapeHtml(p.filename)}" width="52" height="52" />
       `).join('');
     }
 
@@ -766,7 +866,6 @@
     const brand = window.AlbumsStore.getBrandDefaults();
     const txid = `ALB${currentAlbum.slug.replace(/[^a-z0-9]/gi, '').slice(0, 10)}${Date.now().toString().slice(-4)}`;
 
-    // 1. Payload Pix Direto (BRCode Padrão Banco Central)
     const directPayload = window.AlbumsStore.generatePixPayload({
       pixKey: payCfg.pixKey || 'contato@instantesdecarly.com.br',
       merchantName: payCfg.merchantName || brand.studioName,
@@ -777,23 +876,19 @@
 
     if (els.directPixKeyLabel) els.directPixKeyLabel.textContent = payCfg.pixKey || 'contato@instantesdecarly.com.br';
     if (els.directPixCode) els.directPixCode.value = directPayload;
-    renderVisualQrCanvas(els.directQrCanvas, directPayload);
+    renderQrMatrix(els.directQrCanvas, directPayload);
 
-    // 2. Payload Mercado Pago (API Serverless /api/checkout em produção ou Simulador Localhost)
     if (!isLocalEnv && rootState.storageMode === 'cloud') {
       try {
         const res = await fetch('/api/checkout', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            albumId: currentAlbum.id,
-            selectedPhotoIds: calc.selectedIds
-          })
+          body: JSON.stringify({ albumId: currentAlbum.id, selectedPhotoIds: calc.selectedIds })
         });
         const data = await res.json();
         if (res.ok && data.pixCopyPaste) {
           if (els.mpPixCode) els.mpPixCode.value = data.pixCopyPaste;
-          renderVisualQrCanvas(els.mpQrCanvas, data.pixCopyPaste);
+          renderQrMatrix(els.mpQrCanvas, data.pixCopyPaste);
           if (els.btnMpCardLink && data.checkoutUrl) {
             els.btnMpCardLink.onclick = () => window.open(data.checkoutUrl, '_blank', 'noopener');
           }
@@ -802,16 +897,15 @@
       } catch (_) {}
     }
 
-    // Modo Local de Validação: simula payload dinâmico Mercado Pago + exibe gatilho de Webhook
-    const mpSimulatedPayload = window.AlbumsStore.generatePixPayload({
-      pixKey: 'mercadopago-checkout@instantesdecarly.com.br',
+    const mpSimulated = window.AlbumsStore.generatePixPayload({
+      pixKey: 'mercadopago@instantesdecarly.com.br',
       merchantName: payCfg.merchantName || brand.studioName,
       merchantCity: payCfg.merchantCity || brand.city,
       amount: calc.extraTotal,
       txid: `MP${txid.slice(0, 18)}`
     });
-    if (els.mpPixCode) els.mpPixCode.value = mpSimulatedPayload;
-    renderVisualQrCanvas(els.mpQrCanvas, mpSimulatedPayload);
+    if (els.mpPixCode) els.mpPixCode.value = mpSimulated;
+    renderQrMatrix(els.mpQrCanvas, mpSimulated);
     if (els.mpLocalSimBox) els.mpLocalSimBox.hidden = !isLocalEnv;
   }
 
@@ -823,18 +917,17 @@
     currentAlbum.activityLog.unshift({
       at: new Date().toISOString(),
       type: 'selection',
-      text: `Cliente concluiu a seleção dentro do pacote (${calc.selectedCount} fotos).`
+      text: `Seleção concluída dentro do pacote (${calc.selectedCount} fotografias).`
     });
 
     await window.AlbumsStore.saveState(rootState);
     els.chkDialog?.close();
-    renderProofingHeader(currentAlbum);
-    renderPhotosGrid(currentAlbum);
-    updateSelectionDock(currentAlbum);
-    showToast('✅ Seleção enviada com sucesso para edição!');
+    updateProofingChrome(currentAlbum);
+    renderMasonryWall(currentAlbum);
+    showToast('Seleção confirmada e enviada para edição.');
   }
 
-  async function finalizeMercadoPagoApproved(methodLabel = 'Mercado Pago Pix') {
+  async function finalizeMercadoPagoApproved(label = 'Mercado Pago Pix') {
     const calc = window.AlbumsStore.calculateSelectionPricing(currentAlbum);
     currentAlbum.selectionLocked = true;
     currentAlbum.status = 'selection_paid';
@@ -851,15 +944,14 @@
     currentAlbum.activityLog.unshift({
       at: new Date().toISOString(),
       type: 'payment',
-      text: `Webhook ${methodLabel}: Pagamento de ${formatBRL(calc.extraTotal)} (${calc.extraCount} extras) APROVADO! Total: ${calc.selectedCount} fotos.`
+      text: `Pagamento confirmado (${label}): ${formatBRL(calc.extraTotal)} por ${calc.extraCount} extras. Total: ${calc.selectedCount} fotos.`
     });
 
     await window.AlbumsStore.saveState(rootState);
     els.chkDialog?.close();
-    renderProofingHeader(currentAlbum);
-    renderPhotosGrid(currentAlbum);
-    updateSelectionDock(currentAlbum);
-    showToast('✅ Pagamento confirmado! Seleção liberada para edição.');
+    updateProofingChrome(currentAlbum);
+    renderMasonryWall(currentAlbum);
+    showToast('Pagamento aprovado. Seleção liberada para edição.');
   }
 
   async function finalizeDirectPixWithWhatsapp() {
@@ -882,21 +974,20 @@
     currentAlbum.activityLog.unshift({
       at: new Date().toISOString(),
       type: 'pix_pending',
-      text: `Cliente finalizou seleção (${calc.selectedCount} fotos) via Pix Direto (${formatBRL(calc.extraTotal)}) — aguardando comprovante (${orderCode}).`
+      text: `Seleção concluída (${calc.selectedCount} fotos) via Pix Direto (${formatBRL(calc.extraTotal)}) — aguardando comprovante (${orderCode}).`
     });
 
     await window.AlbumsStore.saveState(rootState);
     els.chkDialog?.close();
-    renderProofingHeader(currentAlbum);
-    renderPhotosGrid(currentAlbum);
-    updateSelectionDock(currentAlbum);
+    updateProofingChrome(currentAlbum);
+    renderMasonryWall(currentAlbum);
 
-    const msg = `Olá ${brand.shortName}! Acabei de finalizar a seleção do álbum "${currentAlbum.clientName}" (${calc.selectedCount} fotos no total, sendo ${calc.extraCount} extras = ${formatBRL(calc.extraTotal)}). Segue o comprovante do Pix (Pedido ${orderCode})!`;
+    const msg = `Olá ${brand.shortName}! Concluí a seleção do álbum "${currentAlbum.clientName}" (${calc.selectedCount} fotos no total, sendo ${calc.extraCount} extras = ${formatBRL(calc.extraTotal)}). Segue o comprovante do Pix (${orderCode}).`;
     window.open(`https://wa.me/${brand.whatsappNumber}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener');
   }
 
   /* ==========================================================================
-     8. DOWNLOAD COM PIN DE 4 DÍGITOS & COMPACTADOR .ZIP REAL (PIXIESET)
+     8. DOWNLOAD COM PIN (BLOQUEADO POR CÓDIGO SE NÃO FOR 'delivery')
      ========================================================================== */
   function isPinVerifiedForSession(album) {
     if (!album.downloadPin) return true;
@@ -908,13 +999,14 @@
   }
 
   function openDownloadDialog(singlePhoto = null) {
-    if (!currentAlbum || !els.dlDialog) return;
+    // Trava absoluta de segurança: NUNCA permite download na fase de seleção!
+    if (!currentAlbum || currentAlbum.phase !== 'delivery' || !els.dlDialog) return;
     pendingDownloadTarget = singlePhoto;
 
     if (els.dlTitle) {
       els.dlTitle.textContent = singlePhoto
         ? `Baixar ${singlePhoto.filename}`
-        : `Baixar Álbum Completo (${(currentAlbum.photos || []).length} fotos)`;
+        : `Baixar álbum completo (${(currentAlbum.photos || []).length} fotos)`;
     }
 
     const needPin = !isPinVerifiedForSession(currentAlbum);
@@ -924,21 +1016,17 @@
     if (els.dlProgressBox) els.dlProgressBox.hidden = true;
     if (els.btnStartDownload) els.btnStartDownload.disabled = false;
 
-    if (needPin && isLocalEnv && els.dlPinHint && currentAlbum.downloadPin) {
-      els.dlPinHint.hidden = false;
-      els.dlPinHint.textContent = `🧪 Dica ambiente local: PIN de download = ${currentAlbum.downloadPin}`;
-    }
-
     els.dlDialog.showModal();
   }
 
   async function executeDownloadFlow() {
-    if (!currentAlbum) return;
+    if (!currentAlbum || currentAlbum.phase !== 'delivery') return;
 
     if (!isPinVerifiedForSession(currentAlbum)) {
       const typed = (els.dlPinInput?.value || '').trim();
       if (typed !== String(currentAlbum.downloadPin).trim()) {
         if (els.dlPinError) els.dlPinError.hidden = false;
+        els.dlPinInput?.focus();
         return;
       }
       try {
@@ -951,44 +1039,37 @@
 
     if (els.btnStartDownload) els.btnStartDownload.disabled = true;
     if (els.dlProgressBox) els.dlProgressBox.hidden = false;
-    if (els.dlProgressBar) els.dlProgressBar.style.width = '8%';
+    if (els.dlProgressBar) els.dlProgressBar.style.width = '10%';
 
     try {
       if (pendingDownloadTarget) {
-        if (els.dlProgressText) els.dlProgressText.textContent = `Preparando ${pendingDownloadTarget.filename}...`;
+        if (els.dlProgressText) els.dlProgressText.textContent = `Preparando ${pendingDownloadTarget.filename}…`;
         const bytes = await window.AlbumsStore.fetchImageAsBytes(pendingDownloadTarget.originalSrc, resMode);
         if (els.dlProgressBar) els.dlProgressBar.style.width = '100%';
         triggerBlobDownload(new Blob([bytes], { type: 'image/jpeg' }), pendingDownloadTarget.filename);
-
-        await registerDownloadLog(`Download individual: ${pendingDownloadTarget.filename} (${resLabel})`);
+        await registerDownloadLog(`Download individual: ${pendingDownloadTarget.filename} (${resLabel}).`);
       } else {
         const photos = currentAlbum.photos || [];
         const zipEntries = [];
         for (let i = 0; i < photos.length; i++) {
           const p = photos[i];
           if (els.dlProgressText) {
-            els.dlProgressText.textContent = `Compactando foto ${i + 1} de ${photos.length} (${p.filename})...`;
+            els.dlProgressText.textContent = `Compactando fotografia ${i + 1} de ${photos.length}…`;
           }
           const bytes = await window.AlbumsStore.fetchImageAsBytes(p.originalSrc, resMode);
-          const cleanFolder = (p.folder || '').replace(/[\\/:*?"<>|]/g, '').trim();
-          const entryPath = cleanFolder ? `${cleanFolder}/${p.filename}` : p.filename;
-          zipEntries.push({ name: entryPath, data: bytes });
-          const pct = Math.round(((i + 1) / photos.length) * 92);
-          if (els.dlProgressBar) els.dlProgressBar.style.width = `${pct}%`;
+          zipEntries.push({ name: p.filename, data: bytes });
+          if (els.dlProgressBar) els.dlProgressBar.style.width = `${Math.round(((i + 1) / photos.length) * 92)}%`;
         }
-
         const zipBlob = window.AlbumsStore.buildZipBlob(zipEntries);
         if (els.dlProgressBar) els.dlProgressBar.style.width = '100%';
-        const zipName = `${currentAlbum.slug}-${resMode === 'high' ? 'alta-resolucao' : 'web'}.zip`;
-        triggerBlobDownload(zipBlob, zipName);
-
-        await registerDownloadLog(`Cliente baixou Álbum Completo .ZIP (${photos.length} fotos • ${resLabel}).`);
+        triggerBlobDownload(zipBlob, `${currentAlbum.slug}-${resMode === 'high' ? 'alta-resolucao' : 'web'}.zip`);
+        await registerDownloadLog(`Cliente baixou álbum completo .ZIP (${photos.length} fotos · ${resLabel}).`);
       }
 
-      showToast('⬇️ Download iniciado com sucesso!');
-      setTimeout(() => els.dlDialog?.close(), 500);
+      showToast('Download iniciado.');
+      setTimeout(() => els.dlDialog?.close(), 450);
     } catch (err) {
-      showToast('Erro ao preparar download: ' + err.message);
+      showToast('Erro ao gerar download: ' + err.message);
     } finally {
       if (els.btnStartDownload) els.btnStartDownload.disabled = false;
     }
@@ -1007,27 +1088,24 @@
 
   async function registerDownloadLog(text) {
     currentAlbum.activityLog = currentAlbum.activityLog || [];
-    currentAlbum.activityLog.unshift({
-      at: new Date().toISOString(),
-      type: 'download',
-      text
-    });
+    currentAlbum.activityLog.unshift({ at: new Date().toISOString(), type: 'download', text });
     await window.AlbumsStore.saveState(rootState);
   }
 
   /* ==========================================================================
-     9. EVENTOS DE INTERFACE & INICIALIZAÇÃO
+     9. EVENTOS E BOOTSTRAP
      ========================================================================== */
   function bindEvents() {
     els.portalForm?.addEventListener('submit', (e) => {
       e.preventDefault();
-      const typed = (els.portalSlugIn?.value || '').trim().toLowerCase();
-      const found = (rootState.albums || []).find((a) => a.slug.toLowerCase() === typed);
+      const parsedSlug = window.AlbumsStore.parseAlbumSlugFromInput(els.portalSlugIn?.value);
+      const found = (rootState.albums || []).find((a) => a.slug.toLowerCase() === parsedSlug);
       if (!found) {
         if (els.portalError) {
           els.portalError.hidden = false;
-          els.portalError.textContent = 'Álbum não encontrado. Verifique o código enviado pela sua fotógrafa.';
+          els.portalError.textContent = 'Álbum não encontrado. Confira o link ou código recebido no seu WhatsApp.';
         }
+        els.portalSlugIn?.focus();
         return;
       }
       window.location.href = `${galeriaRoute}?id=${encodeURIComponent(found.slug)}`;
@@ -1040,25 +1118,19 @@
       if (typed === String(currentAlbum.password || '').trim()) {
         markAlbumUnlocked(currentAlbum);
         openAlbumExperience(currentAlbum);
-      } else if (els.pwError) {
-        els.pwError.hidden = false;
+      } else {
+        if (els.pwError) els.pwError.hidden = false;
+        els.pwInput?.focus();
       }
     });
 
     els.btnScrollGallery?.addEventListener('click', () => {
-      els.toolbar?.scrollIntoView({ behavior: 'smooth' });
+      els.topbar?.scrollIntoView({ behavior: 'smooth' });
     });
 
-    els.btnHeroDownloadAll?.addEventListener('click', () => openDownloadDialog(null));
-    els.btnToolbarZip?.addEventListener('click', () => openDownloadDialog(null));
-
-    els.btnFilterSelectedQuick?.addEventListener('click', () => {
-      activeFilter = activeFilter === 'selected' ? 'all' : 'selected';
-      renderToolbarFilters(currentAlbum);
-      renderPhotosGrid(currentAlbum);
-    });
-
-    els.btnFinishSelection?.addEventListener('click', openCheckoutModal);
+    els.btnFinishTop?.addEventListener('click', openCheckoutModal);
+    els.btnFinishDock?.addEventListener('click', openCheckoutModal);
+    els.btnDeliveryZip?.addEventListener('click', () => openDownloadDialog(null));
 
     // Lightbox
     els.lbClose?.addEventListener('click', () => els.lbDialog?.close());
@@ -1082,9 +1154,9 @@
       if (!currentAlbum.photoComments) currentAlbum.photoComments = {};
       currentAlbum.photoComments[p.id] = (els.lbCommentIn?.value || '').trim();
       await window.AlbumsStore.saveState(rootState);
-      renderToolbarFilters(currentAlbum);
-      renderPhotosGrid(currentAlbum);
-      showToast('💬 Observação salva na fotografia!');
+      renderFilterTabs(currentAlbum);
+      renderMasonryWall(currentAlbum);
+      showToast('Observação salva.');
     });
     els.lbFavBtn?.addEventListener('click', () => {
       const p = lightboxList[lightboxIdx];
@@ -1123,20 +1195,15 @@
 
     els.btnCopyMpPix?.addEventListener('click', () => {
       navigator.clipboard?.writeText(els.mpPixCode?.value || '');
-      showToast('📋 Código Pix Mercado Pago copiado!');
+      showToast('Código Pix copiado.');
     });
-
     els.btnCopyDirectPix?.addEventListener('click', () => {
       navigator.clipboard?.writeText(els.directPixCode?.value || '');
-      showToast('📋 Código Pix copiado! Pague no app do seu banco.');
+      showToast('Código Pix copiado.');
     });
-
     els.btnMpCardLink?.addEventListener('click', () => {
-      if (isLocalEnv) {
-        finalizeMercadoPagoApproved('Mercado Pago Cartão');
-      }
+      if (isLocalEnv) finalizeMercadoPagoApproved('Mercado Pago Cartão');
     });
-
     els.btnConfirmFree?.addEventListener('click', finalizeFreeSelection);
     els.btnSimulateWebhook?.addEventListener('click', () => finalizeMercadoPagoApproved('Mercado Pago Pix'));
     els.btnConfirmDirectPix?.addEventListener('click', finalizeDirectPixWithWhatsapp);
@@ -1145,7 +1212,7 @@
     els.dlClose?.addEventListener('click', () => els.dlDialog?.close());
     document.querySelectorAll('input[name="dl-res"]').forEach((radio) => {
       radio.addEventListener('change', () => {
-        document.querySelectorAll('.dl-radio-card').forEach((card) => {
+        document.querySelectorAll('.res-option').forEach((card) => {
           card.classList.toggle('active', card.contains(radio) && radio.checked);
         });
       });
@@ -1156,20 +1223,19 @@
   async function boot() {
     hydrateBrandStrings();
     setupAntiCopyProtection();
+    setupLightboxProtectionLens();
     bindEvents();
 
     rootState = await window.AlbumsStore.loadState();
 
-    // Sincronização em tempo real caso o fotógrafo edite o álbum no /admin na outra aba
     window.AlbumsStore.subscribe(async () => {
       rootState = await window.AlbumsStore.loadState();
       if (currentAlbum) {
         const updated = (rootState.albums || []).find((a) => a.id === currentAlbum.id);
         if (updated && isAlbumUnlocked(updated)) {
           await openAlbumExperience(updated);
+          if (els.lbDialog?.open) refreshLightboxUI();
         }
-      } else if (!initialSlug) {
-        renderPortalView();
       }
     });
 
@@ -1198,4 +1264,3 @@
 
   document.addEventListener('DOMContentLoaded', boot);
 })();
-

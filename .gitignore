@@ -3,6 +3,7 @@
 .gemini/
 .claude/
 .playwright-cli/
+.taste-skill/
 skills-lock.json
 
 # Vercel & Node

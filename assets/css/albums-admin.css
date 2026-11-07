@@ -1,23 +1,27 @@
 /* ==========================================================================
-   ESTILOS DO MÓDULO DE ÁLBUNS DE CLIENTES NO PAINEL /ADMIN
+   ESTILOS DO MÓDULO DE ÁLBUNS DE CLIENTES NO PAINEL /ADMIN (V2)
    ========================================================================== */
+#panel-albums {
+  container-type: inline-size;
+}
+
 .alb-kpi-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
   gap: 10px;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .alb-kpi-card {
   background: #FFFFFF;
   border: 1px solid var(--cms-border, rgba(27, 39, 51, 0.12));
-  border-radius: 12px;
+  border-radius: 10px;
   padding: 12px 14px;
 }
 
 .alb-kpi-card span {
   display: block;
-  font-size: 0.72rem;
+  font-size: 0.71rem;
   color: var(--cms-muted, #627282);
   font-weight: 600;
   text-transform: uppercase;
@@ -26,7 +30,7 @@
 
 .alb-kpi-card strong {
   display: block;
-  font-size: 1.35rem;
+  font-size: 1.3rem;
   margin-top: 4px;
   color: var(--cms-text, #1B2733);
   font-variant-numeric: tabular-nums;
@@ -53,21 +57,24 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 4px;
-  min-width: 205px;
+  min-width: 210px;
   padding: 12px 14px;
-  border-radius: 12px;
+  border-radius: 10px;
   border: 1.5px solid rgba(27, 39, 51, 0.12);
   background: #FFFFFF;
   cursor: pointer;
   text-align: left;
   font-family: inherit;
-  transition: all 0.16s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.alb-pill-item:hover {
+  border-color: rgba(59, 114, 147, 0.45);
 }
 
 .alb-pill-item.active {
   border-color: #3B7293;
   background: #F4F9FC;
-  box-shadow: 0 6px 18px rgba(59, 114, 147, 0.12);
 }
 
 .alb-pill-item strong {
@@ -78,14 +85,16 @@
 .alb-pill-meta {
   font-size: 0.74rem;
   color: #5A6978;
+  font-variant-numeric: tabular-nums;
 }
 
 .alb-status-tag {
   display: inline-block;
   padding: 2px 8px;
   border-radius: 999px;
-  font-size: 0.68rem;
+  font-size: 0.67rem;
   font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 .alb-status-tag.st-wait { background: #FFF4D9; color: #8A5B00; }
@@ -96,17 +105,17 @@
 .alb-phase-toggle-bar {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  background: #FDF6DF;
-  padding: 8px;
-  border-radius: 14px;
-  border: 1px solid rgba(231, 195, 120, 0.5);
+  gap: 6px;
+  background: #F3EFE3;
+  padding: 6px;
+  border-radius: 12px;
+  border: 1px solid rgba(27, 39, 51, 0.10);
   margin-bottom: 16px;
 }
 
 .alb-phase-btn {
-  padding: 11px 12px;
-  border-radius: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
   border: 1px solid transparent;
   background: transparent;
   font-family: inherit;
@@ -114,6 +123,7 @@
   font-weight: 700;
   color: #5A6978;
   cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 .alb-phase-btn.active {
@@ -124,15 +134,219 @@
 .alb-section-box {
   background: #FFFFFF;
   border: 1px solid rgba(27, 39, 51, 0.10);
-  border-radius: 14px;
+  border-radius: 12px;
   padding: 16px 18px;
   margin-bottom: 16px;
 }
 
 .alb-section-box h3 {
   margin: 0 0 12px;
-  font-size: 0.95rem;
+  font-size: 0.94rem;
   color: #1B2733;
+}
+
+/* Seletor de 3 Níveis de Proteção + Marca d'Água */
+.alb-protection-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+@container (max-width: 560px) {
+  .alb-protection-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.alb-prot-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  padding: 12px 13px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(27, 39, 51, 0.13);
+  background: #FAF9F5;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.alb-prot-card:hover {
+  border-color: rgba(59, 114, 147, 0.5);
+}
+
+.alb-prot-card.active {
+  border-color: #1B2733;
+  background: #FFFDF3;
+  box-shadow: inset 0 0 0 1px #1B2733;
+}
+
+.alb-prot-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+}
+
+.alb-prot-card strong {
+  font-size: 0.82rem;
+  color: #1B2733;
+}
+
+.alb-prot-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(27, 39, 51, 0.35);
+  flex-shrink: 0;
+  position: relative;
+}
+
+.alb-prot-card.active .alb-prot-dot {
+  border-color: #1B2733;
+  background: #1B2733;
+}
+
+.alb-prot-card.active .alb-prot-dot::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 999px;
+  background: #FFFDF3;
+}
+
+.alb-prot-card span {
+  font-size: 0.73rem;
+  line-height: 1.4;
+  color: #5A6978;
+}
+
+.alb-wm-studio-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(220px, 0.85fr);
+  gap: 16px;
+  align-items: start;
+  padding-top: 14px;
+  border-top: 1px solid rgba(27, 39, 51, 0.08);
+}
+
+@container (max-width: 640px) {
+  .alb-wm-studio-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.alb-wm-thumb-box {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #232F3B;
+  color: #FFFDF3;
+  margin-bottom: 12px;
+}
+
+.alb-btn-dark-ghost {
+  background: rgba(255, 253, 243, 0.12);
+  color: #FFFDF3;
+  border: 1px solid rgba(255, 253, 243, 0.28);
+}
+.alb-btn-dark-ghost:hover {
+  background: rgba(255, 253, 243, 0.22);
+}
+
+.alb-wm-thumb-checker {
+  width: 68px;
+  height: 46px;
+  border-radius: 6px;
+  background-color: #2E3D4B;
+  background-image:
+    linear-gradient(45deg, rgba(255,255,255,0.08) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(255,255,255,0.08) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.08) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.08) 75%);
+  background-size: 12px 12px;
+  background-position: 0 0, 0 6px, 6px -6px, -6px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  flex-shrink: 0;
+}
+
+.alb-wm-thumb-checker img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.alb-wm-preview-card {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(27, 39, 51, 0.12);
+  background: #1B2733;
+}
+
+.alb-wm-preview-card img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  display: block;
+}
+
+.alb-wm-preview-caption {
+  padding: 8px 10px;
+  font-size: 0.72rem;
+  color: rgba(255, 253, 243, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.alb-seg-row {
+  display: inline-flex;
+  background: #F1EFE8;
+  padding: 3px;
+  border-radius: 8px;
+  gap: 3px;
+}
+
+.alb-seg-btn {
+  border: none;
+  background: transparent;
+  padding: 6px 11px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #5A6978;
+  cursor: pointer;
+}
+
+.alb-seg-btn.active {
+  background: #FFFFFF;
+  color: #1B2733;
+  box-shadow: 0 1px 3px rgba(27, 39, 51, 0.12);
+}
+
+.alb-slider-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.alb-slider-row input[type="range"] {
+  width: 100%;
+  accent-color: #3B7293;
 }
 
 .alb-lr-box {
@@ -168,7 +382,7 @@
 
 .alb-photos-admin-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(156px, 1fr));
   gap: 12px;
   margin-top: 14px;
 }
@@ -176,7 +390,7 @@
 .alb-adm-photo-card {
   background: #FFFDF3;
   border: 1px solid rgba(27, 39, 51, 0.12);
-  border-radius: 12px;
+  border-radius: 10px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -238,7 +452,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-height: 190px;
+  max-height: 180px;
   overflow-y: auto;
 }
 
@@ -253,5 +467,5 @@
   color: #8492A0;
   font-size: 0.71rem;
   margin-right: 6px;
+  font-variant-numeric: tabular-nums;
 }
-
