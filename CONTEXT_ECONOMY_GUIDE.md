@@ -95,11 +95,33 @@ Na precificação de quase todas as LLMs (Anthropic Claude, OpenAI GPT, Google G
 
 ---
 
-## 📑 8. Checklist Rápido de Economia de Token
+## 🧠 8. Model Tiering & Padrão Advisor (Cérebro vs. Músculo)
+
+Separar **decisão arquitetural** (modelo robusto, baixo volume de tokens) de **execução volumosa** (modelo leve, alto volume de tokens a 1/10 do custo). No Antigravity, a ferramenta `invoke_subagent` aceita `Model`: `'pro'`, `'flash'`, `'flash_lite'` ou `'inherit'`.
+
+### Dois fluxos práticos:
+1. **Chat no Flash + Advisor sob demanda (`Model: 'pro'`):**
+   - Mantenha o chat principal em um modelo rápido/econômico para edições rotineiras.
+   - Em decisões complexas de arquitetura ou debug difícil, dispare um subagente read-only (`research` ou `self`) com `Model: 'pro'` pedindo apenas um plano enxuto (200–400 tokens), e execute o código no Flash.
+2. **Chat em Modelo Robusto + Executores (`Model: 'flash'` / `'flash_lite'`):**
+   - Se o chat principal estiver em um modelo de raciocínio pesado (Opus / Pro / Argon), evite que ele próprio gere centenas de linhas repetitivas, varreduras ou testes longos.
+   - Use o chat principal apenas para decidir o plano e delegue tarefas mecânicas/volumosas via `invoke_subagent` com `Model: 'flash'` (código/testes) ou `Model: 'flash_lite'` (buscas/checagens triviais).
+
+### 📋 Regra pronta para `AGENTS.md`:
+```markdown
+### 🧠 Roteamento de Modelos (Advisor Pattern)
+- Se estiver rodando em modelo pesado, atue como Advisor: decida a arquitetura em poucas linhas e delegue edições extensas, buscas amplas ou baterias de testes para `invoke_subagent` com `Model: "flash"` ou `"flash_lite"`.
+- Se estiver rodando em modelo Flash e encontrar decisão arquitetural ambígua ou bug complexo, consulte pontualmente um subagente `research` com `Model: "pro"` pedindo apenas o plano de ação conciso antes de editar.
+```
+
+---
+
+## 📑 9. Checklist Rápido de Economia de Token
 
 | Prática | Economia Estimada | Quando Aplicar |
 | :--- | :---: | :--- |
 | **Agente único em vez de enxame de 8** | **-80% a -90%** | Em quase todas as tarefas de desenvolvimento e design. |
+| **Model Tiering / Padrão Advisor (`pro` vs `flash`)** | **-60% a -85% no Custo** | Decisões no modelo forte; código volumoso e testes no `flash`. |
 | **Comunicação Anti-Rodeios (Zero-Fluff)** | **-40% a -60% no Output** | Diretriz permanente no system prompt / `AGENTS.md`. |
 | **Leitura por intervalo (`StartLine`/`EndLine`)** | **-50% no Input** | Ao inspecionar arquivos CSS ou JS longos. |
 | **Pipes de terminal (`Select-Object -First 20`)** | **-30% no Input** | Em logs de build, testes e status do Git. |
