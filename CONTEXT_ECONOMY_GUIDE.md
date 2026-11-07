@@ -64,12 +64,45 @@ Equipes autônomas completas (`/teamwork` com 5 a 10 subagentes concorrentes —
 
 ---
 
-## 📑 7. Checklist Rápido de Economia de Token
+## 🔇 7. Comunicação Cirúrgica & Eliminação de Fluff (Anti-Rodeios)
+
+### Por que isso é crítico?
+Na precificação de quase todas as LLMs (Anthropic Claude, OpenAI GPT, Google Gemini), **tokens de saída (output) custam de 3x a 5x mais caro que tokens de entrada (input)** e aumentam a latência. Respostas prolixas com preâmbulos e cortesias drenam a cota muito mais rápido do que prompts longos.
+
+### Regras Validadas para o Modelo / Harness:
+1. **Zero Conversational Filler:**
+   - Banir cumprimentos, agradecimentos e bajulações (*"Com certeza!", "Ótima escolha!", "Certamente posso ajudar com isso!"*).
+   - Banir introduções vazias (*"Aqui está o código solicitado...", "Abaixo explico os passos detalhadamente..."*).
+2. **Code & Action First:**
+   - Começar a resposta diretamente com a ação executada ou o bloco de código.
+   - Não reexplicar sintaxe padrão ou o que o código faz a menos que o usuário peça explicitamente.
+3. **Proibido Re-sumarizar Artefatos:**
+   - Se o agente acabou de criar ou editar um arquivo/artefato, ele **não deve** transcrever o conteúdo inteiro novamente no chat. Apenas aponte o caminho e cite decisões pontuais.
+4. **Diffs Cirúrgicos:**
+   - Ao alterar código, fornecer ou aplicar apenas o trecho modificado. Nunca cuspir arquivos inteiros de centenas de linhas se apenas 5 linhas mudaram.
+5. **Explicações em Bullets Concisos:**
+   - Quando explicações forem necessárias, usar listas com no máximo 1 a 2 frases curtas por item.
+
+### 📋 Snippet Pronto para Injetar no seu `AGENTS.md` ou System Prompt:
+```markdown
+### ⚡ Diretriz de Eficiência de Tokens (Zero-Fluff)
+- Seja direto, conciso e técnico. Maximize densidade de informação.
+- Zero conversational filler: omita saudações, elogios, preâmbulos e fechamentos conversacionais.
+- Vá direto ao código ou à ação. Não repita o que o usuário perguntou.
+- Nunca transcreva no chat arquivos inteiros que já foram criados ou editados no disco.
+- Explicações devem ter no máximo 1-2 frases por tópico em formato de bullet points.
+```
+
+---
+
+## 📑 8. Checklist Rápido de Economia de Token
 
 | Prática | Economia Estimada | Quando Aplicar |
 | :--- | :---: | :--- |
 | **Agente único em vez de enxame de 8** | **-80% a -90%** | Em quase todas as tarefas de desenvolvimento e design. |
-| **Leitura por intervalo (`StartLine`/`EndLine`)** | **-50%** | Ao inspecionar arquivos CSS ou JS longos. |
-| **Pipes de terminal (`Select-Object -First 20`)** | **-30%** | Em logs de build, testes e status do Git. |
-| **Uso de `/compact` após marcos** | **-60%** | Quando a conversa passar de 20–30 interações. |
-| **Commits atômicos no Git** | **-40%** | A cada feature funcional concluída. |
+| **Comunicação Anti-Rodeios (Zero-Fluff)** | **-40% a -60% no Output** | Diretriz permanente no system prompt / `AGENTS.md`. |
+| **Leitura por intervalo (`StartLine`/`EndLine`)** | **-50% no Input** | Ao inspecionar arquivos CSS ou JS longos. |
+| **Pipes de terminal (`Select-Object -First 20`)** | **-30% no Input** | Em logs de build, testes e status do Git. |
+| **Uso de `/compact` após marcos** | **-60% no Contexto** | Quando a conversa passar de 20–30 interações. |
+| **Commits atômicos no Git** | **-40% no Contexto** | A cada feature funcional concluída. |
+
