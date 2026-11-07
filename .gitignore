@@ -4,7 +4,6 @@
 .claude/
 .playwright-cli/
 skills-lock.json
-scripts/
 
 # Vercel & Node
 .vercel

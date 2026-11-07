@@ -1365,7 +1365,7 @@ function initPackageAddAction() {
         'Direção acolhedora no seu ritmo',
         'Galeria online em alta resolução'
       ],
-      whatsappMsg: 'Olá Carly! Gostaria de saber mais sobre o Novo Formato.'
+      whatsappMsg: `Olá ${cmsData.brand?.shortName || cmsData.brand?.founder || ''}! Gostaria de saber mais sobre o Novo Formato.`
     });
     markDirtyAndSync(true);
     renderPackagesAdmin();
@@ -2386,7 +2386,20 @@ function initTabsAndPreviewModes() {
   });
 }
 
+function syncAdminBrandUI() {
+  const brandName = cmsData?.brand?.name || 'Painel do Estúdio';
+  document.title = `Painel do Estúdio (Editor Visual) — ${brandName}`;
+  const authTitle = document.getElementById('auth-title');
+  if (authTitle) authTitle.textContent = `Estúdio ${brandName}`;
+  const topbarTitle = document.querySelector('.topbar-title');
+  if (topbarTitle) topbarTitle.textContent = brandName;
+  document.querySelectorAll('.auth-logo-box img, .topbar-logo').forEach((img) => {
+    img.alt = brandName;
+  });
+}
+
 function renderAllPanels() {
+  syncAdminBrandUI();
   renderPortfolioAdmin();
   renderHeroAdmin();
   renderCategoriesAdmin();
