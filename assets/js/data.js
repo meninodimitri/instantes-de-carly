@@ -5,7 +5,7 @@
  */
 
 const SITE_DATA = {
-  "cmsVersion": "2026-11-07T16:51:40.551Z",
+  "cmsVersion": "2026-11-07T17:07:08.351Z",
   "brand": {
     "name": "Instantes de Carly",
     "founder": "Carliane Carvalho (Carly)",
@@ -359,7 +359,8 @@ const SITE_DATA = {
       "image": "assets/images/real/IMG_1186.jpg",
       "objectPosition": "center 25%",
       "location": "Praia de Iracema",
-      "caption": "Começamos com um pouquinho de vergonha... mas, com calma e no nosso tempo, fomos encontrando o ritmo e deixando tudo mais natural."
+      "caption": "Começamos com um pouquinho de vergonha... mas, com calma e no nosso tempo, fomos encontrando o ritmo e deixando tudo mais natural.",
+      "isAcervoCover": false
     },
     {
       "id": 2,
@@ -403,7 +404,8 @@ const SITE_DATA = {
       "image": "assets/images/real/IMG_2305.jpg",
       "objectPosition": "center 25%",
       "location": "Ponte dos Ingleses",
-      "caption": "Apenas o vento do mar, uma conversa tranquila e o jeito único como dois olhares se encontram."
+      "caption": "Apenas o vento do mar, uma conversa tranquila e o jeito único como dois olhares se encontram.",
+      "isAcervoCover": false
     },
     {
       "id": 6,
@@ -471,7 +473,8 @@ const SITE_DATA = {
       "image": "assets/images/real/IMG_2247.jpg",
       "objectPosition": "center 25%",
       "location": "Praia de Iracema",
-      "caption": "Sentar frente ao mar e deixar a cidade desacelerar enquanto a tarde cai."
+      "caption": "Sentar frente ao mar e deixar a cidade desacelerar enquanto a tarde cai.",
+      "isAcervoCover": true
     },
     {
       "id": 12,
