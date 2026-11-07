@@ -2017,7 +2017,7 @@ async function publishToGitHubAtomic(ghCfg) {
 
   // Clonar dados para substituir data:image/... por arquivos reais em assets/images/uploads/
   const cleanPayload = JSON.parse(JSON.stringify(cmsData));
-  cleanPayload.cmsVersion = new Date().toISOString();
+  cleanPayload.cmsVersion = cmsData.cmsVersion || new Date().toISOString();
 
   const pendingBlobs = [];
   let imgCounter = 0;
@@ -2146,17 +2146,30 @@ async function publishToGitHubAtomic(ghCfg) {
   return { uploadedPhotos: pendingBlobs.length, cleanPayload };
 }
 
+function broadcastPublishedSiteData(payload) {
+  if (typeof BroadcastChannel === 'undefined') return;
+  try {
+    const channel = new BroadcastChannel('instantes_carly_cms_sync');
+    channel.postMessage({
+      type: 'CMS_PUBLISHED',
+      payload: JSON.parse(JSON.stringify(payload))
+    });
+    channel.close();
+  } catch (_) {}
+}
+
 async function handleMainPublishClick() {
   const btn = document.getElementById('btn-publish-main');
   const label = document.getElementById('btn-publish-label');
   if (btn) btn.disabled = true;
 
   try {
-    // Sempre grava localmente para funcionamento imediato em localhost
+    // Sempre grava localmente e avisa outras abas abertas imediatamente (0s, sem F5)
     cmsData.cmsVersion = new Date().toISOString();
     await writeCmsSnapshot('local_published', cmsData);
     await writeCmsSnapshot('draft_working', cmsData);
     sendToPreviewIframe({ type: 'CMS_LIVE_UPDATE', payload: cmsData });
+    broadcastPublishedSiteData(cmsData);
 
     const ghCfg = getSavedGitHubConfig();
     if (ghCfg) {

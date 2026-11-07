@@ -41,8 +41,6 @@ async function loadLocalPublishedDataIfDev() {
   const params = new URLSearchParams(window.location.search);
   const isCmsPreview = params.get('cmsPreview') === '1';
 
-  if (!isLocal && !isCmsPreview) return;
-
   try {
     const db = await openCmsIndexedDB();
     const keyToRead = isCmsPreview ? 'draft_working' : 'local_published';
@@ -54,22 +52,77 @@ async function loadLocalPublishedDataIfDev() {
       getReq.onerror = () => resolve(null);
     });
 
-    if (record && record.data && typeof record.data === 'object') {
-      applyIncomingSiteData(record.data, false);
-    } else if (isCmsPreview) {
-      // Fallback para local_published se draft_working ainda não existir
-      const pubRecord = await new Promise((resolve) => {
-        const tx = db.transaction('snapshots', 'readonly');
-        const getReq = tx.objectStore('snapshots').get('local_published');
-        getReq.onsuccess = () => resolve(getReq.result || null);
-        getReq.onerror = () => resolve(null);
-      });
-      if (pubRecord && pubRecord.data) {
-        applyIncomingSiteData(pubRecord.data, false);
+    if (isLocal || isCmsPreview) {
+      if (record && record.data && typeof record.data === 'object') {
+        applyIncomingSiteData(record.data, false);
+      } else if (isCmsPreview) {
+        const pubRecord = await new Promise((resolve) => {
+          const tx = db.transaction('snapshots', 'readonly');
+          const getReq = tx.objectStore('snapshots').get('local_published');
+          getReq.onsuccess = () => resolve(getReq.result || null);
+          getReq.onerror = () => resolve(null);
+        });
+        if (pubRecord && pubRecord.data) {
+          applyIncomingSiteData(pubRecord.data, false);
+        }
+      }
+      return;
+    }
+
+    // Em produção: ponte imediata de 3 minutos para o navegador de quem acabou de publicar no /admin
+    // (cobre os ~15-20s enquanto o deploy da Vercel ainda está processando na nuvem)
+    if (record && record.data && record.updatedAt) {
+      const ageMs = Date.now() - Date.parse(record.updatedAt);
+      const recVer = record.data.cmsVersion || '';
+      const curVer = SITE_DATA.cmsVersion || '';
+      if (ageMs >= 0 && ageMs < 180000 && recVer && recVer > curVer) {
+        applyIncomingSiteData(record.data, false);
       }
     }
   } catch (err) {
     // Segue normalmente com o SITE_DATA estático do data.js
+  }
+}
+
+function parsePublishedDataJs(jsText) {
+  const startMarker = 'const SITE_DATA =';
+  const startIdx = jsText.indexOf(startMarker);
+  if (startIdx === -1) return null;
+  const afterStart = jsText.slice(startIdx + startMarker.length);
+  const endMarker = '\nif (typeof module';
+  const endIdx = afterStart.lastIndexOf(endMarker);
+  let rawJson = (endIdx !== -1 ? afterStart.slice(0, endIdx) : afterStart).trim();
+  if (rawJson.endsWith(';')) rawJson = rawJson.slice(0, -1).trim();
+  try {
+    return JSON.parse(rawJson);
+  } catch (_) {
+    return null;
+  }
+}
+
+let lastDataRevalidateAt = 0;
+async function revalidateSiteDataFromServer() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('cmsPreview') === '1') return;
+
+  const now = Date.now();
+  if (now - lastDataRevalidateAt < 10000) return;
+  lastDataRevalidateAt = now;
+
+  try {
+    const res = await fetch(`assets/js/data.js?t=${now}`, { cache: 'no-store' });
+    if (!res.ok) return;
+    const text = await res.text();
+    const fresh = parsePublishedDataJs(text);
+    if (!fresh || typeof fresh !== 'object') return;
+
+    const freshVer = fresh.cmsVersion || '';
+    const currentVer = SITE_DATA.cmsVersion || '';
+    if (freshVer && freshVer > currentVer) {
+      applyIncomingSiteData(fresh, true);
+    }
+  } catch (_) {
+    // Silencioso caso offline
   }
 }
 
@@ -111,6 +164,26 @@ function initCmsPreviewBridge() {
       if (heroCinemaController) {
         heroCinemaController.selectSlide(msg.slideIndex);
       }
+    }
+  });
+
+  // Sincronização instantânea entre abas abertas no mesmo navegador (sem precisar dar F5)
+  if (typeof BroadcastChannel !== 'undefined') {
+    try {
+      const channel = new BroadcastChannel('instantes_carly_cms_sync');
+      channel.addEventListener('message', (event) => {
+        const msg = event.data;
+        if (msg && msg.type === 'CMS_PUBLISHED' && msg.payload) {
+          applyIncomingSiteData(msg.payload, true);
+        }
+      });
+    } catch (_) {}
+  }
+
+  // Revalidação silenciosa ao voltar para uma aba já aberta em outro celular/navegador
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      revalidateSiteDataFromServer();
     }
   });
 }
@@ -485,6 +558,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   initContactForm();
 
   await loadLocalPublishedDataIfDev();
+  if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    revalidateSiteDataFromServer();
+  }
 });
 
 /* ==========================================================================
