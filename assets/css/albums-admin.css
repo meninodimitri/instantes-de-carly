@@ -715,7 +715,8 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #FFFFFF;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9), 0 2px 8px rgba(0, 0, 0, 0.65);
+  font-weight: 800;
   line-height: 1.1;
   text-align: center;
 }
@@ -748,7 +749,7 @@
 
 /* 1. Centro */
 .pix-cover-thumb[data-style="centro"] img {
-  filter: brightness(0.72);
+  /* Foto limpa em brilho natural sem escurecimento */
 }
 .pix-mini-overlay-center {
   position: absolute;
@@ -759,7 +760,6 @@
   justify-content: center;
   padding: 8px;
   gap: 4px;
-  background: rgba(18, 27, 36, 0.28);
 }
 .pix-mini-pill-btn {
   display: block;
@@ -767,7 +767,8 @@
   height: 5px;
   border-radius: 999px;
   background: #FFFFFF;
-  opacity: 0.9;
+  opacity: 0.95;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 /* 2. Alegria (JOY com foto na letra O) */
@@ -787,20 +788,26 @@
   gap: 3px;
 }
 .mini-joy-letter {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 1.6rem;
-  font-weight: 700;
-  line-height: 0.85;
+  font-family: 'Playfair Display', 'Cinzel', Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: #B91C1C;
 }
 .mini-joy-o {
   position: relative;
-  display: inline-block;
-  width: 22px;
-  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 24px;
   border-radius: 50%;
   overflow: hidden;
-  border: 2.5px solid #B91C1C;
+  border: 2.2px solid #B91C1C;
 }
 .mini-joy-o img {
   position: absolute;
@@ -812,7 +819,7 @@
 
 /* 3. Esquerda */
 .pix-cover-thumb[data-style="esquerda"] img {
-  filter: brightness(0.72);
+  /* Brilho natural */
 }
 .pix-mini-overlay-left {
   position: absolute;
@@ -821,7 +828,7 @@
   align-items: flex-end;
   justify-content: flex-start;
   padding: 8px 10px;
-  background: linear-gradient(0deg, rgba(18, 27, 36, 0.75) 0%, transparent 60%);
+  background: linear-gradient(0deg, rgba(18, 27, 36, 0.55) 0%, transparent 60%);
 }
 .pix-mini-overlay-left .pix-mini-title-light {
   text-align: left;
@@ -878,22 +885,22 @@
 
 /* 6. Moldura (Inset thin frame) */
 .pix-cover-thumb[data-style="moldura"] img {
-  filter: brightness(0.72);
+  /* Brilho natural */
 }
 .pix-mini-inset-frame {
   position: absolute;
   inset: 7px;
-  border: 1px solid rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.95);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 4px;
-  background: rgba(18, 27, 36, 0.18);
+  background: rgba(18, 27, 36, 0.12);
 }
 
 /* 7. Listra (2 horizontal lines) */
 .pix-cover-thumb[data-style="listra"] img {
-  filter: brightness(0.72);
+  /* Brilho natural */
 }
 .pix-mini-stripe-overlay {
   position: absolute;
@@ -908,12 +915,12 @@
 .pix-mini-stripe-line {
   width: 82%;
   height: 1px;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.95);
 }
 
 /* 8. Divisor (Vertical line down center) */
 .pix-cover-thumb[data-style="divisor"] img {
-  filter: brightness(0.72);
+  /* Brilho natural */
 }
 .pix-mini-divisor-overlay {
   position: absolute;
@@ -984,18 +991,18 @@
 
 /* 11. Contorno (Vertical rectangular outline in center) */
 .pix-cover-thumb[data-style="contorno"] img {
-  filter: brightness(0.72);
+  /* Brilho natural */
 }
 .pix-mini-contorno-rect {
   position: absolute;
   inset: 12% 26%;
-  border: 1px solid rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.95);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 4px;
-  background: rgba(18, 27, 36, 0.22);
+  background: rgba(18, 27, 36, 0.14);
 }
 .pix-mini-underline {
   display: block;
@@ -1045,7 +1052,7 @@
 
 /* 14. Rótulo (Full photo with vertical white label card docked left) */
 .pix-cover-thumb[data-style="rotulo"] img {
-  filter: brightness(0.85);
+  /* Brilho natural */
 }
 .pix-mini-rotulo-badge {
   position: absolute;
@@ -1078,7 +1085,7 @@
   justify-content: center;
 }
 .pix-mini-borda-inner img {
-  filter: brightness(0.72);
+  /* Brilho natural */
 }
 .pix-mini-borda-inner .pix-mini-title-light {
   position: relative;
@@ -1536,4 +1543,60 @@
   margin-top: 16px;
   padding-top: 14px;
   border-top: 1px solid rgba(27, 39, 51, 0.09);
+}
+
+/* ==========================================================================
+   7. CONTROLE VISUAL DE LOGOTIPO NA CAPA DO ÁLBUM
+   ========================================================================== */
+.pix-cover-options-bar {
+  margin-top: 18px;
+  padding: 12px 16px;
+  background: #FAF8F5;
+  border: 1px solid rgba(27, 39, 51, 0.12);
+  border-radius: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.pix-cover-opt-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pix-cover-opt-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #1B2733;
+}
+
+.pix-logo-btn-group {
+  display: inline-flex;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(27, 39, 51, 0.18);
+  background: #FFFFFF;
+}
+
+.pix-logo-btn-group button {
+  padding: 5px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  color: #5E6D7C;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+.pix-logo-btn-group button:not(:last-child) {
+  border-right: 1px solid rgba(27, 39, 51, 0.12);
+}
+
+.pix-logo-btn-group button.active {
+  background: #1B2733;
+  color: #FFFFFF;
 }

@@ -111,6 +111,10 @@
         <button type="button" class="preview-mode-btn" data-preview-mode="hidden">
           <span>📐 Expandir Editor</span>
         </button>
+        <button type="button" class="cms-btn cms-btn-ghost" id="btn-toggle-sidebar" title="Recolher / Expandir Menu Lateral (Mais espaço para editar)">
+          <span id="sidebar-toggle-icon">◀|</span>
+          <span id="sidebar-toggle-label">Recolher Menu</span>
+        </button>
       </div>
 
       <!-- Botões de Ação e Publicação -->
@@ -170,6 +174,10 @@
         </div>
 
         <div class="sidebar-footer">
+          <button type="button" id="btn-collapse-sidebar-rail" class="sidebar-rail-collapse-btn" title="Recolher menu lateral (mais espaço de trabalho)">
+            <span>|◀</span>
+            <span>Recolher Menu Lateral</span>
+          </button>
           <a href="mobile-preview.html" target="_blank" rel="noopener" class="sidebar-ext-link">
             <span>Simulador Mobile + PC</span>
             <span>↗</span>
@@ -184,6 +192,12 @@
           </button>
         </div>
       </aside>
+
+      <!-- Botão Flutuante de Restauração do Menu Lateral (quando recolhido) -->
+      <button type="button" id="btn-expand-sidebar-float" class="sidebar-expand-float-btn" title="Expandir menu lateral" hidden>
+        <span>▶|</span>
+        <span>Menu</span>
+      </button>
 
       <!-- Painel Central de Edição -->
       <main class="cms-editor-pane">

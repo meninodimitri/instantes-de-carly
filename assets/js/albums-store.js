@@ -358,7 +358,9 @@
       gridStyle: 'vertical',
       gridSpacing: 'regular',
       gridSize: 'regular',
-      gridNavStyle: 'icons_text'
+      gridNavStyle: 'icons_text',
+      coverLogoVisible: true,
+      coverLogoColor: 'auto'
     };
   }
 
@@ -394,6 +396,7 @@
     if (d.coverStyle && LEGACY_COVER_MAP[d.coverStyle]) {
       d.coverStyle = LEGACY_COVER_MAP[d.coverStyle];
     }
+    const validLogoColors = ['auto', 'light', 'dark'];
     alb.design = {
       coverStyle: DESIGN_PRESETS.coverStyles.some((x) => x.id === d.coverStyle) ? d.coverStyle : defDesign.coverStyle,
       typography: DESIGN_PRESETS.typographies.some((x) => x.id === d.typography) ? d.typography : defDesign.typography,
@@ -401,7 +404,9 @@
       gridStyle: DESIGN_PRESETS.gridStyles.some((x) => x.id === d.gridStyle) ? d.gridStyle : defDesign.gridStyle,
       gridSpacing: DESIGN_PRESETS.gridSpacings.some((x) => x.id === d.gridSpacing) ? d.gridSpacing : defDesign.gridSpacing,
       gridSize: DESIGN_PRESETS.gridSizes.some((x) => x.id === d.gridSize) ? d.gridSize : defDesign.gridSize,
-      gridNavStyle: DESIGN_PRESETS.gridNavStyles.some((x) => x.id === d.gridNavStyle) ? d.gridNavStyle : defDesign.gridNavStyle
+      gridNavStyle: DESIGN_PRESETS.gridNavStyles.some((x) => x.id === d.gridNavStyle) ? d.gridNavStyle : defDesign.gridNavStyle,
+      coverLogoVisible: typeof d.coverLogoVisible === 'boolean' ? d.coverLogoVisible : defDesign.coverLogoVisible,
+      coverLogoColor: validLogoColors.includes(d.coverLogoColor) ? d.coverLogoColor : defDesign.coverLogoColor
     };
 
     if (alb.coverKicker === undefined) alb.coverKicker = 'GALERIA OFICIAL EM ALTA RESOLUÇÃO';

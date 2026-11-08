@@ -2469,6 +2469,40 @@ function initTabsAndPreviewModes() {
     });
   });
 
+  // Alternar Menu Lateral Recolhido / Expandido (Mais Espaço no Editor — Estilo Pixieset)
+  const SIDEBAR_COLLAPSED_KEY = 'cms_main_sidebar_collapsed';
+  const btnToggleSidebar = document.getElementById('btn-toggle-sidebar');
+  const btnCollapseRail = document.getElementById('btn-collapse-sidebar-rail');
+  const btnExpandFloat = document.getElementById('btn-expand-sidebar-float');
+  const iconToggle = document.getElementById('sidebar-toggle-icon');
+  const labelToggle = document.getElementById('sidebar-toggle-label');
+
+  function setSidebarCollapsedState(collapsed) {
+    workspace?.classList.toggle('sidebar-collapsed', collapsed);
+    if (btnExpandFloat) btnExpandFloat.hidden = !collapsed;
+    if (btnToggleSidebar) btnToggleSidebar.classList.toggle('active', collapsed);
+    if (iconToggle) iconToggle.textContent = collapsed ? '▶|' : '◀|';
+    if (labelToggle) labelToggle.textContent = collapsed ? 'Mostrar Menu' : 'Recolher Menu';
+    try {
+      localStorage.setItem(SIDEBAR_COLLAPSED_KEY, collapsed ? 'true' : 'false');
+    } catch (_) {}
+  }
+
+  try {
+    if (localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === 'true') {
+      setSidebarCollapsedState(true);
+    }
+  } catch (_) {}
+
+  const toggleSidebar = () => {
+    const isCurrentlyCollapsed = workspace?.classList.contains('sidebar-collapsed');
+    setSidebarCollapsedState(!isCurrentlyCollapsed);
+  };
+
+  btnToggleSidebar?.addEventListener('click', toggleSidebar);
+  btnCollapseRail?.addEventListener('click', () => setSidebarCollapsedState(true));
+  btnExpandFloat?.addEventListener('click', () => setSidebarCollapsedState(false));
+
   const iframe = document.getElementById('cms-preview-iframe');
   iframe?.addEventListener('load', () => {
     sendToPreviewIframe({ type: 'CMS_LIVE_UPDATE', payload: cmsData });

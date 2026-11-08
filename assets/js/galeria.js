@@ -212,22 +212,49 @@
     root.style.setProperty('--grid-cols', String(gSize.cols));
     root.style.setProperty('--row-h', `${gSize.rowHeight}px`);
 
+    // 5. Harmoniza o fundo do Lightbox com o tema de cor selecionado no álbum
+    if (theme.isDark) {
+      root.style.setProperty('--lb-bg', theme.ground);
+      root.style.setProperty('--lb-sidebar-bg', theme.surface);
+      root.style.setProperty('--lb-backdrop', `${theme.ground}f0`);
+    } else {
+      // Base dark editorial sutilmente infundida com a tonalidade do tema selecionado
+      root.style.setProperty('--lb-bg', `color-mix(in srgb, ${theme.surface} 18%, #111418)`);
+      root.style.setProperty('--lb-sidebar-bg', `color-mix(in srgb, ${theme.surface} 26%, #15181C)`);
+      root.style.setProperty('--lb-backdrop', `color-mix(in srgb, ${theme.ground} 14%, rgba(10, 12, 14, 0.94))`);
+    }
+    root.style.setProperty('--lb-accent', theme.accent);
+
     document.body.classList.toggle('theme-is-dark', Boolean(theme.isDark));
 
-    // Alterna logos automaticamente quando o tema do álbum é escuro ou capa com fundo claro
+    // Alterna logos da topbar e login conforme o tema
     const surfaceLogo = theme.isDark ? 'assets/images/logo-light.png' : 'assets/images/logo-dark.png';
-    document.querySelectorAll('.topbar-logo-link img, .auth-brand-link img').forEach((img) => {
+    document.querySelectorAll('.topbar-logo-link img').forEach((img) => {
       img.setAttribute('src', surfaceLogo);
     });
 
-    if (els.deliveryCoverLogo) {
-      const lightBackingCovers = ['alegria', 'romance', 'vintage', 'diario', 'carimbo', 'classico', 'dividido', 'rotulo', 'borda', 'album'];
-      const useDarkOnCover = lightBackingCovers.includes(coverStyle) && !theme.isDark;
-      els.deliveryCoverLogo.setAttribute('src', useDarkOnCover ? 'assets/images/logo-dark.png' : 'assets/images/logo-light.png');
-    }
-
+    // 4C. Controle de Exibição e Cor da Logo na Capa do Álbum
+    const logoVisible = d.coverLogoVisible !== false;
     if (els.deliveryHero) {
       els.deliveryHero.setAttribute('data-cover', coverStyle);
+      els.deliveryHero.setAttribute('data-logo-visible', String(logoVisible));
+    }
+
+    if (els.deliveryCoverLogo) {
+      const logoColorChoice = d.coverLogoColor || 'auto';
+      let chosenLogoSrc = 'assets/images/logo-light.png';
+
+      if (logoColorChoice === 'light') {
+        chosenLogoSrc = 'assets/images/logo-light.png';
+      } else if (logoColorChoice === 'dark') {
+        chosenLogoSrc = 'assets/images/logo-dark.png';
+      } else {
+        // 'auto': capas com fundo claro usam logo escura; capas escuras/fotográficas usam logo clara
+        const lightBackingCovers = ['alegria', 'romance', 'vintage', 'diario', 'carimbo', 'classico', 'dividido', 'rotulo', 'borda', 'album'];
+        const useDarkOnCover = lightBackingCovers.includes(coverStyle) && !theme.isDark;
+        chosenLogoSrc = useDarkOnCover ? 'assets/images/logo-dark.png' : 'assets/images/logo-light.png';
+      }
+      els.deliveryCoverLogo.setAttribute('src', chosenLogoSrc);
     }
 
     if (els.grid) {

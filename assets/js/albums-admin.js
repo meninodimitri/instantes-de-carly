@@ -656,6 +656,8 @@
     if (activeDesignSection === 'cover') {
       stageHeading = 'Capa';
       stageHint = 'Clique no estilo desejado · Ajuste o ponto focal clicando na miniatura à esquerda';
+      const logoVisible = design.coverLogoVisible !== false;
+      const logoColor = design.coverLogoColor || 'auto';
       stageBody = `
         <div class="pix-cards-grid">
           ${presets.coverStyles.map((st) => {
@@ -668,6 +670,25 @@
               </button>
             `;
           }).join('')}
+        </div>
+
+        <div class="pix-cover-options-bar">
+          <div class="pix-cover-opt-group">
+            <label class="cms-switch" style="cursor:pointer;" title="Ativa ou oculta a logo do estúdio na abertura do álbum">
+              <input type="checkbox" id="sw-cover-logo-visible" ${logoVisible ? 'checked' : ''} />
+              <span class="cms-switch-slider"></span>
+            </label>
+            <span class="pix-cover-opt-label">Exibir Logotipo na Capa</span>
+          </div>
+
+          <div class="pix-cover-opt-group" style="${logoVisible ? '' : 'opacity:0.4; pointer-events:none;'}">
+            <span class="pix-cover-opt-label" style="font-size:0.78rem; color:#5E6D7C;">Cor da Logo:</span>
+            <div class="pix-logo-btn-group">
+              <button type="button" class="${logoColor === 'auto' ? 'active' : ''}" data-cover-logo-color="auto" title="Automática conforme o contraste da capa e do tema">Auto</button>
+              <button type="button" class="${logoColor === 'light' ? 'active' : ''}" data-cover-logo-color="light" title="Logo branca para capas escuras ou fotográficas">Branca</button>
+              <button type="button" class="${logoColor === 'dark' ? 'active' : ''}" data-cover-logo-color="dark" title="Logo escura para capas claras">Escura</button>
+            </div>
+          </div>
         </div>
       `;
     } else if (activeDesignSection === 'typography') {
@@ -1620,6 +1641,30 @@
         broadcastLiveAlbum();
         await window.AlbumsStore.saveState(albumsState);
         renderAlbumsAdminPanel();
+      });
+    });
+
+    const swCoverLogo = panel.querySelector('#sw-cover-logo-visible');
+    if (swCoverLogo) {
+      swCoverLogo.addEventListener('change', async () => {
+        activeAlbum.design = activeAlbum.design || window.AlbumsStore.getDefaultDesign();
+        activeAlbum.design.coverLogoVisible = swCoverLogo.checked;
+        broadcastLiveAlbum();
+        await window.AlbumsStore.saveState(albumsState);
+        renderAlbumsAdminPanel();
+        notifyAdminToast(swCoverLogo.checked ? 'Logotipo ativado na capa.' : 'Logotipo ocultado na capa.');
+      });
+    }
+
+    panel.querySelectorAll('[data-cover-logo-color]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const color = btn.getAttribute('data-cover-logo-color');
+        activeAlbum.design = activeAlbum.design || window.AlbumsStore.getDefaultDesign();
+        activeAlbum.design.coverLogoColor = color;
+        broadcastLiveAlbum();
+        await window.AlbumsStore.saveState(albumsState);
+        renderAlbumsAdminPanel();
+        notifyAdminToast(`Cor da logo alterada para: ${color === 'auto' ? 'Automática' : color === 'light' ? 'Branca' : 'Escura'}.`);
       });
     });
 

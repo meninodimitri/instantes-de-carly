@@ -244,9 +244,8 @@ body.theme-is-dark .gal-btn-primary {
 .auth-fullscreen-scrim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(18, 27, 36, 0.42) 0%, rgba(18, 27, 36, 0.72) 100%);
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
+  /* Vinheta suave para valorizar a foto sem escurecer ou embaçar a imagem */
+  background: radial-gradient(circle at center, rgba(12, 16, 22, 0.12) 0%, rgba(12, 16, 22, 0.42) 100%);
 }
 
 .auth-fullscreen-container {
@@ -259,23 +258,25 @@ body.theme-is-dark .gal-btn-primary {
   justify-content: center;
 }
 
+/* Glassmorphism translúcido ultra-clean (estilo Apple / Frosted Glass) */
 .auth-fullscreen-card {
   width: 100%;
-  background: rgba(255, 253, 243, 0.46);
-  border: 1px solid rgba(255, 255, 255, 0.65);
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.42);
   border-radius: 20px;
   padding: 36px 32px 30px;
-  box-shadow: 0 28px 70px rgba(10, 16, 24, 0.38), inset 0 1px 1px rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(28px) saturate(180%);
-  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28), inset 0 1px 1px rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
   text-align: left;
+  color: #FFFFFF;
   animation: galHeroRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 body.theme-is-dark .auth-fullscreen-card {
-  background: rgba(20, 29, 39, 0.55);
-  border-color: rgba(255, 255, 255, 0.18);
-  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+  background: rgba(18, 24, 32, 0.28);
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.25);
 }
 
 .auth-card-top-row {
@@ -285,7 +286,7 @@ body.theme-is-dark .auth-fullscreen-card {
   gap: 12px;
   margin-bottom: 22px;
   padding-bottom: 14px;
-  border-bottom: 1px solid rgba(231, 195, 120, 0.35);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.22);
 }
 
 .auth-card-top-row .auth-brand-link {
@@ -298,6 +299,7 @@ body.theme-is-dark .auth-fullscreen-card {
   height: 34px;
   width: auto;
   display: block;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
 }
 
 .auth-kicker-pill {
@@ -308,18 +310,19 @@ body.theme-is-dark .auth-fullscreen-card {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #8A6218;
-  background: rgba(231, 195, 120, 0.28);
-  border: 1px solid rgba(231, 195, 120, 0.55);
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.40);
   padding: 4px 11px;
   border-radius: 999px;
   white-space: nowrap;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 body.theme-is-dark .auth-kicker-pill {
-  color: #E7C378;
-  background: rgba(231, 195, 120, 0.16);
-  border-color: rgba(231, 195, 120, 0.35);
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.32);
 }
 
 .auth-heading {
@@ -331,7 +334,8 @@ body.theme-is-dark .auth-kicker-pill {
   font-style: var(--title-style, normal);
   line-height: 1.1;
   margin: 0 0 10px;
-  color: var(--ink);
+  color: #FFFFFF;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
   text-wrap: balance;
 }
 
@@ -339,26 +343,49 @@ body.theme-is-dark .auth-kicker-pill {
   margin: 0 0 24px;
   font-size: 0.92rem;
   line-height: 1.5;
-  color: var(--ink-secondary);
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
   text-wrap: pretty;
 }
 
+.auth-fullscreen-card .field-label {
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
 .auth-fullscreen-card .gal-input {
-  background: rgba(255, 255, 255, 0.85);
-  border: 1.5px solid rgba(231, 195, 120, 0.5);
-  color: #1B2733;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  color: #FFFFFF;
+  backdrop-filter: blur(10px);
+}
+
+.auth-fullscreen-card .gal-input::placeholder {
+  color: rgba(255, 255, 255, 0.72);
 }
 
 .auth-fullscreen-card .gal-input:focus {
-  background: #FFFFFF;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(231, 195, 120, 0.3);
+  background: rgba(255, 255, 255, 0.28);
+  border-color: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.35);
+  color: #FFFFFF;
 }
 
-body.theme-is-dark .auth-fullscreen-card .gal-input {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
-  color: #FFFDF3;
+.auth-fullscreen-card .gal-btn-primary {
+  background: rgba(255, 255, 255, 0.94);
+  color: #171E26;
+  border: 1px solid #FFFFFF;
+  font-weight: 600;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+
+.auth-fullscreen-card .gal-btn-primary:hover:not(:disabled) {
+  background: #FFFFFF;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
 }
 
 .auth-stack-form {
@@ -370,6 +397,15 @@ body.theme-is-dark .auth-fullscreen-card .gal-input {
 
 .auth-foot-links {
   margin-top: 22px;
+}
+
+.auth-fullscreen-card .auth-switch-link {
+  color: rgba(255, 255, 255, 0.88);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.auth-fullscreen-card .auth-switch-link:hover {
+  color: #FFFFFF;
 }
 
 /* Compatibilidade com regras legadas */
@@ -406,11 +442,9 @@ body.theme-is-dark .auth-fullscreen-card .gal-input {
   object-fit: cover;
 }
 
+/* Zero Filtro Escuro sobre a Foto (Cores Vivas e Nitidez 100% Autêntica — Padrão Pixieset) */
 .pixieset-cover-scrim {
-  position: absolute;
-  inset: 0;
-  background-color: rgba(18, 25, 33, 0.40);
-  transition: background-color 0.3s ease;
+  display: none !important;
 }
 
 .pixieset-cover-top {
@@ -473,7 +507,7 @@ body.theme-is-dark .auth-fullscreen-card .gal-input {
   line-height: 1.05;
   margin: 0 0 12px;
   text-wrap: balance;
-  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.45);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65), 0 3px 18px rgba(0, 0, 0, 0.45);
 }
 
 .pixieset-subtitle {
@@ -481,9 +515,9 @@ body.theme-is-dark .auth-fullscreen-card .gal-input {
   max-width: 58ch;
   font-size: 1rem;
   line-height: 1.6;
-  color: rgba(255, 253, 243, 0.94);
+  color: #FFFDF3;
   text-wrap: pretty;
-  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65), 0 2px 10px rgba(0, 0, 0, 0.35);
 }
 
 /* SETINHA PULANDO (INDICADOR DE SCROLL ESTILO SINETO STUDIO) */
@@ -554,12 +588,21 @@ body.theme-is-dark .auth-fullscreen-card .gal-input {
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
 }
 
-/* 1. Centro: Tela cheia com título e botão centralizados */
+/* 1. Centro: Tela cheia com título e botão perfeitamente centralizados em X e Y */
 .pixieset-cover[data-cover="centro"] .pixieset-cover-center {
-  margin: auto auto 12vh;
+  margin: auto;
+  text-align: center;
 }
 
-/* 2. Alegria: Letreiro editorial JOY com recorte da foto na letra O */
+/* Controle de exibição do Logotipo na Capa Pixieset */
+.pixieset-cover[data-logo-visible="false"] .pixieset-brand {
+  display: none !important;
+}
+.pixieset-cover[data-logo-visible="true"] .pixieset-brand {
+  display: inline-flex !important;
+}
+
+/* 2. Alegria: Letreiro editorial JOY com recorte da foto na letra O e alinhamento óptico serif */
 .pixieset-cover[data-cover="alegria"] {
   background: #FAF8F5;
   color: #1A1A1A;
@@ -579,27 +622,32 @@ body.theme-is-dark .auth-fullscreen-card .gal-input {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(8px, 1.8vw, 24px);
-  margin: auto auto 12px;
+  gap: clamp(10px, 2vw, 28px);
+  margin: auto auto 16px;
   z-index: 3;
+  height: clamp(110px, 18vw, 220px);
 }
 .pixieset-cover[data-cover="alegria"] .joy-letter {
-  font-family: var(--font-display);
-  font-size: clamp(6.5rem, 16vw, 15rem);
-  font-weight: 700;
-  line-height: 0.9;
+  font-family: 'Playfair Display', 'Cinzel', 'Georgia', serif !important;
+  font-size: clamp(6.5rem, 15vw, 13.5rem);
+  font-weight: 800;
+  line-height: 1;
+  height: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: #B91C1C;
-  letter-spacing: -0.04em;
+  letter-spacing: 0;
 }
 .pixieset-cover[data-cover="alegria"] .joy-o-mask {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: clamp(90px, 16vw, 210px);
-  height: clamp(120px, 20vw, 260px);
+  height: clamp(92px, 14vw, 185px);
+  width: clamp(82px, 12.5vw, 165px);
   border-radius: 50%;
   overflow: clip;
-  border: clamp(8px, 1.6vw, 22px) solid #B91C1C;
+  border: clamp(9px, 1.5vw, 20px) solid #B91C1C;
 }
 .pixieset-cover[data-cover="alegria"] .joy-cutout-img {
   width: 100%;
@@ -1503,12 +1551,12 @@ body.theme-is-dark .auth-fullscreen-card .gal-input {
   margin: 0;
   padding: 0;
   border: none;
-  background-color: #11161C;
+  background-color: var(--lb-bg, #11161C);
   color: #FFFDF3;
 }
 
 .gal-lightbox::backdrop {
-  background-color: rgba(12, 16, 20, 0.94);
+  background-color: var(--lb-backdrop, rgba(12, 16, 20, 0.94));
 }
 
 .lightbox-wrapper {
@@ -1620,7 +1668,7 @@ body.theme-is-dark .auth-fullscreen-card .gal-input {
 }
 
 .lb-sidebar {
-  background-color: #171E26;
+  background-color: var(--lb-sidebar-bg, #171E26);
   padding: 64px 22px 24px;
   overflow-y: auto;
   display: flex;
