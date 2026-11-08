@@ -301,13 +301,13 @@ button, input, select, textarea {
 .cms-workspace {
   flex: 1;
   display: grid;
-  grid-template-columns: 240px minmax(360px, 460px) 1fr;
+  grid-template-columns: 240px 1fr minmax(420px, 48%);
   overflow: hidden;
   transition: grid-template-columns 0.24s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .cms-workspace.sidebar-collapsed {
-  grid-template-columns: 0px minmax(360px, 460px) 1fr;
+  grid-template-columns: 1fr minmax(420px, 48%);
 }
 
 .cms-workspace.preview-hidden {
@@ -315,7 +315,7 @@ button, input, select, textarea {
 }
 
 .cms-workspace.sidebar-collapsed.preview-hidden {
-  grid-template-columns: 0px 1fr;
+  grid-template-columns: 1fr;
 }
 
 .cms-workspace.preview-hidden .cms-preview-pane {
@@ -337,15 +337,7 @@ button, input, select, textarea {
 
 /* Estado de Menu Lateral Recolhido (Mais Espaço no Editor — Estilo Pixieset) */
 .cms-workspace.sidebar-collapsed .cms-sidebar {
-  width: 0 !important;
-  min-width: 0 !important;
-  max-width: 0 !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  border-right: none !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-  overflow: hidden !important;
+  display: none !important;
 }
 
 .sidebar-rail-collapse-btn {
@@ -473,7 +465,7 @@ button, input, select, textarea {
 
 .cms-panel {
   display: none;
-  max-width: 880px;
+  max-width: 1040px;
   margin: 0 auto;
 }
 
