@@ -17,6 +17,7 @@ package-lock.json
 Thumbs.db
 test-results/
 playwright-report/
+Referencias/
 
 # Backups e rascunhos locais
 *.bak
