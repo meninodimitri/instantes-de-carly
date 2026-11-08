@@ -316,7 +316,7 @@ body.theme-is-dark .auth-fullscreen-card {
   padding: 4px 11px;
   border-radius: 999px;
   white-space: nowrap;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  text-shadow: none;
 }
 
 body.theme-is-dark .auth-kicker-pill {
@@ -335,7 +335,7 @@ body.theme-is-dark .auth-kicker-pill {
   line-height: 1.1;
   margin: 0 0 10px;
   color: #FFFFFF;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+  text-shadow: none;
   text-wrap: balance;
 }
 
@@ -344,7 +344,7 @@ body.theme-is-dark .auth-kicker-pill {
   font-size: 0.92rem;
   line-height: 1.5;
   color: rgba(255, 255, 255, 0.92);
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  text-shadow: none;
   text-wrap: pretty;
 }
 
@@ -352,7 +352,7 @@ body.theme-is-dark .auth-kicker-pill {
   color: rgba(255, 255, 255, 0.95);
   font-weight: 600;
   font-size: 0.85rem;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  text-shadow: none;
 }
 
 .auth-fullscreen-card .gal-input {
@@ -489,6 +489,11 @@ body.theme-is-dark .auth-kicker-pill {
   animation: galHeroRise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+.pixieset-box-author,
+.pixieset-box-date {
+  display: none;
+}
+
 .pixieset-kicker {
   font-size: 0.72rem;
   font-weight: 700;
@@ -508,7 +513,7 @@ body.theme-is-dark .auth-kicker-pill {
   line-height: 1.05;
   margin: 0 0 12px;
   text-wrap: balance;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65), 0 3px 18px rgba(0, 0, 0, 0.45);
+  text-shadow: none;
 }
 
 .pixieset-subtitle {
@@ -518,7 +523,7 @@ body.theme-is-dark .auth-kicker-pill {
   line-height: 1.6;
   color: #FFFDF3;
   text-wrap: pretty;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65), 0 2px 10px rgba(0, 0, 0, 0.35);
+  text-shadow: none;
 }
 
 /* SETINHA PULANDO (INDICADOR DE SCROLL ESTILO SINETO STUDIO) */
@@ -552,7 +557,7 @@ body.theme-is-dark .auth-kicker-pill {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: rgba(255, 253, 243, 0.88);
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.45);
+  text-shadow: none;
 }
 
 .scroll-hint-arrow {
@@ -586,7 +591,7 @@ body.theme-is-dark .auth-kicker-pill {
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: rgba(255, 253, 243, 0.88);
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  text-shadow: none;
 }
 
 /* 1. Centro: Tela cheia com título e botão perfeitamente centralizados em X e Y */
@@ -908,21 +913,152 @@ body.theme-is-dark .auth-kicker-pill {
   color: #FFFFFF;
 }
 
-/* 11. Contorno: Moldura retangular vertical no centro com título e botão */
-.pixieset-cover[data-cover="contorno"] .pixieset-cover-center {
+/* 11. Contorno & Retângulo Vertical: Moldura retangular vertical esbelta de tela cheia (Padrão Autêntico Pixieset) */
+.pixieset-cover[data-cover="contorno"],
+.pixieset-cover[data-cover="retangulo"] {
+  min-height: 100svh;
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.pixieset-cover[data-cover="contorno"] .pixieset-cover-top,
+.pixieset-cover[data-cover="retangulo"] .pixieset-cover-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  padding: clamp(20px, 3.2vw, 36px) clamp(24px, 4vw, 48px);
+  pointer-events: none;
+}
+
+.pixieset-cover[data-cover="contorno"] .pixieset-brand,
+.pixieset-cover[data-cover="retangulo"] .pixieset-brand {
+  pointer-events: auto;
+}
+
+.pixieset-cover[data-cover="contorno"] .pixieset-cover-top .pixieset-cover-author,
+.pixieset-cover[data-cover="contorno"] .pixieset-cover-top .pixieset-date,
+.pixieset-cover[data-cover="retangulo"] .pixieset-cover-top .pixieset-cover-author,
+.pixieset-cover[data-cover="retangulo"] .pixieset-cover-top .pixieset-date {
+  display: none !important;
+}
+
+.pixieset-cover[data-cover="contorno"] .pixieset-cover-center,
+.pixieset-cover[data-cover="retangulo"] .pixieset-cover-center {
   margin: auto;
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px 20px;
+  z-index: 2;
 }
-.pixieset-cover[data-cover="contorno"] .pixieset-cover-box {
-  border: 1.5px solid rgba(255, 255, 255, 0.9);
-  padding: clamp(30px, 4vw, 54px) clamp(28px, 4.5vw, 64px);
-  background: rgba(18, 25, 33, 0.22);
-  backdrop-filter: blur(2px);
-}
-.pixieset-cover[data-cover="contorno"] .gal-btn-cover {
-  border-bottom: 1px solid #FFFFFF;
+
+.pixieset-cover[data-cover="contorno"] .pixieset-cover-box,
+.pixieset-cover[data-cover="retangulo"] .pixieset-cover-box {
+  position: relative;
+  width: min(520px, 86vw);
+  height: min(720px, 78svh);
+  border: 1.5px solid rgba(255, 255, 255, 0.88);
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
   border-radius: 0;
-  background: transparent;
-  padding: 6px 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: clamp(34px, 5.5vh, 52px) clamp(24px, 4vw, 44px) clamp(30px, 4.5vh, 44px);
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.pixieset-cover[data-cover="contorno"] .pixieset-box-author,
+.pixieset-cover[data-cover="retangulo"] .pixieset-box-author {
+  display: block;
+  font-family: var(--font-ui, 'Plus Jakarta Sans', sans-serif);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #FFFFFF;
+  margin: 0 0 6px;
+  text-shadow: none !important;
+}
+
+.pixieset-cover[data-cover="contorno"] .pixieset-box-date,
+.pixieset-cover[data-cover="retangulo"] .pixieset-box-date {
+  display: block;
+  font-family: var(--font-ui, 'Plus Jakarta Sans', sans-serif);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.88);
+  margin: 0;
+  text-shadow: none !important;
+}
+
+.pixieset-cover[data-cover="contorno"] .pixieset-kicker,
+.pixieset-cover[data-cover="retangulo"] .pixieset-kicker,
+.pixieset-cover[data-cover="contorno"] .pixieset-subtitle,
+.pixieset-cover[data-cover="retangulo"] .pixieset-subtitle {
+  display: none !important;
+}
+
+.pixieset-cover[data-cover="contorno"] .pixieset-title,
+.pixieset-cover[data-cover="retangulo"] .pixieset-title {
+  margin: auto 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 3.4vw, 2.9rem);
+  font-weight: var(--title-weight);
+  letter-spacing: var(--title-tracking, 0.04em);
+  text-transform: var(--title-transform, uppercase);
+  line-height: 1.15;
+  color: #FFFFFF;
+  text-shadow: none !important;
+  text-wrap: balance;
+  max-width: 100%;
+}
+
+.pixieset-cover[data-cover="contorno"] .gal-btn-cover,
+.pixieset-cover[data-cover="retangulo"] .gal-btn-cover {
+  background: transparent !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  border-bottom: 1.5px solid #FFFFFF !important;
+  border-radius: 0 !important;
+  padding: 6px 14px 8px !important;
+  font-family: var(--font-ui, 'Plus Jakarta Sans', sans-serif);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  box-shadow: none !important;
+  margin: 0;
+  transition: opacity 0.2s ease, border-color 0.2s ease;
+}
+
+.pixieset-cover[data-cover="contorno"] .gal-btn-cover:hover,
+.pixieset-cover[data-cover="retangulo"] .gal-btn-cover:hover {
+  opacity: 0.85;
+  border-bottom-color: rgba(255, 255, 255, 0.7);
+  transform: none;
+}
+
+.pixieset-cover[data-cover="contorno"] .pixieset-scroll-hint,
+.pixieset-cover[data-cover="retangulo"] .pixieset-scroll-hint,
+.pixieset-cover[data-cover="contorno"] .pixieset-cover-foot-bar,
+.pixieset-cover[data-cover="retangulo"] .pixieset-cover-foot-bar {
+  display: none !important;
 }
 
 /* 12. Clássico: Foto de abertura limpa com barra tipográfica minimalista */
@@ -1992,10 +2128,10 @@ body.theme-is-dark .auth-kicker-pill {
 
 .copyright-title {
   margin: 0;
-  font-family: var(--font-display);
-  font-size: 1.15rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-family: var(--font-ui, 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif) !important;
+  font-size: 0.94rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: #111827;
   text-align: center;
@@ -2035,6 +2171,7 @@ body.theme-is-dark .auth-kicker-pill {
   border: 1px solid #111827;
   border-radius: 3px;
   padding: 10px 26px;
+  font-family: var(--font-ui, 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif) !important;
   font-size: 0.8125rem;
   font-weight: 700;
   letter-spacing: 0.1em;

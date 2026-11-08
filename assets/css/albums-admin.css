@@ -989,27 +989,35 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
-/* 11. Contorno (Vertical rectangular outline in center) */
-.pix-cover-thumb[data-style="contorno"] img {
+/* 11. Contorno & Retângulo Vertical (Vertical rectangular outline in center) */
+.pix-cover-thumb[data-style="contorno"] img,
+.pix-cover-thumb[data-style="retangulo"] img {
   /* Brilho natural */
 }
 .pix-mini-contorno-rect {
   position: absolute;
-  inset: 12% 26%;
+  inset: 10% 25%;
   border: 1px solid rgba(255, 255, 255, 0.95);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 4px;
-  background: rgba(18, 27, 36, 0.14);
+  justify-content: space-between;
+  padding: 5px 3px 4px;
+  background: transparent;
+}
+.pix-mini-ret-author {
+  display: block;
+  width: 14px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.85);
+  margin-bottom: 2px;
 }
 .pix-mini-underline {
   display: block;
   width: 14px;
   height: 1px;
   background: #FFFFFF;
-  margin-top: 3px;
+  margin-top: 2px;
 }
 
 /* 12. Clássico (Top 76% photo, bottom 24% white bar) */

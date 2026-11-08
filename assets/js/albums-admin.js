@@ -541,11 +541,12 @@
       `;
     }
 
-    if (styleId === 'contorno') {
+    if (styleId === 'contorno' || styleId === 'retangulo') {
       return `
-        <div class="pix-choice-frame pix-cover-thumb" data-style="contorno">
+        <div class="pix-choice-frame pix-cover-thumb" data-style="${styleId}">
           <img src="${escSrc}" alt="" style="${fPos}" />
           <div class="pix-mini-contorno-rect">
+            <span class="pix-mini-ret-author"></span>
             <span class="pix-mini-title-light" style="${fStyle}">${escTitle}</span>
             <span class="pix-mini-underline"></span>
           </div>

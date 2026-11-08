@@ -50,10 +50,12 @@
     deliveryHero: document.getElementById('delivery-hero'),
     deliveryHeroImg: document.getElementById('delivery-hero-img'),
     deliveryCoverLogo: document.getElementById('delivery-cover-logo'),
-    deliveryHeroDate: document.getElementById('delivery-hero-date'),
-    deliveryHeroFootDate: document.getElementById('delivery-hero-foot-date'),
     deliveryHeroAuthor: document.getElementById('delivery-hero-author'),
     deliveryHeroFootAuthor: document.getElementById('delivery-hero-foot-author'),
+    deliveryBoxAuthor: document.getElementById('delivery-box-author'),
+    deliveryHeroDate: document.getElementById('delivery-hero-date'),
+    deliveryHeroFootDate: document.getElementById('delivery-hero-foot-date'),
+    deliveryBoxDate: document.getElementById('delivery-box-date'),
     deliveryHeroKicker: document.getElementById('delivery-hero-kicker'),
     deliveryHeroTitle: document.getElementById('delivery-hero-title'),
     deliveryHeroMsg: document.getElementById('delivery-hero-msg'),
@@ -527,6 +529,11 @@
       els.deliveryHeroFootAuthor.hidden = !authorText;
       els.deliveryHeroFootAuthor.style.display = authorText ? '' : 'none';
     }
+    if (els.deliveryBoxAuthor) {
+      els.deliveryBoxAuthor.textContent = authorText.toUpperCase();
+      els.deliveryBoxAuthor.hidden = !authorText;
+      els.deliveryBoxAuthor.style.display = authorText ? '' : 'none';
+    }
 
     const dateOrSub = (album.subtitle || '').trim();
     if (els.deliveryHeroDate) {
@@ -538,6 +545,11 @@
       els.deliveryHeroFootDate.textContent = dateOrSub;
       els.deliveryHeroFootDate.hidden = !dateOrSub;
       els.deliveryHeroFootDate.style.display = dateOrSub ? '' : 'none';
+    }
+    if (els.deliveryBoxDate) {
+      els.deliveryBoxDate.textContent = dateOrSub;
+      els.deliveryBoxDate.hidden = !dateOrSub;
+      els.deliveryBoxDate.style.display = dateOrSub ? '' : 'none';
     }
 
     const titleText = (album.title || album.clientName || '').trim();
