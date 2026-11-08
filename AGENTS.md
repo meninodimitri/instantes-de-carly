@@ -37,7 +37,13 @@ Produto completo de **Portfólio Editorial + Sistema de Gestão de Conteúdo (CM
    - Ponte local temporária (3 min no IndexedDB `local_published`) cobre a janela de ~15s de deploy da Vercel em produção.
    - `revalidateSiteDataFromServer()` busca `assets/js/data.js?t=...` com `cache: 'no-store'` ao abrir ou voltar o foco para a aba (`visibilitychange`), re-hidratando o DOM automaticamente se `cmsVersion` mudou.
 
-4. **Visualizador Mobile (`mobile-preview.html`)**, **Brandbook (`brand/index.html`)** e **Deploy Automatizado (`scripts/push-to-github.js`)**.
+4. **Área Privada do Cliente (`galeria.html`)**:
+   - Plataforma exclusiva de Provas e Entrega Final para clientes (fluxo integrado Sineto Studio + Pixieset).
+   - Tela de acesso protegida por senha com estética editorial em *Glassmorphism* (fundo translúcido com `backdrop-filter: blur`, borda luminosa e foto do ensaio em tela cheia ao fundo).
+   - **Fase 1 (Seleção de Provas — Estilo Sineto)**: Filtros limpos (*Todas, Selecionadas, Não Selecionadas, Com Observação*), proteção de imagem com 3 níveis (Marca d'água autoral, Marca d'água + Baixa resolução, ou Marca d'água + Foco interativo ao passar o mouse/dedo), contador de franquia contratada e compra de fotos extras com cálculo automático e pagamento via Pix.
+   - **Fase 2 (Entrega Final em Alta — Estilo Pixieset)**: 16 capas autênticas do Pixieset (*Centro, Alegria com máscara JOY na foto, Esquerda, Romance split 50/50, Vintage polaroid, Moldura interna, Listra, Divisor central, Diário, Carimbo, Contorno, Clássico, Dividido, Rótulo, Borda passe-partout e Álbum*), personalização de tipografia, cores e grade, e download em alta resolução protegido por PIN opcional de 4 dígitos.
+
+5. **Visualizador Mobile (`mobile-preview.html`)**, **Brandbook (`brand/index.html`)** e **Deploy Automatizado (`scripts/push-to-github.js`)**.
 
 ---
 
@@ -46,26 +52,32 @@ Produto completo de **Portfólio Editorial + Sistema de Gestão de Conteúdo (CM
 ```text
 ├── index.html                   # Página inicial pública do portfólio
 ├── admin.html                   # Painel administrativo visual (CMS)
+├── galeria.html                 # Área privada do cliente (Seleção Sineto + Entrega Pixieset)
 ├── mobile-preview.html          # Simulador responsivo em molduras reais
 ├── vercel.json                  # Clean URLs + Headers Zero-Cache para data.js
 ├── README.md                    # Documentação pública do repositório
-├── AGENTS.md                    # Manual de arquitetura e replicação White-Label (auto-carregado)
-├── CONTEXT_ECONOMY_GUIDE.md     # Guia de economia de tokens e execução enxuta
+├── AGENTS.md                    # Manual de arquitetura, White-Label e Regras de Tokens (auto-carregado)
+├── CONTEXT_ECONOMY_GUIDE.md     # Guia complementar de engenharia de contexto
 │
 ├── assets/
 │   ├── css/
-│   │   ├── style.css            # Design System editorial e responsividade
-│   │   └── admin.css            # Estilos do painel administrativo
+│   │   ├── style.css            # Design System editorial e responsividade do site público
+│   │   ├── admin.css            # Estilos do painel administrativo e preview split-screen
+│   │   ├── galeria.css          # Design editorial da galeria privada, glassmorphism e 16 capas
+│   │   └── albums-admin.css     # Estilos da gestão de álbuns, proteções e mini-previews
 │   ├── js/
-│   │   ├── data.js              # BANCO DE DADOS LOCAL (Fonte Única da Verdade)
+│   │   ├── data.js              # BANCO DE DADOS LOCAL do Portfólio (Fonte Única da Verdade)
 │   │   ├── main.js              # Hidratação, vitrine de capas, filtros, lightbox e live-sync
-│   │   └── admin.js             # Engine do CMS, otimizador DSLR, seletor de capas e GitHub API
+│   │   ├── admin.js             # Engine do CMS, otimizador DSLR, seletor de capas e GitHub API
+│   │   ├── albums-store.js      # Store local/IndexedDB de álbuns, cálculo de extras e marcas d'água
+│   │   ├── albums-admin.js      # Subpainel do CMS para gerenciar álbuns, capas Pixieset e convites
+│   │   └── galeria.js           # Engine da galeria do cliente: seleção, carrinho de extras e downloads
 │   └── images/
 │       ├── real/                # Fotos iniciais curadas do portfólio
 │       ├── uploads/             # Fotos enviadas pelo cliente via Painel Admin
 │       ├── carly-perfil.jpg     # Foto de perfil do(a) fotógrafo(a)
-│       ├── logo-dark.png        # Logo escura (header após scroll)
-│       └── logo-light.png       # Logo clara (hero e admin)
+│       ├── logo-dark.png        # Logo escura (header após scroll e fundos claros)
+│       └── logo-light.png       # Logo clara (hero, admin e capas escuras)
 │
 ├── brand/
 │   └── index.html               # Brandbook interativo da marca
@@ -114,13 +126,66 @@ Chaves oficiais de `SITE_DATA`:
 
 ---
 
-## ⚡ Economia de Tokens & Estilo de Execução da IA
+## ⚡ Economia de Tokens & Gerenciamento de Contexto (Regras Obrigatórias)
+> **Diretrizes Permanentes de Engenharia de Contexto para Antigravity & Harness de IA**  
+> *Redução comprovada de até 80% no consumo de tokens com máxima precisão técnica e estética.*
 
-Regras operacionais obrigatórias (detalhadas em `CONTEXT_ECONOMY_GUIDE.md`):
-* **Zero-Fluff (Respostas Diretas)**: Sem introduções vazias, elogios ou recapitulações longas. Vá direto à resposta/diff em bullets curtos (1–2 frases). Nunca transcreva arquivos inteiros no chat.
-* **Single-Agent por Padrão**: Nunca acione `/teamwork` ou múltiplos subagentes em paralelo para tarefas normais.
-* **Padrão Advisor sob Demanda**: Só invoque 1 subagente pontual (`Model: 'pro'`) para decisões críticas de arquitetura ou bugs complexos; use `flash`/`flash_lite` para varreduras mecânicas.
-* **Leitura e Terminal Cirúrgicos**: Sempre passe `StartLine`/`EndLine` no `read_file` e filtre saídas longas de terminal (`git status -sb`, `--oneline`).
+### 1. 🛑 Princípio de Agente Único (Sem Enxames Desnecessários)
+- **Regra Padrão**: Todo o desenvolvimento, refatoração, estilização e testes deve ser conduzido por um **único agente mestre** direto no chat.
+- **Proibido Multi-Agent Sprawl**: Nunca acione `/teamwork` ou convoque múltiplos subagentes concorrentes em paralelo para tarefas normais (orquestrador, 2 revisores, challengers, auditores). Cada subagente duplica o prompt de sistema e o histórico, multiplicando o consumo em 8x a 15x.
+- **Subagentes Pontuais**: Invoque um subagente somente para tarefas demoradas e isoladas (ex.: varredura de logs massivos ou pesquisa de documentação pesada), encerrando-o imediatamente após obter a resposta.
+
+### 2. 🔍 Leitura Cirúrgica de Código (Zero Dumps Desnecessários)
+- **Proibido ler arquivos inteiros** de centenas ou milhares de linhas sem necessidade.
+- Use busca direcionada (`Select-String` / `grep`) para encontrar as linhas exatas antes de abrir o arquivo.
+- Em `read_file`, especifique **sempre** `StartLine` e `EndLine` (intervalos de 30 a 60 linhas).
+- Cada 1.000 linhas lidas desnecessariamente consomem de 3.000 a 5.000 tokens a cada turno da conversa.
+
+### 3. 💻 Comandos de Terminal Concisos & Filtrados
+- **Sempre filtre saídas de terminal**:
+  - `git status -sb` em vez de `git status` completo.
+  - `git log --oneline -n 5` em vez de `git log`.
+  - `git diff --stat` primeiro para avaliar o escopo; inspecione apenas arquivos/linhas pontuais.
+  - Testes e scripts com flags silenciosas (ex.: `--silent`, `--reporter=list`).
+- Saídas brutas de terminal de 50 KB esgotam até 20% do orçamento de tokens de um ciclo.
+
+### 4. 💾 Commits Atômicos como Pontos de Restauração de Contexto
+- **O Git é o compressor de memória definitivo**:
+  - A cada funcionalidade ou correção concluída, faça commit local imediato com mensagem semântica (ex.: `git commit -m "feat(galeria): ajuste de lightbox e mascara de telefone"`).
+  - Um agente que entra na conversa lê 3 linhas de `git log` e sabe exatamente o estado atual, dispensando releituras de turnos anteriores.
+
+### 5. 🧹 Compactação Periódica de Contexto (`/compact`)
+- Ao acumular 20 a 30 interações ou finalizar um marco arquitetural, recomende e execute `/compact`.
+- O Antigravity descarta dados brutos intermediários e preserva o resumo estruturado, liberando até 70% da janela de contexto para a próxima tarefa.
+
+### 6. 🎯 Tarefas em Passos Curtos e Objetivos
+- Nunca execute mega-prompts combinando dezenas de tarefas desconexas ao mesmo tempo.
+- Divida em turnos focados: implementar componente -> testar/validar visualmente -> commitar -> próximo passo.
+- Evita alucinações, retrabalho e loops de correção caros.
+
+### 7. 🔇 Comunicação Cirúrgica & Eliminação de Fluff (Anti-Rodeios)
+Tokens de saída (output) custam de 3x a 5x mais caro que tokens de entrada e elevam a latência.
+- **Zero Conversational Filler**: Eliminar saudações, cortesias e bajulações (*"Com certeza!", "Ótima escolha!", "Certamente posso ajudar com isso!"*).
+- **Code & Action First**: Inicie a resposta diretamente pela ação executada, código ou diff. Não repita a pergunta do usuário nem explique sintaxe óbvia sem ser solicitado.
+- **Proibido Re-sumarizar Artefatos**: Se um arquivo/artefato foi editado no disco, **nunca** transcreva o conteúdo inteiro no chat. Indique o link do arquivo e cite bullets curtos de decisões críticas.
+- **Diffs Cirúrgicos**: Altere apenas as linhas necessárias. Nunca cuspa centenas de linhas para mudar 5.
+- **Bullets Concisos**: Explicações devem conter no máximo 1 a 2 frases curtas por tópico.
+
+### 8. 🧠 Model Tiering & Padrão Advisor (Cérebro vs. Músculo)
+- **Chat em Modelo Pesado (Opus / Pro / Argon)**: Atue como Advisor — formule a arquitetura em poucas linhas e delegue rotinas volumosas, testes e buscas extensas via `invoke_subagent` com `Model: "flash"` ou `"flash_lite"`.
+- **Chat em Modelo Leve (Flash)**: Ao encontrar decisão arquitetural ambígua ou bug complexo, consulte pontualmente 1 subagente `research` com `Model: "pro"` pedindo apenas o plano de ação conciso (200–400 tokens) antes de implementar.
+
+### 9. 📑 Tabela de Impacto na Economia de Tokens
+
+| Prática | Economia Estimada | Quando Aplicar |
+| :--- | :---: | :--- |
+| **Agente único em vez de enxame (Sem `/teamwork`)** | **-80% a -90%** | Padrão permanente em desenvolvimento e design. |
+| **Model Tiering / Advisor (`pro` vs `flash`)** | **-60% a -85% no Custo** | Decisões no modelo forte; código e varreduras no `flash`. |
+| **Comunicação Anti-Rodeios (Zero-Fluff)** | **-40% a -60% no Output** | Obrigatório em todas as respostas da IA. |
+| **Leitura por intervalo (`StartLine`/`EndLine`)** | **-50% no Input** | Ao ler CSS, JS ou HTML longos. |
+| **Filtros de terminal (`git status -sb`, `--oneline`)** | **-30% no Input** | Em todos os comandos de checagem. |
+| **Uso de `/compact` após marcos** | **-60% no Contexto** | Ao atingir 20–30 mensagens ou fechar ciclos. |
+| **Commits atômicos no Git** | **-40% no Contexto** | A cada feature funcional concluída. |
 
 ---
 
