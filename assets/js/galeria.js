@@ -476,19 +476,49 @@
       els.joyCutoutImg.src = cover;
       els.joyCutoutImg.style.objectPosition = album.coverFocal || '50% 36%';
     }
+    const kText = (album.coverKicker !== undefined ? album.coverKicker : 'GALERIA OFICIAL EM ALTA RESOLUÇÃO').trim();
     if (els.deliveryHeroKicker) {
-      els.deliveryHeroKicker.textContent = album.coverKicker || 'GALERIA OFICIAL EM ALTA RESOLUÇÃO';
+      els.deliveryHeroKicker.textContent = kText;
+      els.deliveryHeroKicker.hidden = !kText;
+      els.deliveryHeroKicker.style.display = kText ? '' : 'none';
     }
-    const authorText = (album.coverAuthor || 'CARLIANE CARVALHO').toUpperCase();
-    if (els.deliveryHeroAuthor) els.deliveryHeroAuthor.textContent = authorText;
-    if (els.deliveryHeroFootAuthor) els.deliveryHeroFootAuthor.textContent = authorText;
+    const authorText = (album.coverAuthor !== undefined ? album.coverAuthor : 'CARLIANE CARVALHO').trim();
+    if (els.deliveryHeroAuthor) {
+      els.deliveryHeroAuthor.textContent = authorText.toUpperCase();
+      els.deliveryHeroAuthor.hidden = !authorText;
+      els.deliveryHeroAuthor.style.display = authorText ? '' : 'none';
+    }
+    if (els.deliveryHeroFootAuthor) {
+      els.deliveryHeroFootAuthor.textContent = authorText.toUpperCase();
+      els.deliveryHeroFootAuthor.hidden = !authorText;
+      els.deliveryHeroFootAuthor.style.display = authorText ? '' : 'none';
+    }
 
-    const dateOrSub = album.subtitle || '';
-    if (els.deliveryHeroDate) els.deliveryHeroDate.textContent = dateOrSub;
-    if (els.deliveryHeroFootDate) els.deliveryHeroFootDate.textContent = dateOrSub;
+    const dateOrSub = (album.subtitle || '').trim();
+    if (els.deliveryHeroDate) {
+      els.deliveryHeroDate.textContent = dateOrSub;
+      els.deliveryHeroDate.hidden = !dateOrSub;
+      els.deliveryHeroDate.style.display = dateOrSub ? '' : 'none';
+    }
+    if (els.deliveryHeroFootDate) {
+      els.deliveryHeroFootDate.textContent = dateOrSub;
+      els.deliveryHeroFootDate.hidden = !dateOrSub;
+      els.deliveryHeroFootDate.style.display = dateOrSub ? '' : 'none';
+    }
 
-    if (els.deliveryHeroTitle) els.deliveryHeroTitle.textContent = album.title || album.clientName || 'Galeria';
-    if (els.deliveryHeroMsg) els.deliveryHeroMsg.textContent = album.welcomeMessage || '';
+    const titleText = (album.title || album.clientName || '').trim();
+    if (els.deliveryHeroTitle) {
+      els.deliveryHeroTitle.textContent = titleText;
+      els.deliveryHeroTitle.hidden = !titleText;
+      els.deliveryHeroTitle.style.display = titleText ? '' : 'none';
+    }
+
+    const wMsg = (album.welcomeMessage || '').trim();
+    if (els.deliveryHeroMsg) {
+      els.deliveryHeroMsg.textContent = wMsg;
+      els.deliveryHeroMsg.hidden = !wMsg;
+      els.deliveryHeroMsg.style.display = wMsg ? '' : 'none';
+    }
   }
 
   function updateProofingChrome(album) {
@@ -1479,18 +1509,34 @@
 
     // Sincronização instantânea ao vivo em 0ms enquanto a fotógrafa digita no Painel Admin
     window.addEventListener('message', (event) => {
-      if (!event.data || event.data.type !== 'ALBUM_LIVE_UPDATE') return;
+      if (!event.data) return;
+      if (event.data.type === 'SCROLL_TO_SECTION') {
+        if (event.data.section === 'grid' || event.data.section === 'topbar') {
+          document.getElementById('gallery-topbar')?.scrollIntoView({ behavior: 'smooth' });
+        } else if (event.data.section === 'cover') {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        return;
+      }
+      if (event.data.type !== 'ALBUM_LIVE_UPDATE') return;
       const alb = event.data.album;
       if (!alb) return;
-      if (currentAlbum && (currentAlbum.id === alb.id || currentAlbum.slug === alb.slug)) {
-        Object.assign(currentAlbum, alb);
-        applyAlbumDesign(currentAlbum);
-        hydrateCoverHero(currentAlbum);
-        if (currentAlbum.phase === 'delivery') {
-          updateDeliveryChrome(currentAlbum);
-        } else {
-          updateProofingChrome(currentAlbum);
-        }
+      if (!currentAlbum) currentAlbum = alb;
+      Object.assign(currentAlbum, alb);
+      const isInsideIframe = window.self !== window.top;
+      const isProof = currentAlbum.phase === 'proofing';
+      const coverStyle = currentAlbum.design?.coverStyle || 'centro';
+      const shouldShowCover = (!isProof || isDesignPreview || isInsideIframe) && coverStyle !== 'none';
+      if (els.deliveryHero) {
+        els.deliveryHero.hidden = !shouldShowCover;
+        els.deliveryHero.setAttribute('data-cover', coverStyle);
+      }
+      applyAlbumDesign(currentAlbum);
+      hydrateCoverHero(currentAlbum);
+      if (currentAlbum.phase === 'delivery') {
+        updateDeliveryChrome(currentAlbum);
+      } else {
+        updateProofingChrome(currentAlbum);
       }
     });
 

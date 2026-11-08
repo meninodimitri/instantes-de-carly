@@ -639,19 +639,28 @@ body.theme-is-dark .auth-fullscreen-card .gal-input {
 .pixieset-cover[data-cover="romance"] {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  align-items: center;
   background: #FFFFFF;
   color: #1A1A1A;
 }
+.pixieset-cover[data-cover="romance"] .pixieset-cover-top {
+  display: none;
+}
 .pixieset-cover[data-cover="romance"] .pixieset-cover-media {
+  grid-column: 2;
+  order: 2;
   position: relative;
   inset: auto;
   margin: 32px 32px 32px 0;
+  height: clamp(380px, 78svh, 840px);
   border-radius: 4px;
 }
 .pixieset-cover[data-cover="romance"] .pixieset-cover-scrim {
   display: none;
 }
 .pixieset-cover[data-cover="romance"] .pixieset-cover-center {
+  grid-column: 1;
+  order: 1;
   margin: auto;
   padding: 40px;
   text-align: center;
@@ -663,6 +672,9 @@ body.theme-is-dark .auth-fullscreen-card .gal-input {
 .pixieset-cover[data-cover="romance"] .pixieset-subtitle {
   color: #555555;
   text-shadow: none;
+}
+.pixieset-cover[data-cover="romance"] .pixieset-kicker {
+  color: #8E9EB0;
 }
 .pixieset-cover[data-cover="romance"] .gal-btn-cover {
   background: #1A1A1A;
@@ -710,13 +722,28 @@ body.theme-is-dark .auth-fullscreen-card .gal-input {
 .pixieset-cover[data-cover="moldura"]::after {
   content: '';
   position: absolute;
-  inset: clamp(20px, 3.5vw, 42px);
-  border: 1px solid rgba(255, 255, 255, 0.85);
+  inset: clamp(24px, 4vw, 56px);
+  border: 1.5px solid rgba(255, 255, 255, 0.88);
   pointer-events: none;
   z-index: 3;
 }
+.pixieset-cover[data-cover="moldura"] .pixieset-cover-top {
+  padding-top: clamp(38px, 5.5vw, 76px);
+  justify-content: center;
+}
+.pixieset-cover[data-cover="moldura"] .pixieset-brand,
+.pixieset-cover[data-cover="moldura"] .pixieset-date {
+  display: none;
+}
+.pixieset-cover[data-cover="moldura"] .pixieset-cover-author {
+  display: block;
+  font-size: 0.74rem;
+  letter-spacing: 0.22em;
+  color: rgba(255, 255, 255, 0.95);
+}
 .pixieset-cover[data-cover="moldura"] .pixieset-cover-center {
   margin: auto;
+  padding-bottom: clamp(38px, 5.5vw, 76px);
 }
 
 /* 7. Listra: Duas listras brancas horizontais com título em destaque */
@@ -915,18 +942,24 @@ body.theme-is-dark .auth-fullscreen-card .gal-input {
 }
 
 /* 14. Rótulo: Fotografia ampla com etiqueta branca vertical na lateral */
+.pixieset-cover[data-cover="rotulo"] .pixieset-cover-top {
+  display: none;
+}
 .pixieset-cover[data-cover="rotulo"] .pixieset-cover-center {
-  margin: auto auto auto 6vw;
-  width: min(420px, 90vw);
+  margin: auto auto auto clamp(20px, 6vw, 72px);
+  width: min(440px, 90vw);
   background: #FFFFFF;
   color: #1A1A1A;
-  padding: 44px 38px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28);
-  border-radius: 4px;
+  padding: clamp(34px, 4vw, 56px) clamp(28px, 3.5vw, 44px);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25);
+  border-radius: 3px;
   text-align: left;
 }
 .pixieset-cover[data-cover="rotulo"] .pixieset-cover-box {
   align-items: flex-start;
+}
+.pixieset-cover[data-cover="rotulo"] .pixieset-kicker {
+  color: #8E9EB0;
 }
 .pixieset-cover[data-cover="rotulo"] .pixieset-title {
   color: #1A1A1A;
@@ -937,12 +970,10 @@ body.theme-is-dark .auth-fullscreen-card .gal-input {
   text-shadow: none;
 }
 .pixieset-cover[data-cover="rotulo"] .gal-btn-cover {
-  background: transparent;
-  color: #1A1A1A;
-  border: none;
-  padding: 0;
-  font-weight: 700;
-  letter-spacing: 0.1em;
+  background: #1A1A1A;
+  color: #FFFFFF;
+  border-radius: 2px;
+  padding: 8px 18px;
 }
 
 /* 15. Borda: Passe-partout branco ao redor de toda a fotografia */
@@ -1235,13 +1266,20 @@ body.theme-is-dark .auth-fullscreen-card .gal-input {
   box-shadow: 0 6px 20px rgba(18, 27, 36, 0.08);
 }
 
-/* Modo Apenas Ícones no Cabeçalho */
-.gallery-topbar[data-grid-nav="icons_only"] .filter-tab .tab-txt,
+/* Modo Apenas Ícones no Cabeçalho (Pixieset Navigation Style) */
 .gallery-topbar[data-grid-nav="icons_only"] .btn-label {
-  display: none;
+  display: none !important;
 }
-.gallery-topbar[data-grid-nav="icons_only"] .filter-tab {
-  padding: 0 14px;
+.gallery-topbar[data-grid-nav="icons_only"] .gal-btn-sm {
+  padding: 7px;
+  min-width: 36px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  justify-content: center;
+}
+.gallery-topbar[data-grid-nav="icons_only"] .topbar-btn-icon {
+  margin: 0;
 }
 
 .masonry-img-btn {

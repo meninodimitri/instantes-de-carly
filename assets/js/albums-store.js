@@ -404,8 +404,8 @@
       gridNavStyle: DESIGN_PRESETS.gridNavStyles.some((x) => x.id === d.gridNavStyle) ? d.gridNavStyle : defDesign.gridNavStyle
     };
 
-    if (!alb.coverKicker) alb.coverKicker = 'GALERIA OFICIAL EM ALTA RESOLUÇÃO';
-    if (!alb.coverAuthor) alb.coverAuthor = 'Carliane Carvalho';
+    if (alb.coverKicker === undefined) alb.coverKicker = 'GALERIA OFICIAL EM ALTA RESOLUÇÃO';
+    if (alb.coverAuthor === undefined) alb.coverAuthor = 'Carliane Carvalho';
     if (!alb.coverFocal) alb.coverFocal = '50% 35%';
     if (!Array.isArray(alb.photos)) alb.photos = [];
     if (!Array.isArray(alb.selectedIds)) alb.selectedIds = [];

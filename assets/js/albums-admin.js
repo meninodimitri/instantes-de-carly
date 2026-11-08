@@ -142,10 +142,65 @@
 
   /* ==========================================================================
      1. LISTA DE ÁLBUNS NA BARRA VERTICAL ESQUERDA (#sidebar-albums-sublist)
+     - Suporte a agrupar / desagrupar (accordion com chevron e persistência)
+     - Rolagem suave com scroll limitado a 280px para acervos com 10+ álbuns
      ========================================================================== */
+  const SIDEBAR_COLLAPSE_STORAGE_KEY = 'cms_albums_sublist_collapsed';
+
+  function isSidebarSublistCollapsed() {
+    try {
+      return localStorage.getItem(SIDEBAR_COLLAPSE_STORAGE_KEY) === 'true';
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function setSidebarSublistCollapsed(collapsed) {
+    try {
+      localStorage.setItem(SIDEBAR_COLLAPSE_STORAGE_KEY, collapsed ? 'true' : 'false');
+    } catch (_) {}
+    applySidebarCollapseVisualState(collapsed);
+  }
+
+  function applySidebarCollapseVisualState(collapsed) {
+    const sublist = document.getElementById('sidebar-albums-sublist');
+    const tabBtn = document.getElementById('tab-btn-albums') || document.querySelector('.sidebar-tab[data-tab="albums"]');
+    const chevron = document.getElementById('btn-toggle-albums-sublist');
+    if (sublist) sublist.classList.toggle('is-collapsed', collapsed);
+    if (tabBtn) tabBtn.classList.toggle('is-sublist-collapsed', collapsed);
+    if (chevron) {
+      chevron.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+      chevron.textContent = collapsed ? '▸' : '▾';
+      chevron.title = collapsed ? 'Desagrupar / Expandir lista de álbuns' : 'Agrupar / Recolher lista de álbuns';
+    }
+  }
+
+  function bindSidebarCollapseButton() {
+    const chevron = document.getElementById('btn-toggle-albums-sublist');
+    if (!chevron || chevron.dataset.boundCollapse) return;
+    chevron.dataset.boundCollapse = '1';
+
+    const toggle = (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      const current = isSidebarSublistCollapsed();
+      setSidebarSublistCollapsed(!current);
+    };
+
+    chevron.addEventListener('click', toggle);
+    chevron.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        toggle(e);
+      }
+    });
+  }
+
   function renderSidebarAlbumsSublist() {
     const sublist = document.getElementById('sidebar-albums-sublist');
     if (!sublist || !albumsState) return;
+
+    bindSidebarCollapseButton();
+    applySidebarCollapseVisualState(isSidebarSublistCollapsed());
 
     const albums = albumsState.albums || [];
     const activeAlbum = getActiveAlbum();
@@ -368,10 +423,11 @@
     `;
   }
 
-  function renderCoverMiniThumb(styleId, coverSrc, focal, shortTitle) {
+  function renderCoverMiniThumb(styleId, coverSrc, focal, typoFamily) {
     const escSrc = escapeHtml(coverSrc);
-    const escTitle = escapeHtml(shortTitle);
+    const escTitle = 'TÍTULO';
     const fPos = `object-position:${focal.x}% ${focal.y}%;`;
+    const fStyle = typoFamily ? `font-family:${escapeHtml(typoFamily)};` : '';
 
     if (styleId === 'none') {
       return `
@@ -392,7 +448,7 @@
             <span class="mini-joy-o"><img src="${escSrc}" alt="" style="${fPos}" /></span>
             <span class="mini-joy-letter">Y</span>
           </div>
-          <span class="pix-mini-title-dark">${escTitle}</span>
+          <span class="pix-mini-title-dark" style="${fStyle}">${escTitle}</span>
         </div>
       `;
     }
@@ -401,7 +457,7 @@
       return `
         <div class="pix-choice-frame pix-cover-thumb" data-style="romance">
           <div class="pix-mini-split-left">
-            <span class="pix-mini-title-dark">${escTitle}</span>
+            <span class="pix-mini-title-dark" style="${fStyle}">${escTitle}</span>
             <span class="pix-mini-rule-dark"></span>
           </div>
           <div class="pix-mini-split-right">
@@ -418,7 +474,7 @@
             <img src="${escSrc}" alt="" style="${fPos}" />
           </div>
           <div class="pix-mini-polaroid-bar">
-            <span class="pix-mini-title-dark">${escTitle}</span>
+            <span class="pix-mini-title-dark" style="${fStyle}">${escTitle}</span>
           </div>
         </div>
       `;
@@ -429,7 +485,7 @@
         <div class="pix-choice-frame pix-cover-thumb" data-style="moldura">
           <img src="${escSrc}" alt="" style="${fPos}" />
           <div class="pix-mini-inset-frame">
-            <span class="pix-mini-title-light">${escTitle}</span>
+            <span class="pix-mini-title-light" style="${fStyle}">${escTitle}</span>
           </div>
         </div>
       `;
@@ -441,7 +497,7 @@
           <img src="${escSrc}" alt="" style="${fPos}" />
           <div class="pix-mini-stripe-overlay">
             <div class="pix-mini-stripe-line"></div>
-            <span class="pix-mini-title-light">${escTitle}</span>
+            <span class="pix-mini-title-light" style="${fStyle}">${escTitle}</span>
             <div class="pix-mini-stripe-line"></div>
           </div>
         </div>
@@ -454,7 +510,7 @@
           <img src="${escSrc}" alt="" style="${fPos}" />
           <div class="pix-mini-divisor-overlay">
             <div class="pix-mini-divisor-vbar"></div>
-            <span class="pix-mini-title-light">${escTitle}</span>
+            <span class="pix-mini-title-light" style="${fStyle}">${escTitle}</span>
           </div>
         </div>
       `;
@@ -467,7 +523,7 @@
             <img src="${escSrc}" alt="" style="${fPos}" />
           </div>
           <div class="pix-mini-diario-card">
-            <span class="pix-mini-title-dark">${escTitle}</span>
+            <span class="pix-mini-title-dark" style="${fStyle}">${escTitle}</span>
             <span class="pix-mini-rule-dark"></span>
           </div>
         </div>
@@ -480,7 +536,7 @@
           <div class="pix-mini-stamp-box">
             <img src="${escSrc}" alt="" style="${fPos}" />
           </div>
-          <span class="pix-mini-title-dark">${escTitle}</span>
+          <span class="pix-mini-title-dark" style="${fStyle}">${escTitle}</span>
         </div>
       `;
     }
@@ -490,7 +546,7 @@
         <div class="pix-choice-frame pix-cover-thumb" data-style="contorno">
           <img src="${escSrc}" alt="" style="${fPos}" />
           <div class="pix-mini-contorno-rect">
-            <span class="pix-mini-title-light">${escTitle}</span>
+            <span class="pix-mini-title-light" style="${fStyle}">${escTitle}</span>
             <span class="pix-mini-underline"></span>
           </div>
         </div>
@@ -505,7 +561,7 @@
           </div>
           <div class="pix-mini-classico-bar">
             <span class="pix-mini-dot"></span>
-            <span class="pix-mini-title-dark">${escTitle}</span>
+            <span class="pix-mini-title-dark" style="${fStyle}">${escTitle}</span>
             <span class="pix-mini-dot"></span>
           </div>
         </div>
@@ -519,7 +575,7 @@
             <img src="${escSrc}" alt="" style="${fPos}" />
           </div>
           <div class="pix-mini-dividido-bar">
-            <span class="pix-mini-title-dark">${escTitle}</span>
+            <span class="pix-mini-title-dark" style="${fStyle}">${escTitle}</span>
           </div>
         </div>
       `;
@@ -530,7 +586,7 @@
         <div class="pix-choice-frame pix-cover-thumb" data-style="rotulo">
           <img src="${escSrc}" alt="" style="${fPos}" />
           <div class="pix-mini-rotulo-badge">
-            <span class="pix-mini-title-dark">${escTitle}</span>
+            <span class="pix-mini-title-dark" style="${fStyle}">${escTitle}</span>
           </div>
         </div>
       `;
@@ -541,7 +597,7 @@
         <div class="pix-choice-frame pix-cover-thumb" data-style="borda">
           <div class="pix-mini-borda-inner">
             <img src="${escSrc}" alt="" style="${fPos}" />
-            <span class="pix-mini-title-light">${escTitle}</span>
+            <span class="pix-mini-title-light" style="${fStyle}">${escTitle}</span>
           </div>
         </div>
       `;
@@ -554,7 +610,7 @@
             <img src="${escSrc}" alt="" style="${fPos}" />
           </div>
           <div class="pix-mini-album-bar">
-            <span class="pix-mini-title-dark">${escTitle}</span>
+            <span class="pix-mini-title-dark" style="${fStyle}">${escTitle}</span>
           </div>
         </div>
       `;
@@ -565,7 +621,7 @@
         <div class="pix-choice-frame pix-cover-thumb" data-style="esquerda">
           <img src="${escSrc}" alt="" style="${fPos}" />
           <div class="pix-mini-overlay-left">
-            <span class="pix-mini-title-light">${escTitle}</span>
+            <span class="pix-mini-title-light" style="${fStyle}">${escTitle}</span>
           </div>
         </div>
       `;
@@ -576,7 +632,7 @@
       <div class="pix-choice-frame pix-cover-thumb" data-style="centro">
         <img src="${escSrc}" alt="" style="${fPos}" />
         <div class="pix-mini-overlay-center">
-          <span class="pix-mini-title-light">${escTitle}</span>
+          <span class="pix-mini-title-light" style="${fStyle}">${escTitle}</span>
           <span class="pix-mini-pill-btn"></span>
         </div>
       </div>
@@ -589,6 +645,9 @@
     const coverSrc = activeAlbum.coverSrc || activeAlbum.photos?.[0]?.originalSrc || 'assets/images/real/IMG_7513.jpg';
     const focal = parseFocalCoords(activeAlbum.coverFocal);
     const shortTitle = (activeAlbum.title || activeAlbum.clientName || 'Álbum').slice(0, 24);
+
+    const activeTypoObj = presets.typographies.find((t) => t.id === design.typography) || presets.typographies[0];
+    const typoFamily = activeTypoObj ? activeTypoObj.fontFamily : 'serif';
 
     let stageBody = '';
     let stageHeading = 'Capa';
@@ -604,7 +663,7 @@
             return `
               <button type="button" class="pix-choice-item ${isAct ? 'active' : ''}" data-design-cover="${escapeHtml(st.id)}">
                 ${st.badge ? `<span class="pix-thumb-badge">${escapeHtml(st.badge)}</span>` : ''}
-                ${renderCoverMiniThumb(st.id, coverSrc, focal, shortTitle)}
+                ${renderCoverMiniThumb(st.id, coverSrc, focal, typoFamily)}
                 <span class="pix-choice-label">${escapeHtml(st.label)}</span>
               </button>
             `;
@@ -731,14 +790,31 @@
 
         <div class="pix-grid-group">
           <span class="pix-grid-group-label">Navegação e Cabeçalho</span>
+          <p style="font-size:0.75rem; color:#5E6D7C; margin:0 0 10px;">Define se os botões da barra da galeria (Baixar fotos, Concluir seleção) exibem o texto ao lado do ícone ou apenas o ícone circular minimalista.</p>
           <div class="pix-cards-grid">
-            ${presets.gridNavStyles.map((gn) => `
-              <button type="button" class="pix-choice-item ${gNav === gn.id ? 'active' : ''}" data-grid-nav="${escapeHtml(gn.id)}">
-                <div class="pix-choice-frame" style="padding:14px 12px; text-align:center; font-size:0.8rem; font-weight:600; color:#1B2733;">
-                  ${escapeHtml(gn.label)}
+            <button type="button" class="pix-choice-item ${gNav === 'icons_text' ? 'active' : ''}" data-grid-nav="icons_text">
+              <div class="pix-choice-frame" style="padding:14px 12px; text-align:center;">
+                <div style="display:flex; align-items:center; justify-content:center; gap:6px; margin-bottom:6px;">
+                  <span style="display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:4px; background:rgba(0,0,0,0.07); font-size:0.72rem; color:#1B2733; font-weight:600;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Baixar
+                  </span>
                 </div>
-              </button>
-            `).join('')}
+                <div style="font-size:0.82rem; font-weight:600; color:#1B2733;">Ícones e Texto</div>
+                <div style="font-size:0.68rem; color:#6B7280; margin-top:3px;">Exibe nome e ícone no botão</div>
+              </div>
+            </button>
+            <button type="button" class="pix-choice-item ${gNav === 'icons_only' ? 'active' : ''}" data-grid-nav="icons_only">
+              <div class="pix-choice-frame" style="padding:14px 12px; text-align:center;">
+                <div style="display:flex; align-items:center; justify-content:center; gap:6px; margin-bottom:6px;">
+                  <span style="display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:50%; background:rgba(0,0,0,0.07); font-size:0.72rem; color:#1B2733;">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  </span>
+                </div>
+                <div style="font-size:0.82rem; font-weight:600; color:#1B2733;">Apenas Ícones</div>
+                <div style="font-size:0.68rem; color:#6B7280; margin-top:3px;">Botões compactos circulares</div>
+              </div>
+            </button>
           </div>
         </div>
       `;
@@ -951,11 +1027,11 @@
         <div class="field-grid" style="margin-top:10px;">
           <div class="field-group">
             <label class="field-label">Selo Superior da Capa (Kicker)</label>
-            <input type="text" id="alb-in-kicker" class="cms-input" value="${escapeHtml(activeAlbum.coverKicker || 'GALERIA OFICIAL EM ALTA RESOLUÇÃO')}" placeholder="Ex: GALERIA OFICIAL EM ALTA RESOLUÇÃO" />
+            <input type="text" id="alb-in-kicker" class="cms-input" value="${escapeHtml(activeAlbum.coverKicker !== undefined ? activeAlbum.coverKicker : 'GALERIA OFICIAL EM ALTA RESOLUÇÃO')}" placeholder="Deixe em branco para ocultar da capa" />
           </div>
           <div class="field-group">
             <label class="field-label">Assinatura da Fotógrafa na Capa</label>
-            <input type="text" id="alb-in-author" class="cms-input" value="${escapeHtml(activeAlbum.coverAuthor || 'Carliane Carvalho')}" placeholder="Ex: Carliane Carvalho" />
+            <input type="text" id="alb-in-author" class="cms-input" value="${escapeHtml(activeAlbum.coverAuthor !== undefined ? activeAlbum.coverAuthor : 'Carliane Carvalho')}" placeholder="Deixe em branco para ocultar da capa" />
           </div>
         </div>
 
@@ -1318,9 +1394,9 @@
       const cSub = document.getElementById('alb-in-sub');
       if (cSub) activeAlbum.subtitle = cSub.value.trim();
       const cKicker = document.getElementById('alb-in-kicker');
-      if (cKicker) activeAlbum.coverKicker = cKicker.value.trim() || 'GALERIA OFICIAL EM ALTA RESOLUÇÃO';
+      if (cKicker) activeAlbum.coverKicker = cKicker.value.trim();
       const cAuthor = document.getElementById('alb-in-author');
-      if (cAuthor) activeAlbum.coverAuthor = cAuthor.value.trim() || 'Carliane Carvalho';
+      if (cAuthor) activeAlbum.coverAuthor = cAuthor.value.trim();
       const cPkg = document.getElementById('alb-in-pkgname');
       if (cPkg) activeAlbum.packageName = cPkg.value.trim() || 'Ensaio';
       const cInc = document.getElementById('alb-in-included');
@@ -1513,6 +1589,14 @@
       btn.addEventListener('click', () => {
         activeDesignSection = btn.getAttribute('data-design-sec');
         renderAlbumsAdminPanel();
+        const iframe = document.getElementById('cms-preview-iframe');
+        if (iframe && iframe.contentWindow) {
+          if (activeDesignSection === 'grid') {
+            iframe.contentWindow.postMessage({ type: 'SCROLL_TO_SECTION', section: 'topbar' }, '*');
+          } else if (activeDesignSection === 'cover') {
+            iframe.contentWindow.postMessage({ type: 'SCROLL_TO_SECTION', section: 'cover' }, '*');
+          }
+        }
       });
     });
 
@@ -1594,6 +1678,10 @@
         activeAlbum.design = activeAlbum.design || window.AlbumsStore.getDefaultDesign();
         activeAlbum.design.gridNavStyle = btn.getAttribute('data-grid-nav');
         broadcastLiveAlbum();
+        const iframe = document.getElementById('cms-preview-iframe');
+        if (iframe && iframe.contentWindow) {
+          iframe.contentWindow.postMessage({ type: 'SCROLL_TO_SECTION', section: 'topbar' }, '*');
+        }
         await window.AlbumsStore.saveState(albumsState);
         renderAlbumsAdminPanel();
       });
