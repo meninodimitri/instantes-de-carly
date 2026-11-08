@@ -816,6 +816,68 @@
   border-radius: 3px;
 }
 
+.pix-cover-thumb[data-style="minimal"] .pix-cover-mini-title {
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
+}
+.pix-cover-thumb[data-style="minimal"] .pix-cover-mini-sub {
+  display: none;
+}
+
+.pix-cover-thumb[data-style="recife"] .pix-cover-mini-title::before,
+.pix-cover-thumb[data-style="recife"] .pix-cover-mini-title::after {
+  content: '';
+  display: block;
+  width: 22px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.85);
+  margin: 3px auto;
+}
+.pix-cover-thumb[data-style="recife"] .pix-cover-mini-sub {
+  display: none;
+}
+
+.pix-cover-thumb[data-style="iracema"] {
+  box-shadow: inset 0 0 0 2px rgba(231, 195, 120, 0.75);
+}
+.pix-cover-thumb[data-style="iracema"] .pix-cover-mini-title {
+  color: #FFFDF3;
+}
+
+.pix-cover-thumb[data-style="passepartout"] {
+  padding: 8px;
+  background: #FFFDF3;
+}
+.pix-cover-thumb[data-style="passepartout"] img {
+  inset: 8px;
+  width: calc(100% - 16px);
+  height: calc(100% - 16px);
+}
+
+.pix-cover-thumb[data-style="aero"] .pix-cover-mini-overlay {
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 8px;
+  background: linear-gradient(180deg, rgba(18, 27, 36, 0.8) 0%, transparent 100%);
+}
+
+.pix-thumb-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 6;
+  font-size: 0.58rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(18, 27, 36, 0.85);
+  color: #E7C378;
+  border: 1px solid rgba(231, 195, 120, 0.4);
+  backdrop-filter: blur(4px);
+}
+
 /* Cartões de Tipografia (Foto 4) */
 .pix-typo-card {
   padding: 20px 16px;
@@ -915,6 +977,40 @@
   background: #64748B;
   border-radius: 2px;
   height: 100%;
+}
+
+.pix-wire-square {
+  display: grid;
+  grid-template-columns: repeat(2, 28px);
+  gap: 5px;
+}
+
+.pix-wire-square span {
+  display: block;
+  width: 28px;
+  height: 28px;
+  background: #64748B;
+  border-radius: 2px;
+}
+
+.pix-wire-passepartout {
+  display: flex;
+  gap: 6px;
+}
+
+.pix-wire-passepartout div {
+  padding: 4px;
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 2px;
+}
+
+.pix-wire-passepartout span {
+  display: block;
+  width: 26px;
+  height: 32px;
+  background: #64748B;
+  border-radius: 1px;
 }
 
 /* ==========================================================================

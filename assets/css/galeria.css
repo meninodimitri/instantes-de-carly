@@ -212,71 +212,105 @@ body.theme-is-dark .gal-btn-primary {
 }
 
 /* ==========================================================================
-   1 & 2. PORTAL E SENHA — SPLIT EDITORIAL 100SVH (ZERO VAZIO GIGANTE)
+   1 & 2. PORTAL E SENHA — TELA CHEIA IMERSIVA (FOTO PREENCHENDO 100% DA TELA)
    ========================================================================== */
-.split-auth-screen {
-  display: grid;
-  grid-template-columns: 1.08fr 1fr;
-  min-height: 100svh;
-  background-color: var(--ground);
-}
-
-.split-photo-pane {
+.auth-fullscreen-view {
   position: relative;
+  min-height: 100svh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: clip;
   background-color: #1B2733;
 }
 
-.split-photo-pane img {
+.auth-fullscreen-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.auth-bg-img {
   width: 100%;
   height: 100%;
-  max-height: 100svh;
   object-fit: cover;
-  object-position: 50% 34%;
+  object-position: 50% 36%;
   display: block;
+  transform: scale(1.02);
+  transition: transform 10s ease-out;
 }
 
-.split-form-pane {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 48px 32px;
+.auth-fullscreen-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(18, 27, 36, 0.42) 0%, rgba(18, 27, 36, 0.72) 100%);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
 }
 
-.split-form-inner {
+.auth-fullscreen-container {
+  position: relative;
+  z-index: 3;
   width: 100%;
-  max-width: 410px;
-  text-align: left;
+  max-width: 460px;
+  padding: 24px 20px;
+  display: flex;
+  justify-content: center;
 }
 
-.auth-brand-link {
+.auth-fullscreen-card {
+  width: 100%;
+  background: rgba(255, 253, 243, 0.94);
+  border: 1.5px solid rgba(231, 195, 120, 0.55);
+  border-radius: 16px;
+  padding: 40px 34px 34px;
+  box-shadow: 0 24px 64px rgba(18, 27, 36, 0.38);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  text-align: center;
+  animation: galHeroRise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.auth-fullscreen-card .auth-brand-link {
   display: inline-block;
-  margin-bottom: 36px;
+  margin-bottom: 20px;
 }
 
-.auth-brand-link img {
-  height: 42px;
+.auth-fullscreen-card .auth-brand-link img {
+  height: 38px;
   width: auto;
   display: block;
+  margin: 0 auto;
+}
+
+.auth-kicker {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #9A7426;
+  margin-bottom: 8px;
 }
 
 .auth-heading {
   font-family: var(--font-display);
-  font-size: clamp(2.1rem, 3.2vw, 2.85rem);
+  font-size: clamp(1.9rem, 2.8vw, 2.45rem);
   font-weight: var(--title-weight);
   letter-spacing: var(--title-tracking);
   text-transform: var(--title-transform);
-  line-height: 1.06;
-  margin: 0 0 14px;
+  line-height: 1.1;
+  margin: 0 0 10px;
   color: var(--ink);
   text-wrap: balance;
 }
 
 .auth-lead {
-  margin: 0 0 28px;
-  font-size: 1rem;
-  line-height: 1.55;
-  color: var(--ink);
+  margin: 0 0 24px;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--ink-secondary);
   text-wrap: pretty;
 }
 
@@ -284,19 +318,25 @@ body.theme-is-dark .gal-btn-primary {
   display: flex;
   flex-direction: column;
   gap: 14px;
+  text-align: left;
 }
 
 .auth-foot-links {
-  margin-top: 28px;
+  margin-top: 22px;
+}
+
+/* Compatibilidade com regras legadas */
+.split-auth-screen {
+  display: none !important;
 }
 
 /* ==========================================================================
-   3A. CAPAS EDITORIAIS ESTILO PIXIESET (8 LAYOUTS CUSTOMIZÁVEIS)
+   3A. CAPAS EDITORIAIS ESTILO PIXIESET (12 LAYOUTS EM TELA CHEIA 100SVH)
    ========================================================================== */
 .pixieset-cover {
   position: relative;
-  height: 86svh;
-  min-height: 520px;
+  height: 100svh;
+  min-height: 560px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -322,7 +362,8 @@ body.theme-is-dark .gal-btn-primary {
 .pixieset-cover-scrim {
   position: absolute;
   inset: 0;
-  background-color: rgba(18, 25, 33, 0.36);
+  background-color: rgba(18, 25, 33, 0.40);
+  transition: background-color 0.3s ease;
 }
 
 .pixieset-cover-top {
@@ -332,7 +373,8 @@ body.theme-is-dark .gal-btn-primary {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 26px 36px;
+  padding: 28px 40px;
+  animation: galHeroRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .pixieset-brand img {
@@ -345,14 +387,15 @@ body.theme-is-dark .gal-btn-primary {
   font-size: 0.88rem;
   text-align: right;
   color: rgba(255, 253, 243, 0.92);
+  letter-spacing: 0.04em;
 }
 
 .pixieset-cover-center {
   position: relative;
   z-index: 2;
   width: 100%;
-  max-width: 760px;
-  margin: 0 auto 10vh;
+  max-width: 820px;
+  margin: auto auto 12vh;
   padding: 0 28px;
   text-align: center;
 }
@@ -361,60 +404,173 @@ body.theme-is-dark .gal-btn-primary {
   display: flex;
   flex-direction: column;
   align-items: center;
+  animation: galHeroRise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.pixieset-kicker {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 253, 243, 0.82);
+  margin-bottom: 12px;
 }
 
 .pixieset-title {
   font-family: var(--font-display);
-  font-size: clamp(2.35rem, 4.8vw, 4.1rem);
+  font-size: clamp(2.4rem, 5.2vw, 4.4rem);
   font-weight: var(--title-weight);
+  font-style: var(--title-style, normal);
   letter-spacing: var(--title-tracking);
   text-transform: var(--title-transform);
   line-height: 1.05;
   margin: 0 0 12px;
   text-wrap: balance;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.45);
 }
 
 .pixieset-subtitle {
   margin: 0 0 24px;
-  max-width: 56ch;
-  font-size: 0.98rem;
-  line-height: 1.55;
-  color: rgba(255, 253, 243, 0.90);
+  max-width: 58ch;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: rgba(255, 253, 243, 0.94);
   text-wrap: pretty;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
 }
 
-/* 1. Bondi: Moldura retangular fina central */
+/* SETINHA PULANDO (INDICADOR DE SCROLL ESTILO SINETO STUDIO) */
+.pixieset-scroll-hint {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  color: #FFFDF3;
+  cursor: pointer;
+  padding: 8px 14px;
+  text-decoration: none;
+  opacity: 0.88;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.pixieset-scroll-hint:hover {
+  opacity: 1;
+}
+
+.scroll-hint-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 253, 243, 0.88);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.45);
+}
+
+.scroll-hint-arrow {
+  display: block;
+  animation: coverArrowBounce 1.8s infinite cubic-bezier(0.45, 0, 0.55, 1);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+@keyframes coverArrowBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(7px);
+  }
+}
+
+/* 1. Cosmos: Clássica tela cheia centralizada com botão */
+.pixieset-cover[data-cover="cosmos"] .pixieset-cover-center {
+  margin: auto auto 12vh;
+}
+
+/* 2. Minimalista: Sem botão pesado, foco amplo na fotografia e tipografia */
+.pixieset-cover[data-cover="minimal"] .gal-btn-cover {
+  display: none;
+}
+.pixieset-cover[data-cover="minimal"] .pixieset-cover-center {
+  margin: auto auto 10vh;
+}
+
+/* 3. Bondi: Moldura retangular fina central sobre a fotografia */
 .pixieset-cover[data-cover="bondi"] .pixieset-cover-center {
   margin: auto;
 }
 .pixieset-cover[data-cover="bondi"] .pixieset-cover-box {
-  border: 2px solid rgba(255, 253, 243, 0.86);
-  padding: 34px 40px;
-  background-color: rgba(18, 25, 33, 0.22);
+  border: 1.5px solid rgba(255, 253, 243, 0.90);
+  padding: 38px 46px;
+  background-color: rgba(18, 25, 33, 0.24);
+  backdrop-filter: blur(2px);
 }
 
-/* 2. Oeste: Alinhado à esquerda sobre a foto */
+/* 4. Oeste: Alinhado à esquerda na base sobre a foto */
 .pixieset-cover[data-cover="oeste"] .pixieset-cover-center {
-  margin: auto auto 11vh 4vw;
+  margin: auto auto 12vh 6vw;
   text-align: left;
 }
 .pixieset-cover[data-cover="oeste"] .pixieset-cover-box {
   align-items: flex-start;
 }
 
-/* 3. Borda: Passe-partout na cor do tema + título no canto inferior direito */
+/* 5. Recife: Título com filetes sutis acima e abaixo */
+.pixieset-cover[data-cover="recife"] .pixieset-title::before,
+.pixieset-cover[data-cover="recife"] .pixieset-title::after {
+  content: '';
+  display: block;
+  width: 64px;
+  height: 1.5px;
+  background-color: rgba(255, 253, 243, 0.85);
+  margin: 12px auto;
+}
+
+/* 6. Oakwood: Traço vertical fino superior e título minimalista */
+.pixieset-cover[data-cover="oakwood"] .pixieset-cover-center {
+  margin: auto;
+}
+.pixieset-cover[data-cover="oakwood"] .pixieset-cover-box::before {
+  content: '';
+  display: block;
+  width: 1.5px;
+  height: 38px;
+  background-color: rgba(255, 253, 243, 0.8);
+  margin-bottom: 16px;
+}
+
+/* 7. Âncora: Título no canto superior esquerdo e seta na base */
+.pixieset-cover[data-cover="ancora"] .pixieset-cover-top {
+  display: none;
+}
+.pixieset-cover[data-cover="ancora"] .pixieset-cover-center {
+  margin: 40px auto auto 6vw;
+  text-align: left;
+}
+.pixieset-cover[data-cover="ancora"] .pixieset-cover-box {
+  align-items: flex-start;
+}
+
+/* 8. Borda: Moldura fina suave ao redor da foto em tela cheia */
 .pixieset-cover[data-cover="borda"] {
   background-color: var(--ground);
-  padding: 24px;
+  padding: 20px;
 }
 .pixieset-cover[data-cover="borda"] .pixieset-cover-media {
-  inset: 24px;
+  inset: 20px;
+  border-radius: 4px;
 }
 .pixieset-cover[data-cover="borda"] .pixieset-cover-top {
-  padding: 22px 28px;
+  padding: 24px 32px;
 }
 .pixieset-cover[data-cover="borda"] .pixieset-cover-center {
-  margin: auto 28px 28px auto;
+  margin: auto 32px 32px auto;
   max-width: 580px;
   text-align: right;
 }
@@ -422,24 +578,40 @@ body.theme-is-dark .gal-btn-primary {
   align-items: flex-end;
 }
 
-/* 4. Oakwood: Minimalista centralizado no meio exato */
-.pixieset-cover[data-cover="oakwood"] .pixieset-cover-center {
+/* 9. Luz Dourada (Autoral da Marca - Brandbook) */
+.pixieset-cover[data-cover="iracema"] .pixieset-cover-media {
+  box-shadow: inset 0 0 0 2px rgba(231, 195, 120, 0.55);
+}
+.pixieset-cover[data-cover="iracema"] .pixieset-title {
+  color: #FFFDF3;
+}
+.pixieset-cover[data-cover="iracema"] .pixieset-kicker {
+  color: #E7C378;
+}
+
+/* 10. Passe-Partout (Brandbook Oficial) */
+.pixieset-cover[data-cover="passepartout"] {
+  background-color: var(--ground);
+  padding: clamp(24px, 4.5vw, 60px);
+}
+.pixieset-cover[data-cover="passepartout"] .pixieset-cover-media {
+  inset: clamp(24px, 4.5vw, 60px);
+  border-radius: 4px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.22);
+}
+.pixieset-cover[data-cover="passepartout"] .pixieset-cover-center {
   margin: auto;
 }
 
-/* 5. Âncora: Título no alto à esquerda + botão discreto embaixo */
-.pixieset-cover[data-cover="ancora"] .pixieset-cover-top {
-  padding-bottom: 8px;
+/* 11. Aero: Cabeçalho limpo com foto panorâmica abaixo */
+.pixieset-cover[data-cover="aero"] {
+  height: 90svh;
 }
-.pixieset-cover[data-cover="ancora"] .pixieset-cover-center {
-  margin: 12px auto auto 12px;
-  text-align: left;
-}
-.pixieset-cover[data-cover="ancora"] .pixieset-cover-box {
-  align-items: flex-start;
+.pixieset-cover[data-cover="aero"] .pixieset-cover-center {
+  margin: auto auto 8vh;
 }
 
-/* 6. Split Editorial: Metade foto / metade fundo do tema */
+/* 12. Split Editorial: Metade foto / metade fundo do tema */
 .pixieset-cover[data-cover="split"] {
   display: grid;
   grid-template-columns: 1.08fr 0.92fr;
@@ -689,6 +861,50 @@ body.theme-is-dark .pixieset-cover[data-cover="split"] .gal-btn-cover {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* Estilo 3: Grade Editorial 4:5 (Aspect Ratio Uniforme de Livro de Arte) */
+.masonry-wall[data-grid-style="square"] {
+  column-count: auto;
+  column-gap: 0;
+  display: grid;
+  grid-template-columns: repeat(var(--grid-cols, 4), minmax(0, 1fr));
+  gap: var(--grid-gap, 8px);
+}
+.masonry-wall[data-grid-style="square"] .masonry-tile {
+  margin: 0;
+  aspect-ratio: 4 / 5;
+}
+.masonry-wall[data-grid-style="square"] .masonry-img-btn {
+  height: 100%;
+}
+.masonry-wall[data-grid-style="square"] .masonry-img-btn > img.tile-base-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Estilo 4: Grade Passe-Partout (Emoldurada em Papel Algodão Oficial) */
+.masonry-wall[data-grid-style="passepartout"] {
+  column-count: var(--grid-cols, 4);
+  column-gap: calc(var(--grid-gap, 8px) + 8px);
+}
+.masonry-wall[data-grid-style="passepartout"] .masonry-tile {
+  margin: 0 0 calc(var(--grid-gap, 8px) + 8px) 0;
+  padding: 12px;
+  background-color: #FFFFFF;
+  border: 1px solid rgba(231, 195, 120, 0.4);
+  border-radius: 4px;
+  box-shadow: 0 6px 20px rgba(18, 27, 36, 0.08);
+}
+
+/* Modo Apenas Ícones no Cabeçalho */
+.gallery-topbar[data-grid-nav="icons_only"] .filter-tab .tab-txt,
+.gallery-topbar[data-grid-nav="icons_only"] .btn-label {
+  display: none;
+}
+.gallery-topbar[data-grid-nav="icons_only"] .filter-tab {
+  padding: 0 14px;
 }
 
 .masonry-img-btn {
@@ -1311,6 +1527,99 @@ body.theme-is-dark .pixieset-cover[data-cover="split"] .gal-btn-cover {
   border-radius: 999px;
   font-size: 0.84rem;
   font-weight: 600;
+}
+
+/* ==========================================================================
+   MODAL DE DIREITO AUTORAL (LEI Nº 9.610/98) — PROTEÇÃO CONTRA PRINT / CÓPIA
+   ========================================================================== */
+.copyright-modal {
+  width: min(520px, calc(100% - 32px));
+  max-width: 520px;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  padding: 0;
+}
+
+.copyright-modal::backdrop {
+  background-color: rgba(14, 18, 24, 0.82);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.copyright-modal-panel {
+  background: #FFFFFF;
+  color: #1A1A1A;
+  padding: 38px 36px 30px;
+  border-radius: 4px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+  animation: galHeroRise 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.copyright-header {
+  margin-bottom: 22px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #EEEEEE;
+}
+
+.copyright-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #111827;
+  text-align: center;
+}
+
+.copyright-content {
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  line-height: 1.75;
+  color: #374151;
+  text-align: justify;
+  margin-bottom: 24px;
+}
+
+.copyright-content p {
+  margin: 0 0 12px;
+}
+
+.copyright-content p:last-child {
+  margin-bottom: 0;
+}
+
+.copyright-content strong {
+  color: #111827;
+  font-weight: 700;
+}
+
+.copyright-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0;
+}
+
+.gal-btn-copyright {
+  background: #111827;
+  color: #FFFFFF;
+  border: 1px solid #111827;
+  border-radius: 3px;
+  padding: 10px 26px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.gal-btn-copyright:hover,
+.gal-btn-copyright:focus-visible {
+  background: #2B3441;
+  border-color: #2B3441;
+  transform: translateY(-1px);
 }
 
 /* ==========================================================================

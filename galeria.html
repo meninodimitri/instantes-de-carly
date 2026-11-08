@@ -9,7 +9,7 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%233B7293%22 stroke-width=%221.8%22><rect x=%222%22 y=%225%22 width=%2220%22 height=%2214%22 rx=%223%22/><circle cx=%2212%22 cy=%2212%22 r=%223.5%22/><circle cx=%2217%22 cy=%228%22 r=%221%22 fill=%22%23E7C378%22/></svg>" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Jost:wght@300;400;500;600&family=Libre+Baskerville:wght@400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Syne:wght@700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Jost:wght@300;400;500;600&family=Libre+Baskerville:wght@400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Syne:wght@700&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="assets/css/galeria.css" />
 </head>
@@ -17,39 +17,42 @@
   <a href="#main-stage" class="skip-link">Pular para a galeria</a>
 
   <!-- ========================================================================
-       1. PORTAL PRIVADO (/galeria — APENAS CAMPO DE ACESSO DO CLIENTE)
+       1. PORTAL PRIVADO (/galeria — TELA CHEIA IMERSIVA COM CARD CENTRAL)
        ======================================================================== -->
-  <section id="portal-view" class="split-auth-screen" aria-labelledby="portal-heading" hidden>
-    <div class="split-photo-pane">
+  <section id="portal-view" class="auth-fullscreen-view" aria-labelledby="portal-heading" hidden>
+    <div class="auth-fullscreen-backdrop">
       <img
         src="assets/images/real/IMG_1186.jpg"
         alt="Fotografia autoral de ensaio na Praia de Iracema"
-        width="1200"
-        height="1600"
+        width="1920"
+        height="1280"
+        class="auth-bg-img"
         fetchpriority="high"
       />
+      <div class="auth-fullscreen-scrim"></div>
     </div>
 
-    <div class="split-form-pane">
-      <div class="split-form-inner">
+    <div class="auth-fullscreen-container">
+      <div class="auth-fullscreen-card">
         <a href="index.html" class="auth-brand-link" aria-label="Voltar para o site principal">
-          <img src="assets/images/logo-dark.png" alt="Instantes de Carly" width="148" height="44" />
+          <img src="assets/images/logo-dark.png" alt="Instantes de Carly" width="138" height="42" />
         </a>
 
+        <span class="auth-kicker">Área Exclusiva do Cliente</span>
         <h1 id="portal-heading" class="auth-heading">Acesse a galeria do seu ensaio</h1>
         <p class="auth-lead">
-          Cole abaixo o link exclusivo ou o código do álbum enviado no seu WhatsApp para abrir suas fotografias.
+          Digite ou cole o código ou link exclusivo enviado no seu WhatsApp para abrir suas fotografias.
         </p>
 
         <form id="portal-code-form" class="auth-stack-form" novalidate>
           <div class="field-block">
-            <label for="portal-slug-input" class="field-label">Link ou código do álbum</label>
+            <label for="portal-slug-input" class="field-label">Link ou código do ensaio</label>
             <input
               type="text"
               id="portal-slug-input"
               name="album_code"
               class="gal-input"
-              placeholder="Ex.: ana-e-lucas…"
+              placeholder="Ex.: ana-e-lucas ou yan-e-carly…"
               autocomplete="off"
               spellcheck="false"
               required
@@ -57,39 +60,42 @@
           </div>
           <p id="portal-error" class="inline-error" role="alert" aria-live="polite" hidden></p>
           <button type="submit" class="gal-btn gal-btn-primary gal-btn-full">
-            Continuar para o álbum
+            Continuar para o álbum →
           </button>
         </form>
 
         <div class="auth-foot-links">
-          <a href="index.html" class="text-link">Voltar para o portfólio principal</a>
+          <a href="index.html" class="text-link">← Voltar para o portfólio principal</a>
         </div>
       </div>
     </div>
   </section>
 
   <!-- ========================================================================
-       2. TELA DE SENHA DO ÁLBUM (/galeria?id=... QUANDO PROTEGIDO)
+       2. TELA DE SENHA DO ÁLBUM (TELA CHEIA IMERSIVA — SEM VAZIO LATERAL)
        ======================================================================== -->
-  <section id="password-view" class="split-auth-screen" aria-labelledby="pw-album-title" hidden>
-    <div class="split-photo-pane">
+  <section id="password-view" class="auth-fullscreen-view" aria-labelledby="pw-album-title" hidden>
+    <div class="auth-fullscreen-backdrop">
       <img
         id="pw-cover-img"
         src="assets/images/real/IMG_7513.jpg"
         alt="Capa do ensaio fotográfico"
-        width="1200"
-        height="1600"
+        width="1920"
+        height="1280"
+        class="auth-bg-img"
         fetchpriority="high"
       />
+      <div class="auth-fullscreen-scrim"></div>
     </div>
 
-    <div class="split-form-pane">
-      <div class="split-form-inner">
+    <div class="auth-fullscreen-container">
+      <div class="auth-fullscreen-card">
         <a href="index.html" class="auth-brand-link" aria-label="Voltar para o site principal">
-          <img src="assets/images/logo-dark.png" alt="Instantes de Carly" width="148" height="44" />
+          <img src="assets/images/logo-dark.png" alt="Instantes de Carly" width="138" height="42" />
         </a>
 
-        <h1 id="pw-album-title" class="auth-heading">Galeria Privada</h1>
+        <span class="auth-kicker">Galeria Privada Protegida</span>
+        <h1 id="pw-album-title" class="auth-heading">Galeria do Ensaio</h1>
         <p id="pw-album-subtitle" class="auth-lead"></p>
 
         <form id="password-form" class="auth-stack-form" novalidate>
@@ -110,7 +116,7 @@
             Senha incorreta. Confira a mensagem recebida no seu WhatsApp.
           </p>
           <button type="submit" class="gal-btn gal-btn-primary gal-btn-full">
-            Abrir fotografias
+            Abrir fotografias →
           </button>
         </form>
 
@@ -126,8 +132,8 @@
        ======================================================================== -->
   <main id="album-view" class="album-shell" hidden>
 
-    <!-- 3A. CAPA EDITORIAL PIXIESET (CUSTOMIZÁVEL: ESTILO, TIPOGRAFIA E COR) -->
-    <section id="delivery-hero" class="pixieset-cover" data-cover="borda" aria-labelledby="delivery-hero-title" hidden>
+    <!-- 3A. CAPA EDITORIAL PIXIESET (TELA CHEIA 100SVH COM MOVIMENTO E SETINHA PULANDO) -->
+    <section id="delivery-hero" class="pixieset-cover" data-cover="cosmos" aria-labelledby="delivery-hero-title" hidden>
       <div class="pixieset-cover-media">
         <img id="delivery-hero-img" src="" alt="" width="1920" height="1280" class="pixieset-cover-img" />
         <div class="pixieset-cover-scrim" aria-hidden="true"></div>
@@ -142,6 +148,7 @@
 
       <div class="pixieset-cover-center">
         <div class="pixieset-cover-box">
+          <span id="delivery-hero-kicker" class="pixieset-kicker">GALERIA OFICIAL EM ALTA RESOLUÇÃO</span>
           <h1 id="delivery-hero-title" class="pixieset-title">Galeria em Alta Resolução</h1>
           <p id="delivery-hero-msg" class="pixieset-subtitle"></p>
           <button type="button" id="btn-scroll-gallery" class="gal-btn gal-btn-cover">
@@ -149,6 +156,14 @@
           </button>
         </div>
       </div>
+
+      <!-- Setinha pulando para indicar scroll (estilo Sineto Studio) -->
+      <button type="button" id="btn-cover-scroll-down" class="pixieset-scroll-hint" aria-label="Rolar para ver fotografias">
+        <span class="scroll-hint-label">Rolar para ver fotos</span>
+        <svg class="scroll-hint-arrow" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M7 10l5 5 5-5"/>
+        </svg>
+      </button>
     </section>
 
     <!-- 3B. BARRA SUPERIOR FIXA DA GALERIA (ESTILO SINETO / PIXIESET) -->
@@ -472,6 +487,27 @@
           Iniciar download
         </button>
       </div>
+    </div>
+  </dialog>
+
+  <!-- ========================================================================
+       MODAL DE DIREITOS AUTORAIS (LEI Nº 9.610/98) — PROTEÇÃO CONTRA PRINT/CÓPIA
+       ======================================================================== -->
+  <dialog id="modal-copyright" class="gal-modal copyright-modal" aria-labelledby="copyright-title">
+    <div class="gal-modal-panel copyright-modal-panel">
+      <div class="copyright-header">
+        <h3 id="copyright-title" class="copyright-title">DIREITO AUTORAL LEI Nº 9.610/98</h3>
+      </div>
+      <div class="copyright-content">
+        <p>AS FOTOS DESTA GALERIA SÃO <strong>PROTEGIDAS POR DIREITOS AUTORAIS</strong> PREVISTOS EM LEI.</p>
+        <p>É <strong>PROIBIDA</strong> A REPRODUÇÃO, CÓPIA, DISTRIBUIÇÃO OU USO NÃO AUTORIZADO DAS IMAGENS, CONFIGURANDO <strong>CRIME</strong> E SUJEITANDO O INFRATOR A SANÇÕES LEGAIS.</p>
+        <p>PARA MAIS INFORMAÇÕES SOBRE O USO DAS FOTOS, ENTRE EM CONTATO COM O FOTÓGRAFO.</p>
+      </div>
+      <form method="dialog" class="copyright-actions">
+        <button type="submit" id="btn-close-copyright" class="gal-btn gal-btn-copyright" autofocus>
+          ENTENDI
+        </button>
+      </form>
     </div>
   </dialog>
 

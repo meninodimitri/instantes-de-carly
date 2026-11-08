@@ -54,6 +54,7 @@
     deliveryHeroTitle: document.getElementById('delivery-hero-title'),
     deliveryHeroMsg: document.getElementById('delivery-hero-msg'),
     btnScrollGallery: document.getElementById('btn-scroll-gallery'),
+    btnCoverScrollDown: document.getElementById('btn-cover-scroll-down'),
 
     topbar: document.getElementById('gallery-topbar'),
     proofingTitle: document.getElementById('proofing-title'),
@@ -138,6 +139,9 @@
     dlProgressBar: document.getElementById('dl-progress-bar'),
     btnStartDownload: document.getElementById('btn-start-download'),
 
+    modalCopyright: document.getElementById('modal-copyright'),
+    btnCloseCopyright: document.getElementById('btn-close-copyright'),
+
     toast: document.getElementById('gal-toast')
   };
 
@@ -180,12 +184,12 @@
     const presets = window.AlbumsStore.DESIGN_PRESETS;
     const d = (album && album.design) || window.AlbumsStore.getDefaultDesign();
 
-    const theme = presets.colorThemes.find((t) => t.id === d.colorTheme) || presets.colorThemes[1];
-    const typo = presets.typographies.find((t) => t.id === d.typography) || presets.typographies[1];
+    const theme = presets.colorThemes.find((t) => t.id === d.colorTheme) || presets.colorThemes[0];
+    const typo = presets.typographies.find((t) => t.id === d.typography) || presets.typographies[0];
     const gSpacing = presets.gridSpacings.find((g) => g.id === d.gridSpacing) || presets.gridSpacings[0];
     const gSize = presets.gridSizes.find((g) => g.id === d.gridSize) || presets.gridSizes[0];
-    const gStyle = d.gridStyle === 'horizontal' ? 'horizontal' : 'vertical';
-    const coverStyle = d.coverStyle || 'borda';
+    const gStyle = d.gridStyle || 'vertical';
+    const coverStyle = d.coverStyle || 'cosmos';
 
     const root = document.documentElement;
     root.style.setProperty('--ground', theme.ground);
@@ -198,6 +202,7 @@
     root.style.setProperty('--title-weight', String(typo.weight));
     root.style.setProperty('--title-tracking', typo.tracking);
     root.style.setProperty('--title-transform', typo.transform);
+    root.style.setProperty('--title-style', typo.fontStyle || 'normal');
     root.style.setProperty('--grid-gap', `${gSpacing.gapPx}px`);
     root.style.setProperty('--grid-cols', String(gSize.cols));
     root.style.setProperty('--row-h', `${gSize.rowHeight}px`);
@@ -222,23 +227,40 @@
     if (els.grid) {
       els.grid.setAttribute('data-grid-style', gStyle);
     }
+
+    if (els.topbar) {
+      els.topbar.setAttribute('data-grid-nav', d.gridNavStyle || 'icons_text');
+    }
+  }
+
+  function showCopyrightModal() {
+    if (!els.modalCopyright) return;
+    if (typeof els.modalCopyright.showModal === 'function') {
+      if (!els.modalCopyright.open) {
+        els.modalCopyright.showModal();
+      }
+    } else {
+      els.modalCopyright.setAttribute('open', '');
+    }
   }
 
   /* ==========================================================================
-     1. PROTEÇÃO ANTI-CÓPIA EM MODO DE PROVA
+     1. PROTEÇÃO ANTI-CÓPIA E ANTI-PRINT (DIREITOS AUTORAIS LEI 9.610/98)
      ========================================================================== */
   function setupAntiCopyProtection() {
+    // 1. Desabilita menu de contexto com abertura do modal de proteção
     document.addEventListener('contextmenu', (e) => {
-      if (currentAlbum && currentAlbum.phase === 'proofing') {
-        if (e.target.closest('.masonry-wall, .gal-lightbox')) {
+      if (currentAlbum && (currentAlbum.phase === 'proofing' || currentAlbum.antiPrintEnabled !== false)) {
+        if (e.target.closest('.masonry-wall, .gal-lightbox, .pixieset-cover, .auth-fullscreen-view')) {
           e.preventDefault();
-          showToast('Fotografia protegida em modo de seleção.');
+          showCopyrightModal();
         }
       }
     });
 
+    // 2. Desabilita arraste de fotografias
     document.addEventListener('dragstart', (e) => {
-      if (currentAlbum && currentAlbum.phase === 'proofing' && e.target.tagName === 'IMG') {
+      if (e.target.tagName === 'IMG') {
         e.preventDefault();
       }
     });
@@ -249,11 +271,37 @@
         el.style.opacity = '0';
       });
     };
+
+    // 3. Detecção de PrintScreen (tecla física)
+    window.addEventListener('keyup', (e) => {
+      if (e.key === 'PrintScreen' || e.keyCode === 44) {
+        e.preventDefault();
+        hideAllSpotlights();
+        showCopyrightModal();
+      }
+    });
+
+    // 4. Detecção de atalhos de impressão e captura (Ctrl+P, Cmd+P, Ctrl+Shift+S, Cmd+Shift+3/4)
+    window.addEventListener('keydown', (e) => {
+      const isCmdOrCtrl = e.ctrlKey || e.metaKey;
+      if (isCmdOrCtrl && (e.key === 'p' || e.key === 'P')) {
+        e.preventDefault();
+        showCopyrightModal();
+      } else if (isCmdOrCtrl && e.shiftKey && (e.key === 's' || e.key === 'S' || e.key === '3' || e.key === '4')) {
+        e.preventDefault();
+        showCopyrightModal();
+      }
+    });
+
+    // 5. Intercepta cópia de área de transferência
+    document.addEventListener('copy', (e) => {
+      if (currentAlbum && (currentAlbum.phase === 'proofing' || currentAlbum.antiPrintEnabled !== false)) {
+        showCopyrightModal();
+      }
+    });
+
     window.addEventListener('blur', hideAllSpotlights);
     document.addEventListener('visibilitychange', hideAllSpotlights);
-    document.addEventListener('keyup', (e) => {
-      if (e.key === 'PrintScreen') hideAllSpotlights();
-    });
   }
 
   /* ==========================================================================
@@ -1258,7 +1306,9 @@
     els.portalForm?.addEventListener('submit', (e) => {
       e.preventDefault();
       const parsedSlug = window.AlbumsStore.parseAlbumSlugFromInput(els.portalSlugIn?.value);
-      const found = (rootState.albums || []).find((a) => a.slug.toLowerCase() === parsedSlug);
+      const found = (rootState.albums || []).find(
+        (a) => (a.slug && a.slug.toLowerCase() === parsedSlug) || (a.id && a.id.toLowerCase() === parsedSlug)
+      );
       if (!found) {
         if (els.portalError) {
           els.portalError.hidden = false;
@@ -1283,9 +1333,17 @@
       }
     });
 
-    els.btnScrollGallery?.addEventListener('click', () => {
-      els.topbar?.scrollIntoView({ behavior: 'smooth' });
-    });
+    const scrollDownToGallery = () => {
+      const target = els.topbar || document.getElementById('main-stage') || els.grid;
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
+      }
+    };
+
+    els.btnScrollGallery?.addEventListener('click', scrollDownToGallery);
+    els.btnCoverScrollDown?.addEventListener('click', scrollDownToGallery);
 
     els.btnFinishTop?.addEventListener('click', openCheckoutModal);
     els.btnFinishDock?.addEventListener('click', openCheckoutModal);
@@ -1404,7 +1462,9 @@
       return;
     }
 
-    const found = (rootState.albums || []).find((a) => a.slug.toLowerCase() === initialSlug);
+    const found = (rootState.albums || []).find(
+      (a) => (a.slug && a.slug.toLowerCase() === initialSlug) || (a.id && a.id.toLowerCase() === initialSlug)
+    );
     if (!found) {
       renderPortalView();
       if (els.portalError) {

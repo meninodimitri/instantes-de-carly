@@ -28,20 +28,61 @@
     : null;
 
   /* ==========================================================================
-     0. CATÁLOGO DE DESIGN ESTILO PIXIESET (CAPA, TIPOGRAFIA, COR E GRADE)
+     0. CATÁLOGO COMPLETO DE DESIGN (PIXIESET + BRANDBOOK INSTANTES DE CARLY)
      ========================================================================== */
   const DESIGN_PRESETS = {
     coverStyles: [
-      { id: 'cosmos', label: 'Cosmos', desc: 'Título centralizado sobre foto em tela cheia' },
-      { id: 'bondi', label: 'Bondi', desc: 'Moldura fina central sobre a fotografia' },
-      { id: 'oeste', label: 'Oeste', desc: 'Título alinhado à esquerda sobre a fotografia' },
-      { id: 'borda', label: 'Borda', desc: 'Moldura editorial ao redor da foto e título no canto inferior' },
-      { id: 'oakwood', label: 'Oakwood', desc: 'Data no topo e título minimalista centralizado' },
-      { id: 'ancora', label: 'Âncora', desc: 'Título no canto superior esquerdo e seta na base' },
-      { id: 'split', label: 'Editorial', desc: 'Metade fotografia e metade painel tipográfico' },
+      { id: 'cosmos', label: 'Cosmos', desc: 'Foto 100% tela cheia, título centralizado, botão fino e seta na base' },
+      { id: 'minimal', label: 'Minimalista', badge: 'Tela Cheia', desc: 'Foto 100% tela cheia com título amplo central e assinatura na base' },
+      { id: 'bondi', label: 'Bondi', desc: 'Foto 100% tela cheia com moldura retangular fina no centro' },
+      { id: 'oeste', label: 'Oeste', desc: 'Foto 100% tela cheia com título e subtítulo alinhados à esquerda' },
+      { id: 'recife', label: 'Recife', desc: 'Foto 100% tela cheia, logo no topo e título entre filetes centrais' },
+      { id: 'oakwood', label: 'Oakwood', desc: 'Foto 100% tela cheia, logo no topo, traço vertical e título central' },
+      { id: 'ancora', label: 'Âncora', desc: 'Foto 100% tela cheia com título no canto superior esquerdo e seta na base' },
+      { id: 'borda', label: 'Borda', desc: 'Moldura fina ao redor da foto em tela cheia e título no canto inferior direito' },
+      { id: 'iracema', label: 'Luz Dourada', badge: 'Marca', desc: 'Foto 100% tela cheia com cantoneiras douradas sutis e estética autoral' },
+      { id: 'passepartout', label: 'Passe-Partout', badge: 'Marca', desc: 'Moldura papel algodão do Brandbook com foto ampla central e título clássico' },
+      { id: 'aero', label: 'Aero', desc: 'Faixa tipográfica limpa no topo e fotografia panorâmica abaixo' },
+      { id: 'split', label: 'Editorial', desc: 'Divisão 50/50 entre fotografia em tela cheia e painel tipográfico' },
       { id: 'none', label: 'Sem Capa', desc: 'Abre diretamente na grade de fotografias' }
     ],
     typographies: [
+      {
+        id: 'carly',
+        label: 'Autoral Carly',
+        badge: 'Marca',
+        sample: 'Instantes',
+        desc: 'Cormorant editorial da marca',
+        fontFamily: "'Cormorant Garamond', Georgia, serif",
+        weight: 500,
+        tracking: '0.01em',
+        transform: 'none',
+        fontStyle: 'normal'
+      },
+      {
+        id: 'cinema',
+        label: 'Cinema Wide',
+        badge: 'Marca',
+        sample: 'ENSAIO',
+        desc: 'Clássica espaçada de galeria',
+        fontFamily: "'Cormorant Garamond', Georgia, serif",
+        weight: 400,
+        tracking: '0.18em',
+        transform: 'uppercase',
+        fontStyle: 'normal'
+      },
+      {
+        id: 'afeto',
+        label: 'Caligrafia',
+        badge: 'Marca',
+        sample: 'Afeto & Luz',
+        desc: 'Manuscrita delicada do Brandbook',
+        fontFamily: "'Alex Brush', 'Cormorant Garamond', cursive",
+        weight: 400,
+        tracking: '0.02em',
+        transform: 'none',
+        fontStyle: 'normal'
+      },
       {
         id: 'sans',
         label: 'Sans',
@@ -50,7 +91,8 @@
         fontFamily: "'Jost', 'Plus Jakarta Sans', sans-serif",
         weight: 600,
         tracking: '0.09em',
-        transform: 'uppercase'
+        transform: 'uppercase',
+        fontStyle: 'normal'
       },
       {
         id: 'serif',
@@ -58,9 +100,10 @@
         sample: 'Serif',
         desc: 'Uma fonte clássica',
         fontFamily: "'Cormorant Garamond', Georgia, serif",
-        weight: 500,
+        weight: 600,
         tracking: '-0.01em',
-        transform: 'none'
+        transform: 'none',
+        fontStyle: 'normal'
       },
       {
         id: 'modern',
@@ -70,7 +113,8 @@
         fontFamily: "'Jost', 'Plus Jakarta Sans', sans-serif",
         weight: 300,
         tracking: '0.03em',
-        transform: 'none'
+        transform: 'none',
+        fontStyle: 'normal'
       },
       {
         id: 'timeless',
@@ -80,7 +124,8 @@
         fontFamily: "'Libre Baskerville', 'Cormorant Garamond', Georgia, serif",
         weight: 400,
         tracking: '0.01em',
-        transform: 'none'
+        transform: 'none',
+        fontStyle: 'normal'
       },
       {
         id: 'bold',
@@ -90,7 +135,8 @@
         fontFamily: "'Syne', 'Plus Jakarta Sans', sans-serif",
         weight: 700,
         tracking: '0.06em',
-        transform: 'uppercase'
+        transform: 'uppercase',
+        fontStyle: 'normal'
       },
       {
         id: 'subtle',
@@ -100,10 +146,63 @@
         fontFamily: "'Jost', 'Plus Jakarta Sans', sans-serif",
         weight: 300,
         tracking: '0.16em',
-        transform: 'uppercase'
+        transform: 'uppercase',
+        fontStyle: 'normal'
       }
     ],
     colorThemes: [
+      {
+        id: 'amarelinho',
+        label: 'Amarelinho Bebê',
+        badge: 'Marca',
+        dots: ['#FFFDF3', '#FDF6DF', '#E7C378'],
+        ground: '#FFFDF3',
+        surface: '#FDF6DF',
+        ink: '#22262A',
+        inkSecondary: '#4E565E',
+        accent: '#8A6218',
+        accentHover: '#6E4E12',
+        isDark: false
+      },
+      {
+        id: 'iracema',
+        label: 'Azul Iracema',
+        badge: 'Marca',
+        dots: ['#F7FAFC', '#EBF2F6', '#3B7293'],
+        ground: '#F7FAFC',
+        surface: '#EBF2F6',
+        ink: '#1B2733',
+        inkSecondary: '#465869',
+        accent: '#2F607D',
+        accentHover: '#234B63',
+        isDark: false
+      },
+      {
+        id: 'maresia',
+        label: 'Azul Maresia',
+        badge: 'Marca',
+        dots: ['#1B2733', '#253545', '#E7C378'],
+        ground: '#1B2733',
+        surface: '#243342',
+        ink: '#FFFDF3',
+        inkSecondary: '#C8D2DC',
+        accent: '#E7C378',
+        accentHover: '#F0D290',
+        isDark: true
+      },
+      {
+        id: 'ysla',
+        label: 'Rosa Bebê Ysla',
+        badge: 'Marca',
+        dots: ['#FDF4F5', '#F3C1C6', '#9E4756'],
+        ground: '#FDF4F5',
+        surface: '#F8E6E8',
+        ink: '#2B2023',
+        inkSecondary: '#5E474C',
+        accent: '#8F3F4D',
+        accentHover: '#75313D',
+        isDark: false
+      },
       {
         id: 'claro',
         label: 'Claro',
@@ -214,8 +313,10 @@
       }
     ],
     gridStyles: [
-      { id: 'vertical', label: 'Vertical', desc: 'Colunas em mosaico respeitando retratos e paisagens' },
-      { id: 'horizontal', label: 'Horizontal', desc: 'Linhas panorâmicas alinhadas pela altura' }
+      { id: 'vertical', label: 'Vertical', desc: 'Mosaico fluido valorizando retratos e paisagens' },
+      { id: 'horizontal', label: 'Horizontal', desc: 'Linhas panorâmicas alinhadas pela altura' },
+      { id: 'square', label: 'Editorial 4:5', desc: 'Grade uniforme alinhada estilo livro de arte' },
+      { id: 'passepartout', label: 'Passe-Partout', badge: 'Marca', desc: 'Cada foto emoldurada em papel algodão da marca' }
     ],
     gridSpacings: [
       { id: 'regular', label: 'Regular', gapPx: 8 },
@@ -224,17 +325,22 @@
     gridSizes: [
       { id: 'regular', label: 'Regular', cols: 4, rowHeight: 250 },
       { id: 'large', label: 'Grande', cols: 3, rowHeight: 330 }
+    ],
+    gridNavStyles: [
+      { id: 'icons_text', label: 'Ícones e Texto' },
+      { id: 'icons_only', label: 'Apenas Ícones' }
     ]
   };
 
   function getDefaultDesign() {
     return {
-      coverStyle: 'borda',
-      typography: 'serif',
-      colorTheme: 'dourado',
+      coverStyle: 'cosmos',
+      typography: 'carly',
+      colorTheme: 'amarelinho',
       gridStyle: 'vertical',
       gridSpacing: 'regular',
-      gridSize: 'regular'
+      gridSize: 'regular',
+      gridNavStyle: 'icons_text'
     };
   }
 
@@ -251,6 +357,9 @@
 
     if (typeof alb.watermarkEnabled !== 'boolean') {
       alb.watermarkEnabled = true;
+    }
+    if (typeof alb.antiPrintEnabled !== 'boolean') {
+      alb.antiPrintEnabled = true;
     }
     if (typeof alb.passwordEnabled !== 'boolean') {
       alb.passwordEnabled = Boolean(alb.password && String(alb.password).trim());
@@ -270,7 +379,8 @@
       colorTheme: DESIGN_PRESETS.colorThemes.some((x) => x.id === d.colorTheme) ? d.colorTheme : defDesign.colorTheme,
       gridStyle: DESIGN_PRESETS.gridStyles.some((x) => x.id === d.gridStyle) ? d.gridStyle : defDesign.gridStyle,
       gridSpacing: DESIGN_PRESETS.gridSpacings.some((x) => x.id === d.gridSpacing) ? d.gridSpacing : defDesign.gridSpacing,
-      gridSize: DESIGN_PRESETS.gridSizes.some((x) => x.id === d.gridSize) ? d.gridSize : defDesign.gridSize
+      gridSize: DESIGN_PRESETS.gridSizes.some((x) => x.id === d.gridSize) ? d.gridSize : defDesign.gridSize,
+      gridNavStyle: DESIGN_PRESETS.gridNavStyles.some((x) => x.id === d.gridNavStyle) ? d.gridNavStyle : defDesign.gridNavStyle
     };
 
     if (!alb.coverFocal) alb.coverFocal = '50% 35%';

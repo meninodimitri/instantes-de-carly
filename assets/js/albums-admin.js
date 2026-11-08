@@ -373,7 +373,7 @@
     const design = activeAlbum.design || window.AlbumsStore.getDefaultDesign();
     const coverSrc = activeAlbum.coverSrc || activeAlbum.photos?.[0]?.originalSrc || 'assets/images/real/IMG_7513.jpg';
     const focal = parseFocalCoords(activeAlbum.coverFocal);
-    const shortTitle = (activeAlbum.clientName || activeAlbum.title || 'Álbum').slice(0, 18);
+    const shortTitle = (activeAlbum.title || activeAlbum.clientName || 'Álbum').slice(0, 24);
 
     let stageBody = '';
     let stageHeading = 'Capa';
@@ -389,6 +389,7 @@
             return `
               <button type="button" class="pix-choice-item ${isAct ? 'active' : ''}" data-design-cover="${escapeHtml(st.id)}">
                 <div class="pix-choice-frame pix-cover-thumb" data-style="${escapeHtml(st.id)}">
+                  ${st.badge ? `<span class="pix-thumb-badge">${escapeHtml(st.badge)}</span>` : ''}
                   ${st.id === 'none' ? `
                     <div class="pix-none-grid">
                       <span></span><span></span><span></span>
@@ -418,9 +419,10 @@
             return `
               <button type="button" class="pix-choice-item ${isAct ? 'active' : ''}" data-design-typo="${escapeHtml(tp.id)}">
                 <div class="pix-choice-frame pix-typo-card">
+                  ${tp.badge ? `<span class="pix-thumb-badge">${escapeHtml(tp.badge)}</span>` : ''}
                   <span
                     class="pix-typo-sample"
-                    style="font-family:${escapeHtml(tp.fontFamily)}; font-weight:${tp.weight}; letter-spacing:${tp.tracking}; text-transform:${tp.transform};"
+                    style="font-family:${escapeHtml(tp.fontFamily)}; font-weight:${tp.weight}; font-style:${tp.fontStyle || 'normal'}; letter-spacing:${tp.tracking}; text-transform:${tp.transform};"
                   >${escapeHtml(tp.sample)}</span>
                   <span class="pix-typo-desc">${escapeHtml(tp.desc)}</span>
                 </div>
@@ -440,6 +442,7 @@
             return `
               <button type="button" class="pix-choice-item ${isAct ? 'active' : ''}" data-design-color="${escapeHtml(ct.id)}">
                 <div class="pix-choice-frame pix-color-card">
+                  ${ct.badge ? `<span class="pix-thumb-badge">${escapeHtml(ct.badge)}</span>` : ''}
                   ${ct.dots.map((hex) => `<span class="pix-color-dot" style="background-color:${escapeHtml(hex)};"></span>`).join('')}
                 </div>
                 <span class="pix-choice-label">${escapeHtml(ct.label)}</span>
@@ -454,32 +457,47 @@
       const gStyle = design.gridStyle || 'vertical';
       const gSpacing = design.gridSpacing || 'regular';
       const gSize = design.gridSize || 'regular';
+      const gNav = design.gridNavStyle || 'icons_text';
       stageBody = `
         <div class="pix-grid-group">
           <span class="pix-grid-group-label">Estilo da Grade</span>
           <div class="pix-cards-grid">
-            <button type="button" class="pix-choice-item ${gStyle !== 'horizontal' ? 'active' : ''}" data-grid-style="vertical">
-              <div class="pix-choice-frame pix-grid-diagram">
-                <div class="pix-wire-vert">
-                  <span style="height:28px;"></span>
-                  <span style="height:18px;"></span>
-                  <span style="height:24px;"></span>
-                  <span style="height:16px;"></span>
-                  <span style="height:26px;"></span>
-                  <span style="height:20px;"></span>
-                </div>
-              </div>
-              <span class="pix-choice-label">Vertical</span>
-            </button>
-            <button type="button" class="pix-choice-item ${gStyle === 'horizontal' ? 'active' : ''}" data-grid-style="horizontal">
-              <div class="pix-choice-frame pix-grid-diagram">
-                <div class="pix-wire-horiz">
-                  <div><span style="flex:1.5;"></span><span style="flex:1;"></span></div>
-                  <div><span style="flex:1;"></span><span style="flex:1.6;"></span></div>
-                </div>
-              </div>
-              <span class="pix-choice-label">Horizontal</span>
-            </button>
+            ${presets.gridStyles.map((gs) => {
+              const isAct = gStyle === gs.id;
+              return `
+                <button type="button" class="pix-choice-item ${isAct ? 'active' : ''}" data-grid-style="${escapeHtml(gs.id)}">
+                  <div class="pix-choice-frame pix-grid-diagram" data-grid-style="${escapeHtml(gs.id)}">
+                    ${gs.badge ? `<span class="pix-thumb-badge">${escapeHtml(gs.badge)}</span>` : ''}
+                    ${gs.id === 'vertical' ? `
+                      <div class="pix-wire-vert">
+                        <span style="height:28px;"></span>
+                        <span style="height:18px;"></span>
+                        <span style="height:24px;"></span>
+                        <span style="height:16px;"></span>
+                        <span style="height:26px;"></span>
+                        <span style="height:20px;"></span>
+                      </div>
+                    ` : gs.id === 'horizontal' ? `
+                      <div class="pix-wire-horiz">
+                        <div><span style="flex:1.5;"></span><span style="flex:1;"></span></div>
+                        <div><span style="flex:1;"></span><span style="flex:1.6;"></span></div>
+                      </div>
+                    ` : gs.id === 'square' ? `
+                      <div class="pix-wire-square">
+                        <span></span><span></span>
+                        <span></span><span></span>
+                      </div>
+                    ` : `
+                      <div class="pix-wire-passepartout">
+                        <div><span></span></div>
+                        <div><span></span></div>
+                      </div>
+                    `}
+                  </div>
+                  <span class="pix-choice-label">${escapeHtml(gs.label)}</span>
+                </button>
+              `;
+            }).join('')}
           </div>
         </div>
 
@@ -503,6 +521,19 @@
               <button type="button" class="pix-choice-item ${gSize === sz.id ? 'active' : ''}" data-grid-size="${escapeHtml(sz.id)}">
                 <div class="pix-choice-frame" style="padding:14px 12px; text-align:center; font-size:0.8rem; font-weight:600; color:#1B2733;">
                   ${escapeHtml(sz.label)} (${sz.cols} colunas)
+                </div>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="pix-grid-group">
+          <span class="pix-grid-group-label">Navegação e Cabeçalho</span>
+          <div class="pix-cards-grid">
+            ${presets.gridNavStyles.map((gn) => `
+              <button type="button" class="pix-choice-item ${gNav === gn.id ? 'active' : ''}" data-grid-nav="${escapeHtml(gn.id)}">
+                <div class="pix-choice-frame" style="padding:14px 12px; text-align:center; font-size:0.8rem; font-weight:600; color:#1B2733;">
+                  ${escapeHtml(gn.label)}
                 </div>
               </button>
             `).join('')}
@@ -1263,6 +1294,15 @@
       btn.addEventListener('click', async () => {
         activeAlbum.design = activeAlbum.design || window.AlbumsStore.getDefaultDesign();
         activeAlbum.design.gridSize = btn.getAttribute('data-grid-size');
+        await window.AlbumsStore.saveState(albumsState);
+        renderAlbumsAdminPanel();
+      });
+    });
+
+    panel.querySelectorAll('[data-grid-nav]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        activeAlbum.design = activeAlbum.design || window.AlbumsStore.getDefaultDesign();
+        activeAlbum.design.gridNavStyle = btn.getAttribute('data-grid-nav');
         await window.AlbumsStore.saveState(albumsState);
         renderAlbumsAdminPanel();
       });
