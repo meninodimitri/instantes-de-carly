@@ -2473,13 +2473,11 @@ function initTabsAndPreviewModes() {
   const SIDEBAR_COLLAPSED_KEY = 'cms_main_sidebar_collapsed';
   const btnToggleSidebar = document.getElementById('btn-toggle-sidebar');
   const btnCollapseRail = document.getElementById('btn-collapse-sidebar-rail');
-  const btnExpandFloat = document.getElementById('btn-expand-sidebar-float');
   const iconToggle = document.getElementById('sidebar-toggle-icon');
   const labelToggle = document.getElementById('sidebar-toggle-label');
 
   function setSidebarCollapsedState(collapsed) {
     workspace?.classList.toggle('sidebar-collapsed', collapsed);
-    if (btnExpandFloat) btnExpandFloat.hidden = !collapsed;
     if (btnToggleSidebar) btnToggleSidebar.classList.toggle('active', collapsed);
     if (iconToggle) iconToggle.textContent = collapsed ? '▶|' : '◀|';
     if (labelToggle) labelToggle.textContent = collapsed ? 'Mostrar Menu' : 'Recolher Menu';
@@ -2501,7 +2499,6 @@ function initTabsAndPreviewModes() {
 
   btnToggleSidebar?.addEventListener('click', toggleSidebar);
   btnCollapseRail?.addEventListener('click', () => setSidebarCollapsedState(true));
-  btnExpandFloat?.addEventListener('click', () => setSidebarCollapsedState(false));
 
   const iframe = document.getElementById('cms-preview-iframe');
   iframe?.addEventListener('load', () => {

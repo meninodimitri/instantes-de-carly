@@ -212,18 +212,25 @@
     root.style.setProperty('--grid-cols', String(gSize.cols));
     root.style.setProperty('--row-h', `${gSize.rowHeight}px`);
 
-    // 5. Harmoniza o fundo do Lightbox com o tema de cor selecionado no álbum
-    if (theme.isDark) {
-      root.style.setProperty('--lb-bg', theme.ground);
-      root.style.setProperty('--lb-sidebar-bg', theme.surface);
-      root.style.setProperty('--lb-backdrop', `${theme.ground}f0`);
-    } else {
-      // Base dark editorial sutilmente infundida com a tonalidade do tema selecionado
-      root.style.setProperty('--lb-bg', `color-mix(in srgb, ${theme.surface} 18%, #111418)`);
-      root.style.setProperty('--lb-sidebar-bg', `color-mix(in srgb, ${theme.surface} 26%, #15181C)`);
-      root.style.setProperty('--lb-backdrop', `color-mix(in srgb, ${theme.ground} 14%, rgba(10, 12, 14, 0.94))`);
-    }
+    // 1 & 5. Harmoniza o fundo e a barra lateral do Lightbox 100% com o tema de cor selecionado no álbum
+    root.style.setProperty('--lb-bg', theme.ground);
+    root.style.setProperty('--lb-sidebar-bg', theme.surface);
+    root.style.setProperty('--lb-backdrop', theme.ground);
+    root.style.setProperty('--lb-ink', theme.ink);
+    root.style.setProperty('--lb-ink-secondary', theme.inkSecondary);
     root.style.setProperty('--lb-accent', theme.accent);
+
+    if (theme.isDark) {
+      root.style.setProperty('--lb-icon-bg', 'rgba(255, 255, 255, 0.12)');
+      root.style.setProperty('--lb-icon-color', '#FFFDF3');
+      root.style.setProperty('--lb-border', 'rgba(255, 255, 255, 0.14)');
+      root.style.setProperty('--lb-box-bg', 'rgba(255, 255, 255, 0.06)');
+    } else {
+      root.style.setProperty('--lb-icon-bg', 'rgba(255, 255, 255, 0.88)');
+      root.style.setProperty('--lb-icon-color', theme.ink);
+      root.style.setProperty('--lb-border', 'rgba(0, 0, 0, 0.10)');
+      root.style.setProperty('--lb-box-bg', 'rgba(0, 0, 0, 0.04)');
+    }
 
     document.body.classList.toggle('theme-is-dark', Boolean(theme.isDark));
 

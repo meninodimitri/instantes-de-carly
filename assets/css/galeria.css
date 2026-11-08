@@ -244,8 +244,8 @@ body.theme-is-dark .gal-btn-primary {
 .auth-fullscreen-scrim {
   position: absolute;
   inset: 0;
-  /* Vinheta suave para valorizar a foto sem escurecer ou embaçar a imagem */
-  background: radial-gradient(circle at center, rgba(12, 16, 22, 0.12) 0%, rgba(12, 16, 22, 0.42) 100%);
+  /* Escurecimento neutro sutil para contraste sem tingir as fotos */
+  background: rgba(0, 0, 0, 0.24);
 }
 
 .auth-fullscreen-container {
@@ -258,25 +258,25 @@ body.theme-is-dark .gal-btn-primary {
   justify-content: center;
 }
 
-/* Glassmorphism translúcido ultra-clean (estilo Apple / Frosted Glass) */
+/* Glassmorphism 100% puro e translúcido (sem cor, apenas o vidro óptico) */
 .auth-fullscreen-card {
   width: 100%;
-  background: rgba(255, 255, 255, 0.14);
-  border: 1px solid rgba(255, 255, 255, 0.42);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.28);
   border-radius: 20px;
   padding: 36px 32px 30px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28), inset 0 1px 1px rgba(255, 255, 255, 0.55);
-  backdrop-filter: blur(28px) saturate(190%);
-  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.24), inset 0 1px 1px rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   text-align: left;
   color: #FFFFFF;
   animation: galHeroRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 body.theme-is-dark .auth-fullscreen-card {
-  background: rgba(18, 24, 32, 0.28);
-  border-color: rgba(255, 255, 255, 0.25);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.25);
 }
 
 .auth-card-top-row {
@@ -356,20 +356,21 @@ body.theme-is-dark .auth-kicker-pill {
 }
 
 .auth-fullscreen-card .gal-input {
-  background: rgba(255, 255, 255, 0.18);
-  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.30);
   color: #FFFFFF;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .auth-fullscreen-card .gal-input::placeholder {
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(255, 255, 255, 0.70);
 }
 
 .auth-fullscreen-card .gal-input:focus {
-  background: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.16);
   border-color: #FFFFFF;
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.35);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.25);
   color: #FFFFFF;
 }
 
@@ -1552,7 +1553,7 @@ body.theme-is-dark .auth-kicker-pill {
   padding: 0;
   border: none;
   background-color: var(--lb-bg, #11161C);
-  color: #FFFDF3;
+  color: var(--lb-ink, #FFFDF3);
 }
 
 .gal-lightbox::backdrop {
@@ -1572,13 +1573,15 @@ body.theme-is-dark .auth-kicker-pill {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 253, 243, 0.20);
-  background-color: rgba(17, 22, 28, 0.76);
-  color: #FFFDF3;
+  border: 1px solid var(--lb-border, rgba(255, 253, 243, 0.20));
+  background-color: var(--lb-icon-bg, rgba(17, 22, 28, 0.76));
+  color: var(--lb-icon-color, #FFFDF3);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
+  transition: all 0.16s ease;
 }
 
 .lb-close-btn {
@@ -1669,6 +1672,8 @@ body.theme-is-dark .auth-kicker-pill {
 
 .lb-sidebar {
   background-color: var(--lb-sidebar-bg, #171E26);
+  color: var(--lb-ink, #FFFDF3);
+  border-left: 1px solid var(--lb-border, rgba(255, 255, 255, 0.08));
   padding: 64px 22px 24px;
   overflow-y: auto;
   display: flex;
@@ -1680,20 +1685,20 @@ body.theme-is-dark .auth-kicker-pill {
   display: flex;
   justify-content: space-between;
   font-size: 0.82rem;
-  color: rgba(255, 253, 243, 0.72);
+  color: var(--lb-ink-secondary, rgba(255, 253, 243, 0.72));
 }
 
 .lb-assist-box {
   padding: 12px;
   border-radius: 8px;
-  background-color: rgba(255, 253, 243, 0.06);
-  border: 1px solid rgba(255, 253, 243, 0.12);
+  background-color: var(--lb-box-bg, rgba(255, 253, 243, 0.06));
+  border: 1px solid var(--lb-border, rgba(255, 253, 243, 0.12));
 }
 
 .lb-assist-text {
   margin: 0;
   font-size: 0.8rem;
-  color: rgba(255, 253, 243, 0.84);
+  color: var(--lb-ink, rgba(255, 253, 243, 0.84));
 }
 
 .lb-controls-stack {
@@ -1704,9 +1709,9 @@ body.theme-is-dark .auth-kicker-pill {
 
 .gal-btn-select-lg {
   width: 100%;
-  background-color: rgba(255, 253, 243, 0.10);
-  color: #FFFDF3;
-  border: 1px solid rgba(255, 253, 243, 0.24);
+  background-color: var(--lb-box-bg, rgba(255, 253, 243, 0.10));
+  color: var(--lb-ink, #FFFDF3);
+  border: 1px solid var(--lb-border, rgba(255, 253, 243, 0.24));
 }
 .gal-btn-select-lg.active {
   background-color: var(--heart-active);
@@ -1715,15 +1720,15 @@ body.theme-is-dark .auth-kicker-pill {
 }
 
 .lb-dark-label {
-  color: rgba(255, 253, 243, 0.88);
+  color: var(--lb-ink, rgba(255, 253, 243, 0.88));
   margin-bottom: 6px;
   display: block;
 }
 
 .lb-dark-textarea {
-  background-color: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 253, 243, 0.18);
-  color: #FFFDF3;
+  background-color: var(--lb-box-bg, rgba(255, 255, 255, 0.06));
+  border-color: var(--lb-border, rgba(255, 253, 243, 0.18));
+  color: var(--lb-ink, #FFFDF3);
 }
 
 /* ==========================================================================
