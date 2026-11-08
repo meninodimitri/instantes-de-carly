@@ -368,6 +368,221 @@
     `;
   }
 
+  function renderCoverMiniThumb(styleId, coverSrc, focal, shortTitle) {
+    const escSrc = escapeHtml(coverSrc);
+    const escTitle = escapeHtml(shortTitle);
+    const fPos = `object-position:${focal.x}% ${focal.y}%;`;
+
+    if (styleId === 'none') {
+      return `
+        <div class="pix-choice-frame pix-cover-thumb" data-style="none">
+          <div class="pix-none-grid">
+            <span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+      `;
+    }
+
+    if (styleId === 'alegria') {
+      return `
+        <div class="pix-choice-frame pix-cover-thumb" data-style="alegria">
+          <div class="pix-mini-joy">
+            <span class="mini-joy-letter">J</span>
+            <span class="mini-joy-o"><img src="${escSrc}" alt="" style="${fPos}" /></span>
+            <span class="mini-joy-letter">Y</span>
+          </div>
+          <span class="pix-mini-title-dark">${escTitle}</span>
+        </div>
+      `;
+    }
+
+    if (styleId === 'romance') {
+      return `
+        <div class="pix-choice-frame pix-cover-thumb" data-style="romance">
+          <div class="pix-mini-split-left">
+            <span class="pix-mini-title-dark">${escTitle}</span>
+            <span class="pix-mini-rule-dark"></span>
+          </div>
+          <div class="pix-mini-split-right">
+            <img src="${escSrc}" alt="" style="${fPos}" />
+          </div>
+        </div>
+      `;
+    }
+
+    if (styleId === 'vintage') {
+      return `
+        <div class="pix-choice-frame pix-cover-thumb" data-style="vintage">
+          <div class="pix-mini-polaroid-img">
+            <img src="${escSrc}" alt="" style="${fPos}" />
+          </div>
+          <div class="pix-mini-polaroid-bar">
+            <span class="pix-mini-title-dark">${escTitle}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    if (styleId === 'moldura') {
+      return `
+        <div class="pix-choice-frame pix-cover-thumb" data-style="moldura">
+          <img src="${escSrc}" alt="" style="${fPos}" />
+          <div class="pix-mini-inset-frame">
+            <span class="pix-mini-title-light">${escTitle}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    if (styleId === 'listra') {
+      return `
+        <div class="pix-choice-frame pix-cover-thumb" data-style="listra">
+          <img src="${escSrc}" alt="" style="${fPos}" />
+          <div class="pix-mini-stripe-overlay">
+            <div class="pix-mini-stripe-line"></div>
+            <span class="pix-mini-title-light">${escTitle}</span>
+            <div class="pix-mini-stripe-line"></div>
+          </div>
+        </div>
+      `;
+    }
+
+    if (styleId === 'divisor') {
+      return `
+        <div class="pix-choice-frame pix-cover-thumb" data-style="divisor">
+          <img src="${escSrc}" alt="" style="${fPos}" />
+          <div class="pix-mini-divisor-overlay">
+            <div class="pix-mini-divisor-vbar"></div>
+            <span class="pix-mini-title-light">${escTitle}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    if (styleId === 'diario') {
+      return `
+        <div class="pix-choice-frame pix-cover-thumb" data-style="diario">
+          <div class="pix-mini-diario-img">
+            <img src="${escSrc}" alt="" style="${fPos}" />
+          </div>
+          <div class="pix-mini-diario-card">
+            <span class="pix-mini-title-dark">${escTitle}</span>
+            <span class="pix-mini-rule-dark"></span>
+          </div>
+        </div>
+      `;
+    }
+
+    if (styleId === 'carimbo') {
+      return `
+        <div class="pix-choice-frame pix-cover-thumb" data-style="carimbo">
+          <div class="pix-mini-stamp-box">
+            <img src="${escSrc}" alt="" style="${fPos}" />
+          </div>
+          <span class="pix-mini-title-dark">${escTitle}</span>
+        </div>
+      `;
+    }
+
+    if (styleId === 'contorno') {
+      return `
+        <div class="pix-choice-frame pix-cover-thumb" data-style="contorno">
+          <img src="${escSrc}" alt="" style="${fPos}" />
+          <div class="pix-mini-contorno-rect">
+            <span class="pix-mini-title-light">${escTitle}</span>
+            <span class="pix-mini-underline"></span>
+          </div>
+        </div>
+      `;
+    }
+
+    if (styleId === 'classico') {
+      return `
+        <div class="pix-choice-frame pix-cover-thumb" data-style="classico">
+          <div class="pix-mini-classico-img">
+            <img src="${escSrc}" alt="" style="${fPos}" />
+          </div>
+          <div class="pix-mini-classico-bar">
+            <span class="pix-mini-dot"></span>
+            <span class="pix-mini-title-dark">${escTitle}</span>
+            <span class="pix-mini-dot"></span>
+          </div>
+        </div>
+      `;
+    }
+
+    if (styleId === 'dividido') {
+      return `
+        <div class="pix-choice-frame pix-cover-thumb" data-style="dividido">
+          <div class="pix-mini-dividido-img">
+            <img src="${escSrc}" alt="" style="${fPos}" />
+          </div>
+          <div class="pix-mini-dividido-bar">
+            <span class="pix-mini-title-dark">${escTitle}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    if (styleId === 'rotulo') {
+      return `
+        <div class="pix-choice-frame pix-cover-thumb" data-style="rotulo">
+          <img src="${escSrc}" alt="" style="${fPos}" />
+          <div class="pix-mini-rotulo-badge">
+            <span class="pix-mini-title-dark">${escTitle}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    if (styleId === 'borda') {
+      return `
+        <div class="pix-choice-frame pix-cover-thumb" data-style="borda">
+          <div class="pix-mini-borda-inner">
+            <img src="${escSrc}" alt="" style="${fPos}" />
+            <span class="pix-mini-title-light">${escTitle}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    if (styleId === 'album') {
+      return `
+        <div class="pix-choice-frame pix-cover-thumb" data-style="album">
+          <div class="pix-mini-album-img">
+            <img src="${escSrc}" alt="" style="${fPos}" />
+          </div>
+          <div class="pix-mini-album-bar">
+            <span class="pix-mini-title-dark">${escTitle}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    if (styleId === 'esquerda') {
+      return `
+        <div class="pix-choice-frame pix-cover-thumb" data-style="esquerda">
+          <img src="${escSrc}" alt="" style="${fPos}" />
+          <div class="pix-mini-overlay-left">
+            <span class="pix-mini-title-light">${escTitle}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    // Padrão: 'centro'
+    return `
+      <div class="pix-choice-frame pix-cover-thumb" data-style="centro">
+        <img src="${escSrc}" alt="" style="${fPos}" />
+        <div class="pix-mini-overlay-center">
+          <span class="pix-mini-title-light">${escTitle}</span>
+          <span class="pix-mini-pill-btn"></span>
+        </div>
+      </div>
+    `;
+  }
+
   function renderDesignSubTab(activeAlbum) {
     const presets = window.AlbumsStore.DESIGN_PRESETS;
     const design = activeAlbum.design || window.AlbumsStore.getDefaultDesign();
@@ -388,21 +603,8 @@
             const isAct = design.coverStyle === st.id;
             return `
               <button type="button" class="pix-choice-item ${isAct ? 'active' : ''}" data-design-cover="${escapeHtml(st.id)}">
-                <div class="pix-choice-frame pix-cover-thumb" data-style="${escapeHtml(st.id)}">
-                  ${st.badge ? `<span class="pix-thumb-badge">${escapeHtml(st.badge)}</span>` : ''}
-                  ${st.id === 'none' ? `
-                    <div class="pix-none-grid">
-                      <span></span><span></span><span></span>
-                      <span></span><span></span><span></span>
-                    </div>
-                  ` : `
-                    <img src="${escapeHtml(coverSrc)}" alt="" style="object-position: ${focal.x}% ${focal.y}%;" />
-                    <div class="pix-cover-mini-overlay">
-                      <span class="pix-cover-mini-title">${escapeHtml(shortTitle)}</span>
-                      <span class="pix-cover-mini-sub"></span>
-                    </div>
-                  `}
-                </div>
+                ${st.badge ? `<span class="pix-thumb-badge">${escapeHtml(st.badge)}</span>` : ''}
+                ${renderCoverMiniThumb(st.id, coverSrc, focal, shortTitle)}
                 <span class="pix-choice-label">${escapeHtml(st.label)}</span>
               </button>
             `;
@@ -748,6 +950,17 @@
 
         <div class="field-grid" style="margin-top:10px;">
           <div class="field-group">
+            <label class="field-label">Selo Superior da Capa (Kicker)</label>
+            <input type="text" id="alb-in-kicker" class="cms-input" value="${escapeHtml(activeAlbum.coverKicker || 'GALERIA OFICIAL EM ALTA RESOLUÇÃO')}" placeholder="Ex: GALERIA OFICIAL EM ALTA RESOLUÇÃO" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Assinatura da Fotógrafa na Capa</label>
+            <input type="text" id="alb-in-author" class="cms-input" value="${escapeHtml(activeAlbum.coverAuthor || 'Carliane Carvalho')}" placeholder="Ex: Carliane Carvalho" />
+          </div>
+        </div>
+
+        <div class="field-grid" style="margin-top:10px;">
+          <div class="field-group">
             <label class="field-label">Nome do Pacote</label>
             <input type="text" id="alb-in-pkgname" class="cms-input" value="${escapeHtml(activeAlbum.packageName || 'Ensaio')}" />
           </div>
@@ -758,8 +971,8 @@
         </div>
 
         <div class="field-group" style="margin-top:10px;">
-          <label class="field-label">Mensagem de Boas-Vindas (Opcional)</label>
-          <textarea id="alb-in-welcome" class="cms-textarea" rows="2">${escapeHtml(activeAlbum.welcomeMessage || '')}</textarea>
+          <label class="field-label">Mensagem de Boas-Vindas / Subtítulo da Capa (Exibida no Hero)</label>
+          <textarea id="alb-in-welcome" class="cms-textarea" rows="2" placeholder="Ex: Escolham com calma as fotografias favoritas de vocês.">${escapeHtml(activeAlbum.welcomeMessage || '')}</textarea>
         </div>
 
         <!-- CHAVE ON/OFF 1: VENDA DE FOTOS EXTRAS -->
@@ -1087,6 +1300,76 @@
     const panel = document.getElementById('panel-albums');
     if (!panel) return;
 
+    let liveSaveTimer = null;
+    const debouncedSaveState = () => {
+      clearTimeout(liveSaveTimer);
+      liveSaveTimer = setTimeout(async () => {
+        await window.AlbumsStore.saveState(albumsState);
+      }, 350);
+    };
+
+    const flushTextMetaInputs = () => {
+      const cName = document.getElementById('alb-in-client');
+      if (cName) activeAlbum.clientName = cName.value.trim() || activeAlbum.clientName;
+      const cSlug = document.getElementById('alb-in-slug');
+      if (cSlug) activeAlbum.slug = slugify(cSlug.value || activeAlbum.clientName);
+      const cTitle = document.getElementById('alb-in-title');
+      if (cTitle) activeAlbum.title = cTitle.value.trim() || activeAlbum.clientName;
+      const cSub = document.getElementById('alb-in-sub');
+      if (cSub) activeAlbum.subtitle = cSub.value.trim();
+      const cKicker = document.getElementById('alb-in-kicker');
+      if (cKicker) activeAlbum.coverKicker = cKicker.value.trim() || 'GALERIA OFICIAL EM ALTA RESOLUÇÃO';
+      const cAuthor = document.getElementById('alb-in-author');
+      if (cAuthor) activeAlbum.coverAuthor = cAuthor.value.trim() || 'Carliane Carvalho';
+      const cPkg = document.getElementById('alb-in-pkgname');
+      if (cPkg) activeAlbum.packageName = cPkg.value.trim() || 'Ensaio';
+      const cInc = document.getElementById('alb-in-included');
+      if (cInc) activeAlbum.packageIncluded = Math.max(0, parseInt(cInc.value, 10) || 0);
+      const cWel = document.getElementById('alb-in-welcome');
+      if (cWel) activeAlbum.welcomeMessage = cWel.value.trim();
+      const cExt = document.getElementById('alb-in-extraprice');
+      if (cExt) activeAlbum.extraPhotoPrice = Math.max(0, Number(cExt.value) || 0);
+      const cPw = document.getElementById('alb-in-password');
+      if (cPw) activeAlbum.password = cPw.value.trim();
+      const cPin = document.getElementById('alb-in-pin');
+      if (cPin) activeAlbum.downloadPin = cPin.value.trim();
+
+      const pixKey = document.getElementById('cfg-pix-key');
+      const pixName = document.getElementById('cfg-pix-name');
+      if (pixKey || pixName) {
+        albumsState.paymentConfig = {
+          ...albumsState.paymentConfig,
+          pixKey: pixKey ? pixKey.value.trim() : albumsState.paymentConfig?.pixKey,
+          merchantName: pixName ? pixName.value.trim() : albumsState.paymentConfig?.merchantName
+        };
+      }
+    };
+
+    const broadcastLiveAlbum = () => {
+      flushTextMetaInputs();
+      const iframe = document.getElementById('cms-preview-iframe');
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage({
+          type: 'ALBUM_LIVE_UPDATE',
+          album: JSON.parse(JSON.stringify(activeAlbum))
+        }, '*');
+      }
+      debouncedSaveState();
+    };
+
+    // Ouvintes de digitação em tempo real em todos os campos de texto do álbum (0ms de atraso visual)
+    [
+      'alb-in-client', 'alb-in-slug', 'alb-in-title', 'alb-in-sub',
+      'alb-in-kicker', 'alb-in-author', 'alb-in-pkgname', 'alb-in-included',
+      'alb-in-welcome', 'alb-in-extraprice', 'alb-in-password', 'alb-in-pin'
+    ].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('input', broadcastLiveAlbum);
+        el.addEventListener('change', broadcastLiveAlbum);
+      }
+    });
+
     // Switcher mobile
     document.getElementById('alb-mobile-switcher')?.addEventListener('change', (e) => {
       selectedAlbumId = e.target.value;
@@ -1240,6 +1523,7 @@
       const x = Math.round(Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100)));
       const y = Math.round(Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100)));
       activeAlbum.coverFocal = `${x}% ${y}%`;
+      broadcastLiveAlbum();
       await window.AlbumsStore.saveState(albumsState);
       renderAlbumsAdminPanel();
       notifyAdminToast(`Ponto focal da capa ajustado (${x}% · ${y}%).`);
@@ -1249,6 +1533,7 @@
       btn.addEventListener('click', async () => {
         activeAlbum.design = activeAlbum.design || window.AlbumsStore.getDefaultDesign();
         activeAlbum.design.coverStyle = btn.getAttribute('data-design-cover');
+        broadcastLiveAlbum();
         await window.AlbumsStore.saveState(albumsState);
         renderAlbumsAdminPanel();
       });
@@ -1258,6 +1543,7 @@
       btn.addEventListener('click', async () => {
         activeAlbum.design = activeAlbum.design || window.AlbumsStore.getDefaultDesign();
         activeAlbum.design.typography = btn.getAttribute('data-design-typo');
+        broadcastLiveAlbum();
         await window.AlbumsStore.saveState(albumsState);
         renderAlbumsAdminPanel();
       });
@@ -1267,6 +1553,7 @@
       btn.addEventListener('click', async () => {
         activeAlbum.design = activeAlbum.design || window.AlbumsStore.getDefaultDesign();
         activeAlbum.design.colorTheme = btn.getAttribute('data-design-color');
+        broadcastLiveAlbum();
         await window.AlbumsStore.saveState(albumsState);
         renderAlbumsAdminPanel();
       });
@@ -1276,6 +1563,7 @@
       btn.addEventListener('click', async () => {
         activeAlbum.design = activeAlbum.design || window.AlbumsStore.getDefaultDesign();
         activeAlbum.design.gridStyle = btn.getAttribute('data-grid-style');
+        broadcastLiveAlbum();
         await window.AlbumsStore.saveState(albumsState);
         renderAlbumsAdminPanel();
       });
@@ -1285,6 +1573,7 @@
       btn.addEventListener('click', async () => {
         activeAlbum.design = activeAlbum.design || window.AlbumsStore.getDefaultDesign();
         activeAlbum.design.gridSpacing = btn.getAttribute('data-grid-spacing');
+        broadcastLiveAlbum();
         await window.AlbumsStore.saveState(albumsState);
         renderAlbumsAdminPanel();
       });
@@ -1294,6 +1583,7 @@
       btn.addEventListener('click', async () => {
         activeAlbum.design = activeAlbum.design || window.AlbumsStore.getDefaultDesign();
         activeAlbum.design.gridSize = btn.getAttribute('data-grid-size');
+        broadcastLiveAlbum();
         await window.AlbumsStore.saveState(albumsState);
         renderAlbumsAdminPanel();
       });
@@ -1303,6 +1593,7 @@
       btn.addEventListener('click', async () => {
         activeAlbum.design = activeAlbum.design || window.AlbumsStore.getDefaultDesign();
         activeAlbum.design.gridNavStyle = btn.getAttribute('data-grid-nav');
+        broadcastLiveAlbum();
         await window.AlbumsStore.saveState(albumsState);
         renderAlbumsAdminPanel();
       });
@@ -1424,39 +1715,6 @@
     });
 
     /* --- SUB-ABA 4: PACOTE, EXTRAS & SENHAS (CHAVES ON/OFF) --- */
-    const flushTextMetaInputs = () => {
-      const cName = document.getElementById('alb-in-client');
-      if (cName) activeAlbum.clientName = cName.value.trim() || activeAlbum.clientName;
-      const cSlug = document.getElementById('alb-in-slug');
-      if (cSlug) activeAlbum.slug = slugify(cSlug.value || activeAlbum.clientName);
-      const cTitle = document.getElementById('alb-in-title');
-      if (cTitle) activeAlbum.title = cTitle.value.trim() || activeAlbum.clientName;
-      const cSub = document.getElementById('alb-in-sub');
-      if (cSub) activeAlbum.subtitle = cSub.value.trim();
-      const cPkg = document.getElementById('alb-in-pkgname');
-      if (cPkg) activeAlbum.packageName = cPkg.value.trim() || 'Ensaio';
-      const cInc = document.getElementById('alb-in-included');
-      if (cInc) activeAlbum.packageIncluded = Math.max(0, parseInt(cInc.value, 10) || 0);
-      const cWel = document.getElementById('alb-in-welcome');
-      if (cWel) activeAlbum.welcomeMessage = cWel.value.trim();
-      const cExt = document.getElementById('alb-in-extraprice');
-      if (cExt) activeAlbum.extraPhotoPrice = Math.max(0, Number(cExt.value) || 0);
-      const cPw = document.getElementById('alb-in-password');
-      if (cPw) activeAlbum.password = cPw.value.trim();
-      const cPin = document.getElementById('alb-in-pin');
-      if (cPin) activeAlbum.downloadPin = cPin.value.trim();
-
-      const pixKey = document.getElementById('cfg-pix-key');
-      const pixName = document.getElementById('cfg-pix-name');
-      if (pixKey || pixName) {
-        albumsState.paymentConfig = {
-          ...albumsState.paymentConfig,
-          pixKey: pixKey ? pixKey.value.trim() : albumsState.paymentConfig?.pixKey,
-          merchantName: pixName ? pixName.value.trim() : albumsState.paymentConfig?.merchantName
-        };
-      }
-    };
-
     document.getElementById('sw-alb-extras')?.addEventListener('change', async (e) => {
       flushTextMetaInputs();
       activeAlbum.extrasEnabled = Boolean(e.target.checked);

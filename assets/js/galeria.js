@@ -51,8 +51,13 @@
     deliveryHeroImg: document.getElementById('delivery-hero-img'),
     deliveryCoverLogo: document.getElementById('delivery-cover-logo'),
     deliveryHeroDate: document.getElementById('delivery-hero-date'),
+    deliveryHeroFootDate: document.getElementById('delivery-hero-foot-date'),
+    deliveryHeroAuthor: document.getElementById('delivery-hero-author'),
+    deliveryHeroFootAuthor: document.getElementById('delivery-hero-foot-author'),
+    deliveryHeroKicker: document.getElementById('delivery-hero-kicker'),
     deliveryHeroTitle: document.getElementById('delivery-hero-title'),
     deliveryHeroMsg: document.getElementById('delivery-hero-msg'),
+    joyCutoutImg: document.getElementById('joy-cutout-img'),
     btnScrollGallery: document.getElementById('btn-scroll-gallery'),
     btnCoverScrollDown: document.getElementById('btn-cover-scroll-down'),
 
@@ -189,7 +194,7 @@
     const gSpacing = presets.gridSpacings.find((g) => g.id === d.gridSpacing) || presets.gridSpacings[0];
     const gSize = presets.gridSizes.find((g) => g.id === d.gridSize) || presets.gridSizes[0];
     const gStyle = d.gridStyle || 'vertical';
-    const coverStyle = d.coverStyle || 'cosmos';
+    const coverStyle = d.coverStyle || 'centro';
 
     const root = document.documentElement;
     root.style.setProperty('--ground', theme.ground);
@@ -209,14 +214,15 @@
 
     document.body.classList.toggle('theme-is-dark', Boolean(theme.isDark));
 
-    // Alterna logos automaticamente quando o tema do álbum é escuro ou capa Split clara
+    // Alterna logos automaticamente quando o tema do álbum é escuro ou capa com fundo claro
     const surfaceLogo = theme.isDark ? 'assets/images/logo-light.png' : 'assets/images/logo-dark.png';
     document.querySelectorAll('.topbar-logo-link img, .auth-brand-link img').forEach((img) => {
       img.setAttribute('src', surfaceLogo);
     });
 
     if (els.deliveryCoverLogo) {
-      const useDarkOnCover = coverStyle === 'split' && !theme.isDark;
+      const lightBackingCovers = ['alegria', 'romance', 'vintage', 'diario', 'carimbo', 'classico', 'dividido', 'rotulo', 'borda', 'album'];
+      const useDarkOnCover = lightBackingCovers.includes(coverStyle) && !theme.isDark;
       els.deliveryCoverLogo.setAttribute('src', useDarkOnCover ? 'assets/images/logo-dark.png' : 'assets/images/logo-light.png');
     }
 
@@ -463,11 +469,25 @@
     const cover = album.coverSrc || album.photos?.[0]?.originalSrc || 'assets/images/real/IMG_1186.jpg';
     if (els.deliveryHeroImg) {
       els.deliveryHeroImg.src = cover;
-      els.deliveryHeroImg.alt = album.title || album.clientName;
+      els.deliveryHeroImg.alt = album.title || album.clientName || 'Capa do ensaio';
       els.deliveryHeroImg.style.objectPosition = album.coverFocal || '50% 36%';
     }
-    if (els.deliveryHeroDate) els.deliveryHeroDate.textContent = album.subtitle || '';
-    if (els.deliveryHeroTitle) els.deliveryHeroTitle.textContent = album.title || album.clientName;
+    if (els.joyCutoutImg) {
+      els.joyCutoutImg.src = cover;
+      els.joyCutoutImg.style.objectPosition = album.coverFocal || '50% 36%';
+    }
+    if (els.deliveryHeroKicker) {
+      els.deliveryHeroKicker.textContent = album.coverKicker || 'GALERIA OFICIAL EM ALTA RESOLUÇÃO';
+    }
+    const authorText = (album.coverAuthor || 'CARLIANE CARVALHO').toUpperCase();
+    if (els.deliveryHeroAuthor) els.deliveryHeroAuthor.textContent = authorText;
+    if (els.deliveryHeroFootAuthor) els.deliveryHeroFootAuthor.textContent = authorText;
+
+    const dateOrSub = album.subtitle || '';
+    if (els.deliveryHeroDate) els.deliveryHeroDate.textContent = dateOrSub;
+    if (els.deliveryHeroFootDate) els.deliveryHeroFootDate.textContent = dateOrSub;
+
+    if (els.deliveryHeroTitle) els.deliveryHeroTitle.textContent = album.title || album.clientName || 'Galeria';
     if (els.deliveryHeroMsg) els.deliveryHeroMsg.textContent = album.welcomeMessage || '';
   }
 
@@ -1453,6 +1473,23 @@
         if (updated && isAlbumUnlocked(updated)) {
           await openAlbumExperience(updated);
           if (els.lbDialog?.open) refreshLightboxUI();
+        }
+      }
+    });
+
+    // Sincronização instantânea ao vivo em 0ms enquanto a fotógrafa digita no Painel Admin
+    window.addEventListener('message', (event) => {
+      if (!event.data || event.data.type !== 'ALBUM_LIVE_UPDATE') return;
+      const alb = event.data.album;
+      if (!alb) return;
+      if (currentAlbum && (currentAlbum.id === alb.id || currentAlbum.slug === alb.slug)) {
+        Object.assign(currentAlbum, alb);
+        applyAlbumDesign(currentAlbum);
+        hydrateCoverHero(currentAlbum);
+        if (currentAlbum.phase === 'delivery') {
+          updateDeliveryChrome(currentAlbum);
+        } else {
+          updateProofingChrome(currentAlbum);
         }
       }
     });

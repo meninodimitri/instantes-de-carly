@@ -328,7 +328,10 @@ async function verifyGitHubCredentials(repo, branch, token) {
 
 function unlockStudio() {
   const gate = document.getElementById('auth-gate');
-  if (gate) gate.hidden = true;
+  if (gate) {
+    gate.hidden = true;
+    gate.style.display = 'none';
+  }
   syncGitHubSettingsPanel();
   updateStatusUI();
   sendToPreviewIframe({ type: 'CMS_LIVE_UPDATE', payload: cmsData });
@@ -351,7 +354,8 @@ function initAuthGate() {
   const savedGh = getSavedGitHubConfig();
   if (savedGh) {
     unlockStudio();
-  } else if (isLocalhost && sessionStorage.getItem('cms_local_unlocked') === '1') {
+  } else if (isLocalhost && (sessionStorage.getItem('cms_local_unlocked') === '1' || new URLSearchParams(window.location.search).has('local'))) {
+    sessionStorage.setItem('cms_local_unlocked', '1');
     unlockStudio();
   }
 
@@ -2432,6 +2436,14 @@ function initTabsAndPreviewModes() {
       }
     });
   });
+
+  const urlTab = new URLSearchParams(window.location.search).get('tab');
+  if (urlTab) {
+    const targetTabBtn = document.querySelector(`.sidebar-tab[data-tab="${urlTab}"]`);
+    if (targetTabBtn) {
+      setTimeout(() => targetTabBtn.click(), 50);
+    }
+  }
 
   const workspace = document.getElementById('cms-workspace');
   const stage = document.getElementById('preview-stage');

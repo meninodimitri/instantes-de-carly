@@ -28,22 +28,40 @@
     : null;
 
   /* ==========================================================================
-     0. CATÁLOGO COMPLETO DE DESIGN (PIXIESET + BRANDBOOK INSTANTES DE CARLY)
+     0. CATÁLOGO COMPLETO DE DESIGN (16 CAPAS PIXIESET + BRANDBOOK)
      ========================================================================== */
+  const LEGACY_COVER_MAP = {
+    cosmos: 'centro',
+    minimal: 'centro',
+    bondi: 'moldura',
+    oeste: 'esquerda',
+    recife: 'listra',
+    oakwood: 'contorno',
+    ancora: 'esquerda',
+    iracema: 'moldura',
+    passepartout: 'borda',
+    aero: 'dividido',
+    split: 'romance'
+  };
+
   const DESIGN_PRESETS = {
     coverStyles: [
-      { id: 'cosmos', label: 'Cosmos', desc: 'Foto 100% tela cheia, título centralizado, botão fino e seta na base' },
-      { id: 'minimal', label: 'Minimalista', badge: 'Tela Cheia', desc: 'Foto 100% tela cheia com título amplo central e assinatura na base' },
-      { id: 'bondi', label: 'Bondi', desc: 'Foto 100% tela cheia com moldura retangular fina no centro' },
-      { id: 'oeste', label: 'Oeste', desc: 'Foto 100% tela cheia com título e subtítulo alinhados à esquerda' },
-      { id: 'recife', label: 'Recife', desc: 'Foto 100% tela cheia, logo no topo e título entre filetes centrais' },
-      { id: 'oakwood', label: 'Oakwood', desc: 'Foto 100% tela cheia, logo no topo, traço vertical e título central' },
-      { id: 'ancora', label: 'Âncora', desc: 'Foto 100% tela cheia com título no canto superior esquerdo e seta na base' },
-      { id: 'borda', label: 'Borda', desc: 'Moldura fina ao redor da foto em tela cheia e título no canto inferior direito' },
-      { id: 'iracema', label: 'Luz Dourada', badge: 'Marca', desc: 'Foto 100% tela cheia com cantoneiras douradas sutis e estética autoral' },
-      { id: 'passepartout', label: 'Passe-Partout', badge: 'Marca', desc: 'Moldura papel algodão do Brandbook com foto ampla central e título clássico' },
-      { id: 'aero', label: 'Aero', desc: 'Faixa tipográfica limpa no topo e fotografia panorâmica abaixo' },
-      { id: 'split', label: 'Editorial', desc: 'Divisão 50/50 entre fotografia em tela cheia e painel tipográfico' },
+      { id: 'centro', label: 'Centro', desc: 'Fotografia em tela cheia com título e botão centralizados' },
+      { id: 'alegria', label: 'Alegria', desc: 'Tipografia editorial JOY com recorte da fotografia na letra O' },
+      { id: 'esquerda', label: 'Esquerda', desc: 'Fotografia em tela cheia com título e data alinhados na base esquerda' },
+      { id: 'romance', label: 'Romance', desc: 'Painel editorial branco à esquerda e fotografia em destaque à direita' },
+      { id: 'vintage', label: 'Vintage', desc: 'Fotografia emoldurada no topo e faixa polaroid clássica abaixo' },
+      { id: 'moldura', label: 'Moldura', desc: 'Fotografia em tela cheia com moldura retangular branca interna' },
+      { id: 'listra', label: 'Listra', desc: 'Duas listras brancas horizontais com título em destaque ao centro' },
+      { id: 'divisor', label: 'Divisor', desc: 'Linha vertical no centro dividindo título e fotografia' },
+      { id: 'diario', label: 'Diário', desc: 'Fotografia quadrada à esquerda e bloco tipográfico à direita' },
+      { id: 'carimbo', label: 'Carimbo', desc: 'Fundo branco com miniatura fotográfica central em formato de selo' },
+      { id: 'contorno', label: 'Contorno', desc: 'Moldura retangular vertical no centro com título e botão' },
+      { id: 'classico', label: 'Clássico', desc: 'Foto de abertura limpa com barra tipográfica minimalista' },
+      { id: 'dividido', label: 'Dividido', desc: 'Faixa fotográfica panorâmica no topo e bloco branco abaixo' },
+      { id: 'rotulo', label: 'Rótulo', desc: 'Fotografia ampla com etiqueta branca vertical na lateral' },
+      { id: 'borda', label: 'Borda', desc: 'Passe-partout branco ao redor de toda a fotografia' },
+      { id: 'album', label: 'Álbum', desc: 'Abertura fotográfica limpa com título e acesso imediato' },
       { id: 'none', label: 'Sem Capa', desc: 'Abre diretamente na grade de fotografias' }
     ],
     typographies: [
@@ -334,7 +352,7 @@
 
   function getDefaultDesign() {
     return {
-      coverStyle: 'cosmos',
+      coverStyle: 'centro',
       typography: 'carly',
       colorTheme: 'amarelinho',
       gridStyle: 'vertical',
@@ -373,6 +391,9 @@
 
     const defDesign = getDefaultDesign();
     const d = alb.design && typeof alb.design === 'object' ? alb.design : {};
+    if (d.coverStyle && LEGACY_COVER_MAP[d.coverStyle]) {
+      d.coverStyle = LEGACY_COVER_MAP[d.coverStyle];
+    }
     alb.design = {
       coverStyle: DESIGN_PRESETS.coverStyles.some((x) => x.id === d.coverStyle) ? d.coverStyle : defDesign.coverStyle,
       typography: DESIGN_PRESETS.typographies.some((x) => x.id === d.typography) ? d.typography : defDesign.typography,
@@ -383,6 +404,8 @@
       gridNavStyle: DESIGN_PRESETS.gridNavStyles.some((x) => x.id === d.gridNavStyle) ? d.gridNavStyle : defDesign.gridNavStyle
     };
 
+    if (!alb.coverKicker) alb.coverKicker = 'GALERIA OFICIAL EM ALTA RESOLUÇÃO';
+    if (!alb.coverAuthor) alb.coverAuthor = 'Carliane Carvalho';
     if (!alb.coverFocal) alb.coverFocal = '50% 35%';
     if (!Array.isArray(alb.photos)) alb.photos = [];
     if (!Array.isArray(alb.selectedIds)) alb.selectedIds = [];

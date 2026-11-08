@@ -692,10 +692,13 @@
   font-weight: 700;
 }
 
-/* Miniaturas visuais de Capa (Foto 3) */
+/* Miniaturas visuais de Capa — 16 Estilos Autênticos do Pixieset */
 .pix-cover-thumb {
   aspect-ratio: 16 / 10;
-  background: #1F2937;
+  background: #FFFFFF;
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
 }
 
 .pix-cover-thumb img {
@@ -704,161 +707,417 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: brightness(0.76);
 }
 
-.pix-cover-mini-overlay {
+.pix-mini-title-light {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #FFFFFF;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+  line-height: 1.1;
+  text-align: center;
+}
+
+.pix-mini-title-dark {
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #1A1A1A;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.pix-mini-rule-dark {
+  display: block;
+  width: 18px;
+  height: 1px;
+  background: #C89D42;
+  margin: 3px auto 0;
+}
+
+.pix-mini-dot {
+  display: inline-block;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #C89D42;
+}
+
+/* 1. Centro */
+.pix-cover-thumb[data-style="centro"] img {
+  filter: brightness(0.72);
+}
+.pix-mini-overlay-center {
   position: absolute;
   inset: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 10px;
-  color: #FFFFFF;
-  text-align: center;
+  padding: 8px;
+  gap: 4px;
+  background: rgba(18, 27, 36, 0.28);
 }
-
-.pix-cover-mini-title {
-  font-size: 0.64rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.55);
-}
-
-.pix-cover-mini-sub {
+.pix-mini-pill-btn {
   display: block;
-  width: 24px;
-  height: 2px;
-  background: rgba(255, 255, 255, 0.8);
-  margin-top: 4px;
+  width: 28px;
+  height: 5px;
+  border-radius: 999px;
+  background: #FFFFFF;
+  opacity: 0.9;
 }
 
-/* Variações fiéis das 8 capas na miniatura */
-.pix-cover-thumb[data-style="bondi"] .pix-cover-mini-overlay::before {
-  content: '';
+/* 2. Alegria (JOY com foto na letra O) */
+.pix-cover-thumb[data-style="alegria"] {
+  background: #FAF8F5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  gap: 3px;
+}
+.pix-mini-joy {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+}
+.mini-joy-letter {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 0.85;
+  color: #B91C1C;
+}
+.mini-joy-o {
+  position: relative;
+  display: inline-block;
+  width: 22px;
+  height: 28px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2.5px solid #B91C1C;
+}
+.mini-joy-o img {
   position: absolute;
-  inset: 18% 14%;
-  border: 1px solid rgba(255, 255, 255, 0.85);
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-.pix-cover-thumb[data-style="oeste"] .pix-cover-mini-overlay {
-  align-items: flex-start;
+/* 3. Esquerda */
+.pix-cover-thumb[data-style="esquerda"] img {
+  filter: brightness(0.72);
+}
+.pix-mini-overlay-left {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding: 8px 10px;
+  background: linear-gradient(0deg, rgba(18, 27, 36, 0.75) 0%, transparent 60%);
+}
+.pix-mini-overlay-left .pix-mini-title-light {
   text-align: left;
-  padding-left: 14px;
 }
 
-.pix-cover-thumb[data-style="borda"] {
-  padding: 7px;
+/* 4. Romance (Split 50/50) */
+.pix-cover-thumb[data-style="romance"] {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   background: #FFFFFF;
 }
-
-.pix-cover-thumb[data-style="borda"] img {
-  inset: 7px;
-  width: calc(100% - 14px);
-  height: calc(100% - 14px);
+.pix-mini-split-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+}
+.pix-mini-split-right {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #E5E7EB;
+}
+.pix-mini-split-right img {
+  position: absolute;
+  inset: 4px;
+  width: calc(100% - 8px);
+  height: calc(100% - 8px);
   border-radius: 2px;
 }
 
-.pix-cover-thumb[data-style="borda"] .pix-cover-mini-overlay {
-  align-items: flex-end;
-  justify-content: flex-end;
-  padding: 14px;
+/* 5. Vintage (Polaroid) */
+.pix-cover-thumb[data-style="vintage"] {
+  display: flex;
+  flex-direction: column;
+  background: #FFFFFF;
+  padding: 4px 4px 0;
+}
+.pix-mini-polaroid-img {
+  position: relative;
+  width: 100%;
+  height: 72%;
+  overflow: hidden;
+  border-radius: 2px;
+}
+.pix-mini-polaroid-bar {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 4px;
 }
 
-.pix-cover-thumb[data-style="oakwood"] .pix-cover-mini-title {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 0.76rem;
-  letter-spacing: 0.04em;
+/* 6. Moldura (Inset thin frame) */
+.pix-cover-thumb[data-style="moldura"] img {
+  filter: brightness(0.72);
+}
+.pix-mini-inset-frame {
+  position: absolute;
+  inset: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  background: rgba(18, 27, 36, 0.18);
 }
 
-.pix-cover-thumb[data-style="ancora"] .pix-cover-mini-overlay {
-  align-items: flex-start;
+/* 7. Listra (2 horizontal lines) */
+.pix-cover-thumb[data-style="listra"] img {
+  filter: brightness(0.72);
+}
+.pix-mini-stripe-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px;
+}
+.pix-mini-stripe-line {
+  width: 82%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+/* 8. Divisor (Vertical line down center) */
+.pix-cover-thumb[data-style="divisor"] img {
+  filter: brightness(0.72);
+}
+.pix-mini-divisor-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
   justify-content: flex-start;
-  padding: 10px 12px;
+  padding-left: 10px;
+}
+.pix-mini-divisor-vbar {
+  position: absolute;
+  top: 10%;
+  bottom: 10%;
+  left: 50%;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.9);
+}
+.pix-mini-divisor-overlay .pix-mini-title-light {
+  max-width: 42%;
+  text-align: left;
 }
 
-.pix-cover-thumb[data-style="split"] img {
-  width: 52%;
-  filter: brightness(0.92);
+/* 9. Diário (Square photo left, white card right) */
+.pix-cover-thumb[data-style="diario"] {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: #FFFFFF;
+}
+.pix-mini-diario-img {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 5px;
+}
+.pix-mini-diario-img img {
+  position: absolute;
+  inset: 5px;
+  width: calc(100% - 10px);
+  height: calc(100% - 10px);
+  border-radius: 2px;
+}
+.pix-mini-diario-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
 }
 
-.pix-cover-thumb[data-style="split"] .pix-cover-mini-overlay {
-  left: 52%;
-  background: #FAF8F4;
-  color: #1B2733;
+/* 10. Carimbo (Small stamp box at top center) */
+.pix-cover-thumb[data-style="carimbo"] {
+  background: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  gap: 4px;
+}
+.pix-mini-stamp-box {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: 2px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
-.pix-cover-thumb[data-style="split"] .pix-cover-mini-title {
-  text-shadow: none;
-  font-size: 0.58rem;
+/* 11. Contorno (Vertical rectangular outline in center) */
+.pix-cover-thumb[data-style="contorno"] img {
+  filter: brightness(0.72);
+}
+.pix-mini-contorno-rect {
+  position: absolute;
+  inset: 12% 26%;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  background: rgba(18, 27, 36, 0.22);
+}
+.pix-mini-underline {
+  display: block;
+  width: 14px;
+  height: 1px;
+  background: #FFFFFF;
+  margin-top: 3px;
 }
 
-.pix-cover-thumb[data-style="split"] .pix-cover-mini-sub {
-  background: #9A8762;
+/* 12. Clássico (Top 76% photo, bottom 24% white bar) */
+.pix-cover-thumb[data-style="classico"] {
+  display: flex;
+  flex-direction: column;
+  background: #FFFFFF;
+}
+.pix-mini-classico-img {
+  position: relative;
+  width: 100%;
+  height: 76%;
+}
+.pix-mini-classico-bar {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
 }
 
+/* 13. Dividido (Top 50% banner photo, bottom 50% white card) */
+.pix-cover-thumb[data-style="dividido"] {
+  display: flex;
+  flex-direction: column;
+  background: #FFFFFF;
+}
+.pix-mini-dividido-img {
+  position: relative;
+  width: 100%;
+  height: 50%;
+}
+.pix-mini-dividido-bar {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+}
+
+/* 14. Rótulo (Full photo with vertical white label card docked left) */
+.pix-cover-thumb[data-style="rotulo"] img {
+  filter: brightness(0.85);
+}
+.pix-mini-rotulo-badge {
+  position: absolute;
+  top: 10%;
+  bottom: 10%;
+  left: 6px;
+  width: 44%;
+  background: #FFFFFF;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* 15. Borda (Passe-partout white border all around) */
+.pix-cover-thumb[data-style="borda"] {
+  background: #FFFFFF;
+  padding: 6px;
+}
+.pix-mini-borda-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pix-mini-borda-inner img {
+  filter: brightness(0.72);
+}
+.pix-mini-borda-inner .pix-mini-title-light {
+  position: relative;
+  z-index: 2;
+}
+
+/* 16. Álbum (Clean photo with bottom strip title) */
+.pix-cover-thumb[data-style="album"] {
+  display: flex;
+  flex-direction: column;
+  background: #FFFFFF;
+}
+.pix-mini-album-img {
+  position: relative;
+  width: 100%;
+  height: 78%;
+}
+.pix-mini-album-bar {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
+}
+
+/* 17. Sem Capa (Grade de miniaturas) */
 .pix-cover-thumb[data-style="none"] {
   background: #F4F5F7;
 }
-
 .pix-cover-thumb[data-style="none"] .pix-none-grid {
   position: absolute;
-  inset: 12px;
+  inset: 10px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 5px;
+  gap: 4px;
 }
-
 .pix-cover-thumb[data-style="none"] .pix-none-grid span {
   background: #CBD5E1;
-  border-radius: 3px;
-}
-
-.pix-cover-thumb[data-style="minimal"] .pix-cover-mini-title {
-  font-size: 0.74rem;
-  letter-spacing: 0.12em;
-}
-.pix-cover-thumb[data-style="minimal"] .pix-cover-mini-sub {
-  display: none;
-}
-
-.pix-cover-thumb[data-style="recife"] .pix-cover-mini-title::before,
-.pix-cover-thumb[data-style="recife"] .pix-cover-mini-title::after {
-  content: '';
-  display: block;
-  width: 22px;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.85);
-  margin: 3px auto;
-}
-.pix-cover-thumb[data-style="recife"] .pix-cover-mini-sub {
-  display: none;
-}
-
-.pix-cover-thumb[data-style="iracema"] {
-  box-shadow: inset 0 0 0 2px rgba(231, 195, 120, 0.75);
-}
-.pix-cover-thumb[data-style="iracema"] .pix-cover-mini-title {
-  color: #FFFDF3;
-}
-
-.pix-cover-thumb[data-style="passepartout"] {
-  padding: 8px;
-  background: #FFFDF3;
-}
-.pix-cover-thumb[data-style="passepartout"] img {
-  inset: 8px;
-  width: calc(100% - 16px);
-  height: calc(100% - 16px);
-}
-
-.pix-cover-thumb[data-style="aero"] .pix-cover-mini-overlay {
-  align-items: center;
-  justify-content: flex-start;
-  padding-top: 8px;
-  background: linear-gradient(180deg, rgba(18, 27, 36, 0.8) 0%, transparent 100%);
+  border-radius: 2px;
 }
 
 .pix-thumb-badge {

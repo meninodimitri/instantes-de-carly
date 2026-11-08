@@ -261,45 +261,74 @@ body.theme-is-dark .gal-btn-primary {
 
 .auth-fullscreen-card {
   width: 100%;
-  background: rgba(255, 253, 243, 0.94);
-  border: 1.5px solid rgba(231, 195, 120, 0.55);
-  border-radius: 16px;
-  padding: 40px 34px 34px;
-  box-shadow: 0 24px 64px rgba(18, 27, 36, 0.38);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  text-align: center;
-  animation: galHeroRise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  background: rgba(255, 253, 243, 0.46);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 20px;
+  padding: 36px 32px 30px;
+  box-shadow: 0 28px 70px rgba(10, 16, 24, 0.38), inset 0 1px 1px rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  text-align: left;
+  animation: galHeroRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.auth-fullscreen-card .auth-brand-link {
-  display: inline-block;
-  margin-bottom: 20px;
+body.theme-is-dark .auth-fullscreen-card {
+  background: rgba(20, 29, 39, 0.55);
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.2);
 }
 
-.auth-fullscreen-card .auth-brand-link img {
-  height: 38px;
+.auth-card-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 22px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(231, 195, 120, 0.35);
+}
+
+.auth-card-top-row .auth-brand-link {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+}
+
+.auth-card-top-row .auth-brand-link img {
+  height: 34px;
   width: auto;
   display: block;
-  margin: 0 auto;
 }
 
-.auth-kicker {
-  display: inline-block;
-  font-size: 0.72rem;
+.auth-kicker-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #9A7426;
-  margin-bottom: 8px;
+  color: #8A6218;
+  background: rgba(231, 195, 120, 0.28);
+  border: 1px solid rgba(231, 195, 120, 0.55);
+  padding: 4px 11px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+body.theme-is-dark .auth-kicker-pill {
+  color: #E7C378;
+  background: rgba(231, 195, 120, 0.16);
+  border-color: rgba(231, 195, 120, 0.35);
 }
 
 .auth-heading {
   font-family: var(--font-display);
-  font-size: clamp(1.9rem, 2.8vw, 2.45rem);
+  font-size: clamp(2rem, 3.2vw, 2.5rem);
   font-weight: var(--title-weight);
   letter-spacing: var(--title-tracking);
   text-transform: var(--title-transform);
+  font-style: var(--title-style, normal);
   line-height: 1.1;
   margin: 0 0 10px;
   color: var(--ink);
@@ -312,6 +341,24 @@ body.theme-is-dark .gal-btn-primary {
   line-height: 1.5;
   color: var(--ink-secondary);
   text-wrap: pretty;
+}
+
+.auth-fullscreen-card .gal-input {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1.5px solid rgba(231, 195, 120, 0.5);
+  color: #1B2733;
+}
+
+.auth-fullscreen-card .gal-input:focus {
+  background: #FFFFFF;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(231, 195, 120, 0.3);
+}
+
+body.theme-is-dark .auth-fullscreen-card .gal-input {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #FFFDF3;
 }
 
 .auth-stack-form {
@@ -488,168 +535,458 @@ body.theme-is-dark .gal-btn-primary {
   }
 }
 
-/* 1. Cosmos: Clássica tela cheia centralizada com botão */
-.pixieset-cover[data-cover="cosmos"] .pixieset-cover-center {
+/* ==========================================================================
+   3A. 16 CAPAS AUTÊNTICAS DO PIXIESET + CONTROLES
+   ========================================================================== */
+.pixieset-stripe-line,
+.pixieset-center-divisor,
+.pixieset-joy-wrap,
+.pixieset-cover-foot-bar {
+  display: none;
+}
+
+.pixieset-cover-author {
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 253, 243, 0.88);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* 1. Centro: Tela cheia com título e botão centralizados */
+.pixieset-cover[data-cover="centro"] .pixieset-cover-center {
   margin: auto auto 12vh;
 }
 
-/* 2. Minimalista: Sem botão pesado, foco amplo na fotografia e tipografia */
-.pixieset-cover[data-cover="minimal"] .gal-btn-cover {
+/* 2. Alegria: Letreiro editorial JOY com recorte da foto na letra O */
+.pixieset-cover[data-cover="alegria"] {
+  background: #FAF8F5;
+  color: #1A1A1A;
+}
+.pixieset-cover[data-cover="alegria"] .pixieset-cover-media {
   display: none;
 }
-.pixieset-cover[data-cover="minimal"] .pixieset-cover-center {
-  margin: auto auto 10vh;
+.pixieset-cover[data-cover="alegria"] .pixieset-cover-top {
+  color: #1A1A1A;
+}
+.pixieset-cover[data-cover="alegria"] .pixieset-cover-author,
+.pixieset-cover[data-cover="alegria"] .pixieset-date {
+  color: #1A1A1A;
+  text-shadow: none;
+}
+.pixieset-cover[data-cover="alegria"] .pixieset-joy-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(8px, 1.8vw, 24px);
+  margin: auto auto 12px;
+  z-index: 3;
+}
+.pixieset-cover[data-cover="alegria"] .joy-letter {
+  font-family: var(--font-display);
+  font-size: clamp(6.5rem, 16vw, 15rem);
+  font-weight: 700;
+  line-height: 0.9;
+  color: #B91C1C;
+  letter-spacing: -0.04em;
+}
+.pixieset-cover[data-cover="alegria"] .joy-o-mask {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(90px, 16vw, 210px);
+  height: clamp(120px, 20vw, 260px);
+  border-radius: 50%;
+  overflow: clip;
+  border: clamp(8px, 1.6vw, 22px) solid #B91C1C;
+}
+.pixieset-cover[data-cover="alegria"] .joy-cutout-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.pixieset-cover[data-cover="alegria"] .pixieset-cover-center {
+  margin: 0 auto auto;
+}
+.pixieset-cover[data-cover="alegria"] .pixieset-title {
+  color: #1A1A1A;
+  text-shadow: none;
+}
+.pixieset-cover[data-cover="alegria"] .pixieset-subtitle {
+  color: #555555;
+  text-shadow: none;
+}
+.pixieset-cover[data-cover="alegria"] .pixieset-kicker {
+  color: #B91C1C;
+}
+.pixieset-cover[data-cover="alegria"] .gal-btn-cover {
+  background: #1A1A1A;
+  color: #FFFFFF;
+  border-color: #1A1A1A;
 }
 
-/* 3. Bondi: Moldura retangular fina central sobre a fotografia */
-.pixieset-cover[data-cover="bondi"] .pixieset-cover-center {
-  margin: auto;
-}
-.pixieset-cover[data-cover="bondi"] .pixieset-cover-box {
-  border: 1.5px solid rgba(255, 253, 243, 0.90);
-  padding: 38px 46px;
-  background-color: rgba(18, 25, 33, 0.24);
-  backdrop-filter: blur(2px);
-}
-
-/* 4. Oeste: Alinhado à esquerda na base sobre a foto */
-.pixieset-cover[data-cover="oeste"] .pixieset-cover-center {
+/* 3. Esquerda: Alinhado na base esquerda */
+.pixieset-cover[data-cover="esquerda"] .pixieset-cover-center {
   margin: auto auto 12vh 6vw;
   text-align: left;
 }
-.pixieset-cover[data-cover="oeste"] .pixieset-cover-box {
+.pixieset-cover[data-cover="esquerda"] .pixieset-cover-box {
   align-items: flex-start;
 }
 
-/* 5. Recife: Título com filetes sutis acima e abaixo */
-.pixieset-cover[data-cover="recife"] .pixieset-title::before,
-.pixieset-cover[data-cover="recife"] .pixieset-title::after {
-  content: '';
-  display: block;
-  width: 64px;
-  height: 1.5px;
-  background-color: rgba(255, 253, 243, 0.85);
-  margin: 12px auto;
-}
-
-/* 6. Oakwood: Traço vertical fino superior e título minimalista */
-.pixieset-cover[data-cover="oakwood"] .pixieset-cover-center {
-  margin: auto;
-}
-.pixieset-cover[data-cover="oakwood"] .pixieset-cover-box::before {
-  content: '';
-  display: block;
-  width: 1.5px;
-  height: 38px;
-  background-color: rgba(255, 253, 243, 0.8);
-  margin-bottom: 16px;
-}
-
-/* 7. Âncora: Título no canto superior esquerdo e seta na base */
-.pixieset-cover[data-cover="ancora"] .pixieset-cover-top {
-  display: none;
-}
-.pixieset-cover[data-cover="ancora"] .pixieset-cover-center {
-  margin: 40px auto auto 6vw;
-  text-align: left;
-}
-.pixieset-cover[data-cover="ancora"] .pixieset-cover-box {
-  align-items: flex-start;
-}
-
-/* 8. Borda: Moldura fina suave ao redor da foto em tela cheia */
-.pixieset-cover[data-cover="borda"] {
-  background-color: var(--ground);
-  padding: 20px;
-}
-.pixieset-cover[data-cover="borda"] .pixieset-cover-media {
-  inset: 20px;
-  border-radius: 4px;
-}
-.pixieset-cover[data-cover="borda"] .pixieset-cover-top {
-  padding: 24px 32px;
-}
-.pixieset-cover[data-cover="borda"] .pixieset-cover-center {
-  margin: auto 32px 32px auto;
-  max-width: 580px;
-  text-align: right;
-}
-.pixieset-cover[data-cover="borda"] .pixieset-cover-box {
-  align-items: flex-end;
-}
-
-/* 9. Luz Dourada (Autoral da Marca - Brandbook) */
-.pixieset-cover[data-cover="iracema"] .pixieset-cover-media {
-  box-shadow: inset 0 0 0 2px rgba(231, 195, 120, 0.55);
-}
-.pixieset-cover[data-cover="iracema"] .pixieset-title {
-  color: #FFFDF3;
-}
-.pixieset-cover[data-cover="iracema"] .pixieset-kicker {
-  color: #E7C378;
-}
-
-/* 10. Passe-Partout (Brandbook Oficial) */
-.pixieset-cover[data-cover="passepartout"] {
-  background-color: var(--ground);
-  padding: clamp(24px, 4.5vw, 60px);
-}
-.pixieset-cover[data-cover="passepartout"] .pixieset-cover-media {
-  inset: clamp(24px, 4.5vw, 60px);
-  border-radius: 4px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.22);
-}
-.pixieset-cover[data-cover="passepartout"] .pixieset-cover-center {
-  margin: auto;
-}
-
-/* 11. Aero: Cabeçalho limpo com foto panorâmica abaixo */
-.pixieset-cover[data-cover="aero"] {
-  height: 90svh;
-}
-.pixieset-cover[data-cover="aero"] .pixieset-cover-center {
-  margin: auto auto 8vh;
-}
-
-/* 12. Split Editorial: Metade foto / metade fundo do tema */
-.pixieset-cover[data-cover="split"] {
+/* 4. Romance: Painel branco à esquerda e foto à direita */
+.pixieset-cover[data-cover="romance"] {
   display: grid;
-  grid-template-columns: 1.08fr 0.92fr;
-  background-color: var(--ground);
-  color: var(--ink);
+  grid-template-columns: 1fr 1fr;
+  background: #FFFFFF;
+  color: #1A1A1A;
 }
-.pixieset-cover[data-cover="split"] .pixieset-cover-media {
+.pixieset-cover[data-cover="romance"] .pixieset-cover-media {
   position: relative;
   inset: auto;
-  height: 100%;
+  margin: 32px 32px 32px 0;
+  border-radius: 4px;
 }
-.pixieset-cover[data-cover="split"] .pixieset-cover-scrim {
+.pixieset-cover[data-cover="romance"] .pixieset-cover-scrim {
   display: none;
 }
-.pixieset-cover[data-cover="split"] .pixieset-cover-top {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 46%;
-  color: var(--ink);
-}
-.pixieset-cover[data-cover="split"] .pixieset-date {
-  color: var(--ink-secondary);
-}
-.pixieset-cover[data-cover="split"] .pixieset-cover-center {
+.pixieset-cover[data-cover="romance"] .pixieset-cover-center {
   margin: auto;
-  padding: 48px 40px;
-  color: var(--ink);
+  padding: 40px;
+  text-align: center;
 }
-.pixieset-cover[data-cover="split"] .pixieset-subtitle {
-  color: var(--ink-secondary);
+.pixieset-cover[data-cover="romance"] .pixieset-title {
+  color: #1A1A1A;
+  text-shadow: none;
 }
-.pixieset-cover[data-cover="split"] .gal-btn-cover {
-  background-color: var(--accent);
+.pixieset-cover[data-cover="romance"] .pixieset-subtitle {
+  color: #555555;
+  text-shadow: none;
+}
+.pixieset-cover[data-cover="romance"] .gal-btn-cover {
+  background: #1A1A1A;
   color: #FFFFFF;
 }
-body.theme-is-dark .pixieset-cover[data-cover="split"] .gal-btn-cover {
-  color: #15181C;
+
+/* 5. Vintage: Foto emoldurada no topo e faixa polaroid clássica abaixo */
+.pixieset-cover[data-cover="vintage"] {
+  height: auto;
+  min-height: 100svh;
+  background: #FFFFFF;
+  color: #1A1A1A;
+  padding: 24px 24px 0;
+  display: flex;
+  flex-direction: column;
+}
+.pixieset-cover[data-cover="vintage"] .pixieset-cover-media {
+  position: relative;
+  inset: auto;
+  height: 68svh;
+}
+.pixieset-cover[data-cover="vintage"] .pixieset-cover-scrim {
+  display: none;
+}
+.pixieset-cover[data-cover="vintage"] .pixieset-cover-center {
+  margin: 0;
+  padding: 28px 16px 36px;
+  text-align: center;
+  color: #1A1A1A;
+}
+.pixieset-cover[data-cover="vintage"] .pixieset-title {
+  color: #1A1A1A;
+  text-shadow: none;
+}
+.pixieset-cover[data-cover="vintage"] .pixieset-subtitle {
+  color: #555555;
+  text-shadow: none;
+}
+.pixieset-cover[data-cover="vintage"] .gal-btn-cover {
+  background: #1A1A1A;
+  color: #FFFFFF;
+}
+
+/* 6. Moldura: Foto em tela cheia com moldura retangular branca interna */
+.pixieset-cover[data-cover="moldura"]::after {
+  content: '';
+  position: absolute;
+  inset: clamp(20px, 3.5vw, 42px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  pointer-events: none;
+  z-index: 3;
+}
+.pixieset-cover[data-cover="moldura"] .pixieset-cover-center {
+  margin: auto;
+}
+
+/* 7. Listra: Duas listras brancas horizontais com título em destaque */
+.pixieset-cover[data-cover="listra"] .pixieset-stripe-top {
+  display: block;
+  position: absolute;
+  top: 18%;
+  left: 6vw;
+  right: 6vw;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.85);
+  z-index: 3;
+}
+.pixieset-cover[data-cover="listra"] .pixieset-stripe-bottom {
+  display: block;
+  position: absolute;
+  bottom: 18%;
+  left: 6vw;
+  right: 6vw;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.85);
+  z-index: 3;
+}
+.pixieset-cover[data-cover="listra"] .pixieset-cover-center {
+  margin: auto;
+}
+
+/* 8. Divisor: Linha vertical no centro */
+.pixieset-cover[data-cover="divisor"] .pixieset-center-divisor {
+  display: block;
+  position: absolute;
+  top: 10%;
+  bottom: 10%;
+  left: 50%;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.85);
+  z-index: 3;
+}
+.pixieset-cover[data-cover="divisor"] .pixieset-cover-center {
+  margin: auto auto auto 8vw;
+  max-width: 38%;
+  text-align: left;
+}
+.pixieset-cover[data-cover="divisor"] .pixieset-cover-box {
+  align-items: flex-start;
+}
+
+/* 9. Diário: Foto quadrada à esquerda e bloco tipográfico à direita */
+.pixieset-cover[data-cover="diario"] {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  background: #FFFFFF;
+  color: #1A1A1A;
+}
+.pixieset-cover[data-cover="diario"] .pixieset-cover-media {
+  position: relative;
+  inset: auto;
+  margin: 40px;
+  aspect-ratio: 1 / 1;
+  height: auto;
+}
+.pixieset-cover[data-cover="diario"] .pixieset-cover-scrim {
+  display: none;
+}
+.pixieset-cover[data-cover="diario"] .pixieset-cover-center {
+  margin: auto;
+  padding: 40px;
+}
+.pixieset-cover[data-cover="diario"] .pixieset-title {
+  color: #1A1A1A;
+  text-shadow: none;
+}
+.pixieset-cover[data-cover="diario"] .pixieset-subtitle {
+  color: #555555;
+  text-shadow: none;
+}
+.pixieset-cover[data-cover="diario"] .gal-btn-cover {
+  background: #1A1A1A;
+  color: #FFFFFF;
+}
+
+/* 10. Carimbo: Fundo branco com miniatura quadrada de selo */
+.pixieset-cover[data-cover="carimbo"] {
+  background: #FFFFFF;
+  color: #1A1A1A;
+}
+.pixieset-cover[data-cover="carimbo"] .pixieset-cover-media {
+  position: relative;
+  inset: auto;
+  width: clamp(200px, 22vw, 300px);
+  height: clamp(200px, 22vw, 300px);
+  margin: 50px auto 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+.pixieset-cover[data-cover="carimbo"] .pixieset-cover-scrim {
+  display: none;
+}
+.pixieset-cover[data-cover="carimbo"] .pixieset-cover-center {
+  margin: 0 auto auto;
+  text-align: center;
+}
+.pixieset-cover[data-cover="carimbo"] .pixieset-title {
+  color: #1A1A1A;
+  text-shadow: none;
+}
+.pixieset-cover[data-cover="carimbo"] .pixieset-subtitle {
+  color: #555555;
+  text-shadow: none;
+}
+.pixieset-cover[data-cover="carimbo"] .gal-btn-cover {
+  background: #1A1A1A;
+  color: #FFFFFF;
+}
+
+/* 11. Contorno: Moldura retangular vertical no centro com título e botão */
+.pixieset-cover[data-cover="contorno"] .pixieset-cover-center {
+  margin: auto;
+}
+.pixieset-cover[data-cover="contorno"] .pixieset-cover-box {
+  border: 1.5px solid rgba(255, 255, 255, 0.9);
+  padding: clamp(30px, 4vw, 54px) clamp(28px, 4.5vw, 64px);
+  background: rgba(18, 25, 33, 0.22);
+  backdrop-filter: blur(2px);
+}
+.pixieset-cover[data-cover="contorno"] .gal-btn-cover {
+  border-bottom: 1px solid #FFFFFF;
+  border-radius: 0;
+  background: transparent;
+  padding: 6px 2px;
+}
+
+/* 12. Clássico: Foto de abertura limpa com barra tipográfica minimalista */
+.pixieset-cover[data-cover="classico"] {
+  height: auto;
+  background: #FFFFFF;
+  color: #1A1A1A;
+}
+.pixieset-cover[data-cover="classico"] .pixieset-cover-media {
+  position: relative;
+  inset: auto;
+  height: 80svh;
+}
+.pixieset-cover[data-cover="classico"] .pixieset-cover-scrim {
+  display: none;
+}
+.pixieset-cover[data-cover="classico"] .pixieset-cover-center {
+  margin: 0;
+  padding: 24px 30px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+.pixieset-cover[data-cover="classico"] .pixieset-title {
+  color: #1A1A1A;
+  text-shadow: none;
+  font-size: clamp(1.4rem, 2.5vw, 2.2rem);
+  margin: 0;
+}
+
+/* 13. Dividido: Faixa fotográfica panorâmica no topo e bloco branco abaixo */
+.pixieset-cover[data-cover="dividido"] {
+  height: auto;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  background: #FFFFFF;
+  color: #1A1A1A;
+}
+.pixieset-cover[data-cover="dividido"] .pixieset-cover-media {
+  position: relative;
+  inset: auto;
+  height: 60svh;
+}
+.pixieset-cover[data-cover="dividido"] .pixieset-cover-scrim {
+  display: none;
+}
+.pixieset-cover[data-cover="dividido"] .pixieset-cover-center {
+  margin: 0;
+  padding: 36px 20px 48px;
+  text-align: center;
+}
+.pixieset-cover[data-cover="dividido"] .pixieset-title {
+  color: #1A1A1A;
+  text-shadow: none;
+}
+.pixieset-cover[data-cover="dividido"] .pixieset-subtitle {
+  color: #555555;
+  text-shadow: none;
+}
+.pixieset-cover[data-cover="dividido"] .gal-btn-cover {
+  background: #1A1A1A;
+  color: #FFFFFF;
+}
+
+/* 14. Rótulo: Fotografia ampla com etiqueta branca vertical na lateral */
+.pixieset-cover[data-cover="rotulo"] .pixieset-cover-center {
+  margin: auto auto auto 6vw;
+  width: min(420px, 90vw);
+  background: #FFFFFF;
+  color: #1A1A1A;
+  padding: 44px 38px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28);
+  border-radius: 4px;
+  text-align: left;
+}
+.pixieset-cover[data-cover="rotulo"] .pixieset-cover-box {
+  align-items: flex-start;
+}
+.pixieset-cover[data-cover="rotulo"] .pixieset-title {
+  color: #1A1A1A;
+  text-shadow: none;
+}
+.pixieset-cover[data-cover="rotulo"] .pixieset-subtitle {
+  color: #555555;
+  text-shadow: none;
+}
+.pixieset-cover[data-cover="rotulo"] .gal-btn-cover {
+  background: transparent;
+  color: #1A1A1A;
+  border: none;
+  padding: 0;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+/* 15. Borda: Passe-partout branco ao redor de toda a fotografia */
+.pixieset-cover[data-cover="borda"] {
+  background-color: #FFFFFF;
+  padding: clamp(16px, 2.5vw, 32px);
+}
+.pixieset-cover[data-cover="borda"] .pixieset-cover-media {
+  inset: clamp(16px, 2.5vw, 32px);
+  border-radius: 2px;
+}
+.pixieset-cover[data-cover="borda"] .pixieset-cover-center {
+  margin: auto;
+  text-align: center;
+}
+
+/* 16. Álbum: Abertura fotográfica limpa com título e acesso imediato */
+.pixieset-cover[data-cover="album"] {
+  height: auto;
+  background: #FFFFFF;
+  color: #1A1A1A;
+}
+.pixieset-cover[data-cover="album"] .pixieset-cover-media {
+  position: relative;
+  inset: auto;
+  height: 82svh;
+}
+.pixieset-cover[data-cover="album"] .pixieset-cover-scrim {
+  display: none;
+}
+.pixieset-cover[data-cover="album"] .pixieset-cover-center {
+  margin: 0;
+  padding: 24px 30px;
+  text-align: center;
+}
+.pixieset-cover[data-cover="album"] .pixieset-title {
+  color: #1A1A1A;
+  text-shadow: none;
+  font-size: clamp(1.5rem, 2.8vw, 2.4rem);
+}
+
+/* 17. Sem Capa */
+.pixieset-cover[data-cover="none"] {
+  display: none !important;
 }
 
 /* ==========================================================================

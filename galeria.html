@@ -34,11 +34,15 @@
 
     <div class="auth-fullscreen-container">
       <div class="auth-fullscreen-card">
-        <a href="index.html" class="auth-brand-link" aria-label="Voltar para o site principal">
-          <img src="assets/images/logo-dark.png" alt="Instantes de Carly" width="138" height="42" />
-        </a>
+        <div class="auth-card-top-row">
+          <a href="index.html" class="auth-brand-link" aria-label="Voltar para o site principal">
+            <img src="assets/images/logo-dark.png" alt="Instantes de Carly" width="138" height="42" />
+          </a>
+          <span class="auth-kicker-pill">
+            Área do Cliente
+          </span>
+        </div>
 
-        <span class="auth-kicker">Área Exclusiva do Cliente</span>
         <h1 id="portal-heading" class="auth-heading">Acesse a galeria do seu ensaio</h1>
         <p class="auth-lead">
           Digite ou cole o código ou link exclusivo enviado no seu WhatsApp para abrir suas fotografias.
@@ -90,11 +94,16 @@
 
     <div class="auth-fullscreen-container">
       <div class="auth-fullscreen-card">
-        <a href="index.html" class="auth-brand-link" aria-label="Voltar para o site principal">
-          <img src="assets/images/logo-dark.png" alt="Instantes de Carly" width="138" height="42" />
-        </a>
+        <div class="auth-card-top-row">
+          <a href="index.html" class="auth-brand-link" aria-label="Voltar para o site principal">
+            <img src="assets/images/logo-dark.png" alt="Instantes de Carly" width="138" height="42" />
+          </a>
+          <span class="auth-kicker-pill">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Galeria Privada
+          </span>
+        </div>
 
-        <span class="auth-kicker">Galeria Privada Protegida</span>
         <h1 id="pw-album-title" class="auth-heading">Galeria do Ensaio</h1>
         <p id="pw-album-subtitle" class="auth-lead"></p>
 
@@ -132,19 +141,34 @@
        ======================================================================== -->
   <main id="album-view" class="album-shell" hidden>
 
-    <!-- 3A. CAPA EDITORIAL PIXIESET (TELA CHEIA 100SVH COM MOVIMENTO E SETINHA PULANDO) -->
-    <section id="delivery-hero" class="pixieset-cover" data-cover="cosmos" aria-labelledby="delivery-hero-title" hidden>
+    <!-- 3A. CAPA EDITORIAL PIXIESET (16 ESTILOS AUTÊNTICOS DO PIXIESET) -->
+    <section id="delivery-hero" class="pixieset-cover" data-cover="centro" aria-labelledby="delivery-hero-title" hidden>
       <div class="pixieset-cover-media">
         <img id="delivery-hero-img" src="" alt="" width="1920" height="1280" class="pixieset-cover-img" />
         <div class="pixieset-cover-scrim" aria-hidden="true"></div>
       </div>
 
+      <!-- Linhas gráficas decorativas para Listra e Divisor -->
+      <div class="pixieset-stripe-line pixieset-stripe-top" aria-hidden="true"></div>
+      <div class="pixieset-stripe-line pixieset-stripe-bottom" aria-hidden="true"></div>
+      <div class="pixieset-center-divisor" aria-hidden="true"></div>
+
       <header class="pixieset-cover-top">
         <a href="index.html" class="pixieset-brand" aria-label="Instantes de Carly">
           <img id="delivery-cover-logo" src="assets/images/logo-light.png" alt="Instantes de Carly" width="140" height="42" />
         </a>
+        <span id="delivery-hero-author" class="pixieset-cover-author">CARLIANE CARVALHO</span>
         <span id="delivery-hero-date" class="pixieset-date"></span>
       </header>
+
+      <!-- Letreiro recortado especial para a capa "Alegria" (JOY com foto na letra O) -->
+      <div class="pixieset-joy-wrap" aria-hidden="true">
+        <span class="joy-letter">J</span>
+        <span class="joy-letter joy-o-mask">
+          <img id="joy-cutout-img" src="" alt="" class="joy-cutout-img" />
+        </span>
+        <span class="joy-letter">Y</span>
+      </div>
 
       <div class="pixieset-cover-center">
         <div class="pixieset-cover-box">
@@ -152,9 +176,15 @@
           <h1 id="delivery-hero-title" class="pixieset-title">Galeria em Alta Resolução</h1>
           <p id="delivery-hero-msg" class="pixieset-subtitle"></p>
           <button type="button" id="btn-scroll-gallery" class="gal-btn gal-btn-cover">
-            Ver fotografias
+            Ver galeria
           </button>
         </div>
+      </div>
+
+      <!-- Barra clássica para os estilos Vintage, Clássico e Álbum -->
+      <div class="pixieset-cover-foot-bar">
+        <span id="delivery-hero-foot-author" class="pixieset-cover-author">CARLIANE CARVALHO</span>
+        <span id="delivery-hero-foot-date" class="pixieset-date"></span>
       </div>
 
       <!-- Setinha pulando para indicar scroll (estilo Sineto Studio) -->
