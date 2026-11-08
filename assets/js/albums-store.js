@@ -606,7 +606,7 @@
         req.onsuccess = () => resolve(req.result || null);
         req.onerror = () => reject(req.error);
       });
-      if (saved && Array.isArray(saved.albums)) {
+      if (saved && Array.isArray(saved.albums) && saved.albums.length > 0) {
         if (!saved.watermarkConfig) {
           saved.watermarkConfig = createInitialDemoState().watermarkConfig;
         }
