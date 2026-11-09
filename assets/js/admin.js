@@ -2641,6 +2641,16 @@ async function handleMainPublishClick() {
   if (btn) btn.disabled = true;
 
   try {
+    // Sincroniza álbuns de clientes com o payload oficial do site antes de publicar
+    if (window.AlbumsStore && typeof window.AlbumsStore.loadState === 'function') {
+      try {
+        const albState = await window.AlbumsStore.loadState();
+        if (albState && Array.isArray(albState.albums)) {
+          cmsData.clientAlbums = albState.albums;
+        }
+      } catch (_) {}
+    }
+
     // Sempre grava localmente e avisa outras abas abertas imediatamente (0s, sem F5)
     cmsData.cmsVersion = new Date().toISOString();
     await writeCmsSnapshot('local_published', cmsData);
@@ -2653,13 +2663,23 @@ async function handleMainPublishClick() {
       if (label) label.textContent = 'Publicando...';
       const result = await publishToGitHubAtomic(ghCfg);
       // Em produção (fora do localhost), já adota os caminhos limpos publicados
-      if (!isLocalhost) {
+      if (!isLocalhost && result && result.cleanPayload) {
         cmsData = result.cleanPayload;
         await writeCmsSnapshot('draft_working', cmsData);
+        if (result.cleanPayload.clientAlbums && window.AlbumsStore && typeof window.AlbumsStore.saveState === 'function') {
+          try {
+            const albState = await window.AlbumsStore.loadState();
+            albState.albums = result.cleanPayload.clientAlbums;
+            await window.AlbumsStore.saveState(albState);
+            if (typeof renderAlbumsAdminPanel === 'function') {
+              renderAlbumsAdminPanel();
+            }
+          } catch (_) {}
+        }
       }
       isDirty = false;
       updateStatusUI();
-      showToast('Publicado com sucesso! O site oficial estará atualizado para todos os visitantes em ~15 segundos.', 'success', 6000);
+      showToast('Publicado com sucesso! O site oficial e as galerias estarão atualizados em ~15 segundos.', 'success', 6000);
     } else {
       isDirty = false;
       updateStatusUI();

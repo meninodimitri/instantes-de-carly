@@ -598,31 +598,60 @@
   }
 
   async function loadState() {
+    let saved = null;
     try {
       const db = await openAlbumsDb();
-      const saved = await new Promise((resolve, reject) => {
+      saved = await new Promise((resolve, reject) => {
         const tx = db.transaction(STORE_NAME, 'readonly');
         const req = tx.objectStore(STORE_NAME).get(STATE_KEY);
         req.onsuccess = () => resolve(req.result || null);
         req.onerror = () => reject(req.error);
       });
-      if (saved && Array.isArray(saved.albums) && saved.albums.length > 0) {
-        if (!saved.watermarkConfig) {
-          saved.watermarkConfig = createInitialDemoState().watermarkConfig;
-        }
-        if (typeof saved.watermarkConfig.enabled !== 'boolean') {
-          saved.watermarkConfig.enabled = true;
-        }
-        if (!saved.paymentConfig) {
-          saved.paymentConfig = createInitialDemoState().paymentConfig;
-        }
-        saved.albums.forEach(normalizeAlbum);
-        return saved;
-      }
     } catch (_) {}
-    const seed = createInitialDemoState();
-    await saveState(seed, { silent: true });
-    return seed;
+
+    if (!saved) {
+      try {
+        const rawLocal = localStorage.getItem(STATE_KEY);
+        if (rawLocal) saved = JSON.parse(rawLocal);
+      } catch (__) {}
+    }
+
+    const cloudAlbums = (typeof window !== 'undefined' && window.SITE_DATA && Array.isArray(window.SITE_DATA.clientAlbums))
+      ? window.SITE_DATA.clientAlbums
+      : [];
+
+    let root = saved;
+    if (!root || !Array.isArray(root.albums) || root.albums.length === 0) {
+      root = createInitialDemoState();
+      if (cloudAlbums.length > 0) {
+        root.albums = JSON.parse(JSON.stringify(cloudAlbums));
+      }
+    } else if (cloudAlbums.length > 0) {
+      // Mescla álbuns centrais do SITE_DATA para garantir disponibilidade cross-device (celular / PC)
+      cloudAlbums.forEach((cAlb) => {
+        const existingIdx = root.albums.findIndex((a) => a.id === cAlb.id || (cAlb.slug && a.slug === cAlb.slug));
+        if (existingIdx === -1) {
+          root.albums.push(JSON.parse(JSON.stringify(cAlb)));
+        } else {
+          const localAlb = root.albums[existingIdx];
+          if ((!localAlb.photos || localAlb.photos.length === 0) && cAlb.photos && cAlb.photos.length > 0) {
+            root.albums[existingIdx] = JSON.parse(JSON.stringify(cAlb));
+          }
+        }
+      });
+    }
+
+    if (!root.watermarkConfig) {
+      root.watermarkConfig = createInitialDemoState().watermarkConfig;
+    }
+    if (typeof root.watermarkConfig.enabled !== 'boolean') {
+      root.watermarkConfig.enabled = true;
+    }
+    if (!root.paymentConfig) {
+      root.paymentConfig = createInitialDemoState().paymentConfig;
+    }
+    root.albums.forEach(normalizeAlbum);
+    return root;
   }
 
   async function saveState(nextState, opts = {}) {

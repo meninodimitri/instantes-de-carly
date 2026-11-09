@@ -1270,6 +1270,9 @@
         </div>
 
         <div class="alb-studio-actions">
+          <button type="button" id="btn-publish-album-now" class="cms-btn cms-btn-primary cms-btn-sm" title="Publica este e todos os álbuns no site oficial via GitHub">
+            ☁ Publicar no Site
+          </button>
           <button type="button" id="btn-copy-whatsapp-invite" class="cms-btn cms-btn-gold cms-btn-sm">
             Copiar Convite WhatsApp
           </button>
@@ -1289,8 +1292,11 @@
       ` : ''}
 
       ${activeAlbum.status === 'selection_paid' ? `
-        <div class="alb-pix-alert-banner" style="background: rgba(39, 174, 96, 0.12); border-color: rgba(39, 174, 96, 0.35); color: #1e8449;">
+        <div class="alb-pix-alert-banner" style="background: rgba(39, 174, 96, 0.12); border-color: rgba(39, 174, 96, 0.35); color: #1e8449; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
           <span>✅ <strong>Pagamento Confirmado:</strong> ${formatBRL(activeAlbum.paymentOrder?.totalAmount)} (${activeAlbum.paymentOrder?.extraCount || 0} fotos extras) pagos via ${activeAlbum.paymentOrder?.method || 'Mercado Pago'}. As ${calc.selectedCount} fotografias selecionadas estão prontas para edição!</span>
+          <button type="button" id="btn-reset-album-payment" class="cms-btn cms-btn-outline cms-btn-sm" style="border-color: rgba(39, 174, 96, 0.45); color: #1e8449; background: #fff;" title="Reabre a seleção para o cliente e limpa status de pago">
+            Reabrir Seleção
+          </button>
         </div>
       ` : ''}
 
@@ -1511,6 +1517,31 @@
       });
     });
 
+    // Publicar no site oficial (via botão rápido dentro do próprio álbum)
+    document.getElementById('btn-publish-album-now')?.addEventListener('click', () => {
+      const mainPublishBtn = document.getElementById('btn-publish-main');
+      if (mainPublishBtn) {
+        mainPublishBtn.click();
+      } else if (typeof handleMainPublishClick === 'function') {
+        handleMainPublishClick();
+      } else {
+        notifyAdminToast('Acesse a aba Publicação para conectar o GitHub e enviar as alterações.', 'warning');
+      }
+    });
+
+    // Reabrir seleção e limpar falso positivo ou pagamento de teste
+    document.getElementById('btn-reset-album-payment')?.addEventListener('click', async () => {
+      activeAlbum.status = 'awaiting_selection';
+      activeAlbum.selectionLocked = false;
+      activeAlbum.paymentOrder = null;
+      if (Array.isArray(activeAlbum.activityLog)) {
+        activeAlbum.activityLog = activeAlbum.activityLog.filter((l) => !l.text || (!l.text.includes('117,80') && !l.text.includes('Pagamento aprovado')));
+      }
+      await window.AlbumsStore.saveState(albumsState);
+      renderAlbumsAdminPanel();
+      notifyAdminToast('Seleção reaberta e pagamento resetado com sucesso!');
+    });
+
     // Convite WhatsApp inteligente (omite senha/PIN quando desativados!)
     document.getElementById('btn-copy-whatsapp-invite')?.addEventListener('click', () => {
       const baseUrl = `${window.location.origin}${window.location.pathname.replace(/admin(\.html)?$/i, '')}${galeriaRoute}?id=${encodeURIComponent(activeAlbum.slug)}`;
@@ -1528,7 +1559,13 @@
         ? `Olá, ${activeAlbum.clientName}!\nAs prévias do seu ensaio já estão prontas para escolha:\n\nLink: ${baseUrl}${pwLine}\nPacote: ${activeAlbum.packageIncluded} fotos inclusas${extraInfo}.`
         : `Olá, ${activeAlbum.clientName}!\nSeu álbum final em alta resolução está pronto para ver e baixar:\n\nLink: ${baseUrl}${pwLine}${pinLine}`;
       navigator.clipboard?.writeText(msg);
-      notifyAdminToast('Convite copiado para colar no WhatsApp.');
+
+      const hasLocalBase64 = (activeAlbum.photos || []).some((p) => typeof p.originalSrc === 'string' && p.originalSrc.startsWith('data:image/'));
+      if (hasLocalBase64) {
+        notifyAdminToast('Convite copiado! Lembre-se de clicar em "☁ Publicar no Site" para que as fotos abram no celular do cliente.', 'info', 6000);
+      } else {
+        notifyAdminToast('Convite copiado para colar no WhatsApp.');
+      }
     });
 
     // Confirmar Pix Direto
@@ -1925,15 +1962,35 @@
       if (!payments.length || !albumsState || !Array.isArray(albumsState.albums)) return;
 
       let changed = false;
+
+      // 1. Higienização automática de falsos positivos (ex: pagamentos antigos que não pertencem a este álbum)
+      albumsState.albums.forEach((a) => {
+        if (a.paymentOrder && (a.paymentOrder.totalAmount === 117.8 || (a.paymentOrder.extraCount === 0 && a.status === 'selection_paid' && (!a.selectedIds || a.selectedIds.length === 0)))) {
+          const hasLegit = payments.some(
+            (p) => p.status === 'approved' && p.albumId && (p.albumId === a.id || (a.slug && p.albumId.toLowerCase() === a.slug.toLowerCase()))
+          );
+          if (!hasLegit) {
+            a.status = 'awaiting_selection';
+            a.selectionLocked = false;
+            a.paymentOrder = null;
+            if (Array.isArray(a.activityLog)) {
+              a.activityLog = a.activityLog.filter((l) => !l.text || (!l.text.includes('117,80') && !l.text.includes('Pagamento aprovado')));
+            }
+            changed = true;
+          }
+        }
+      });
+
+      // 2. Vinculação estrita e segura de pagamentos aprovados do Mercado Pago
       payments.forEach((pay) => {
         if (pay.status !== 'approved') return;
-        // Localiza por albumId ou se não houver ID exato, usa o primeiro álbum ativo
+        const targetId = String(pay.albumId || '').trim();
+        if (!targetId) return; // NUNCA faz fallback para o primeiro álbum!
+
         let alb = albumsState.albums.find(
-          (a) => a.id === pay.albumId || (pay.albumId && a.slug === pay.albumId)
+          (a) => a.id === targetId || (a.slug && a.slug.toLowerCase() === targetId.toLowerCase())
         );
-        if (!alb && albumsState.albums.length > 0) {
-          alb = albumsState.albums[0];
-        }
+        if (!alb) return;
 
         if (alb && alb.status !== 'selection_paid') {
           alb.status = 'selection_paid';

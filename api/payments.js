@@ -43,13 +43,18 @@ export default async function handler(req, res) {
       paidAt: p.date_approved || p.date_created,
       paymentMethod: p.payment_method_id,
       albumId: p.metadata?.album_id || '',
+      albumSlug: p.metadata?.album_slug || p.metadata?.slug || '',
       selectedIds: p.metadata?.selected_ids || [],
       extraCount: p.metadata?.extra_count || 0,
       clientEmail: p.payer?.email || ''
     }));
 
     if (albumId) {
-      const filtered = payments.filter((p) => p.albumId === albumId);
+      const q = String(albumId).trim().toLowerCase();
+      const filtered = payments.filter((p) =>
+        (p.albumId && p.albumId.toLowerCase() === q) ||
+        (p.albumSlug && p.albumSlug.toLowerCase() === q)
+      );
       return res.status(200).json({ payments: filtered });
     }
 
@@ -58,3 +63,4 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: err.message, payments: [] });
   }
 }
+

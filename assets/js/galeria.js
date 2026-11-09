@@ -1252,6 +1252,7 @@
 
   async function finalizeFreeSelection() {
     const calc = window.AlbumsStore.calculateSelectionPricing(currentAlbum);
+    const brand = window.AlbumsStore.getBrandDefaults();
     currentAlbum.selectionLocked = true;
     currentAlbum.status = 'selection_completed';
     currentAlbum.activityLog = currentAlbum.activityLog || [];
@@ -1265,7 +1266,10 @@
     els.chkDialog?.close();
     updateProofingChrome(currentAlbum);
     renderMasonryWall(currentAlbum);
-    showToast('Seleção confirmada e enviada para edição.');
+    showToast('Seleção confirmada com sucesso!');
+
+    const msg = `Olá ${brand.shortName}! Concluí a escolha das ${calc.selectedCount} fotografias do meu ensaio "${currentAlbum.clientName}". Minha seleção já está pronta para edição final!`;
+    window.open(`https://wa.me/${brand.whatsappNumber}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener');
   }
 
   async function finalizeMercadoPagoApproved(label = 'Mercado Pago Pix') {
@@ -1628,9 +1632,22 @@
       return;
     }
 
-    const found = (rootState.albums || []).find(
+    let found = (rootState.albums || []).find(
       (a) => (a.slug && a.slug.toLowerCase() === initialSlug) || (a.id && a.id.toLowerCase() === initialSlug)
     );
+
+    // Fallback inteligente para álbuns centrais publicados via SITE_DATA
+    if (!found && window.SITE_DATA && Array.isArray(window.SITE_DATA.clientAlbums)) {
+      found = window.SITE_DATA.clientAlbums.find(
+        (a) => (a.slug && a.slug.toLowerCase() === initialSlug) || (a.id && a.id.toLowerCase() === initialSlug)
+      );
+      if (found) {
+        rootState.albums = rootState.albums || [];
+        rootState.albums.push(found);
+        window.AlbumsStore.saveState(rootState, { silent: true });
+      }
+    }
+
     if (!found) {
       renderPortalView();
       if (els.portalError) {
