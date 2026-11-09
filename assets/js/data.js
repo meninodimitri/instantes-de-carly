@@ -5,7 +5,7 @@
  */
 
 const SITE_DATA = {
-  "cmsVersion": "2026-11-09T20:45:10.620Z",
+  "cmsVersion": "2026-11-09T20:48:32.024Z",
   "brand": {
     "name": "Instantes de Carly",
     "founder": "Carliane Carvalho (Carly)",
@@ -615,8 +615,8 @@ const SITE_DATA = {
       "allowHighResDownload": true,
       "allowWebDownload": true,
       "welcomeMessage": "Olá, Yan Gordin! Escolham com carinho suas fotografias favoritas.",
-      "coverSrc": "assets/images/uploads/foto-20261109204221-01.jpg",
-      "coverFocal": "50% 35%",
+      "coverSrc": "assets/images/uploads/foto-20261109204832-01.jpg",
+      "coverFocal": "78% 44%",
       "design": {
         "coverStyle": "moldura",
         "typography": "bold",
@@ -632,57 +632,57 @@ const SITE_DATA = {
         {
           "id": "ph_1794256845474_0",
           "filename": "IMG-20260904-WA0065.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109204221-02.jpg"
+          "originalSrc": "assets/images/uploads/foto-20261109204832-02.jpg"
         },
         {
           "id": "ph_1794256845509_1",
           "filename": "IMG-20250519-WA0035.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109204221-03.jpg"
+          "originalSrc": "assets/images/uploads/foto-20261109204832-03.jpg"
         },
         {
           "id": "ph_1794256845577_2",
           "filename": "IMG-20250530-WA0102.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109204221-04.jpg"
+          "originalSrc": "assets/images/uploads/foto-20261109204832-04.jpg"
         },
         {
           "id": "ph_1794256845618_3",
           "filename": "IMG-20250613-WA0074.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109204221-05.jpg"
+          "originalSrc": "assets/images/uploads/foto-20261109204832-05.jpg"
         },
         {
           "id": "ph_1794256845752_4",
           "filename": "IMG-20250613-WA0063.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109204221-06.jpg"
+          "originalSrc": "assets/images/uploads/foto-20261109204832-06.jpg"
         },
         {
           "id": "ph_1794256845782_5",
           "filename": "IMG-20250613-WA0079.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109204221-07.jpg"
+          "originalSrc": "assets/images/uploads/foto-20261109204832-07.jpg"
         },
         {
           "id": "ph_1794256845869_6",
           "filename": "IMG-20250613-WA0073.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109204221-08.jpg"
+          "originalSrc": "assets/images/uploads/foto-20261109204832-08.jpg"
         },
         {
           "id": "ph_1794256845907_7",
           "filename": "IMG-20250613-WA0077.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109204221-09.jpg"
+          "originalSrc": "assets/images/uploads/foto-20261109204832-09.jpg"
         },
         {
           "id": "ph_1794256846004_8",
           "filename": "Gemini_Generated_Image_cn2estcn2estcn2e.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109204221-10.jpg"
+          "originalSrc": "assets/images/uploads/foto-20261109204832-10.jpg"
         },
         {
           "id": "ph_1794256846093_9",
           "filename": "Gemini_Generated_Image_luk4ifluk4ifluk4.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109204221-11.jpg"
+          "originalSrc": "assets/images/uploads/foto-20261109204832-11.jpg"
         },
         {
           "id": "ph_1794256846123_10",
           "filename": "WhatsApp Image 2026-09-09 at 21.12.32.jpeg",
-          "originalSrc": "assets/images/uploads/foto-20261109204221-12.jpg"
+          "originalSrc": "assets/images/uploads/foto-20261109204832-12.jpg"
         }
       ],
       "selectedIds": [],
