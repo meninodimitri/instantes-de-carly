@@ -1182,12 +1182,22 @@
     if (els.directPixCode) els.directPixCode.value = directPayload;
     renderQrMatrix(els.directQrCanvas, directPayload);
 
-    if (!isLocalEnv && rootState.storageMode === 'cloud') {
+    if (!isLocalEnv) {
       try {
         const res = await fetch('/api/checkout', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ albumId: currentAlbum.id, selectedPhotoIds: calc.selectedIds })
+          body: JSON.stringify({
+            albumId: currentAlbum.id,
+            slug: currentAlbum.slug,
+            clientName: currentAlbum.clientName,
+            clientEmail: currentAlbum.clientEmail,
+            packageIncluded: calc.packageIncluded,
+            extraPrice: calc.extraPhotoPrice,
+            extraCount: calc.extraCount,
+            totalAmount: calc.extraTotal,
+            selectedPhotoIds: calc.selectedIds
+          })
         });
         const data = await res.json();
         if (res.ok && data.pixCopyPaste) {

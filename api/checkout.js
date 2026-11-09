@@ -23,42 +23,53 @@ export default async function handler(req, res) {
     const sbUrl = process.env.SUPABASE_URL;
     const sbKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-    if (!mpToken || !sbUrl || !sbKey) {
+    if (!mpToken) {
       return res.status(503).json({
-        error: 'Chaves de nuvem ainda não configuradas na Vercel (rodando em modo local).'
+        error: 'MP_ACCESS_TOKEN ainda não configurado nas variáveis de ambiente da Vercel.'
       });
     }
 
-    // 1. Busca o álbum direto no banco seguro (nunca confia no preço vindo do cliente!)
-    const albRes = await fetch(
-      `${sbUrl}/rest/v1/client_albums?id=eq.${encodeURIComponent(albumId)}&select=*`,
-      {
-        headers: {
-          apikey: sbKey,
-          Authorization: `Bearer ${sbKey}`
-        }
-      }
-    );
-    const rows = await albRes.json();
-    const album = rows?.[0];
-    if (!album) {
-      return res.status(404).json({ error: 'Álbum não encontrado.' });
-    }
+    let clientName = req.body.clientName || 'Cliente';
+    let clientEmail = req.body.clientEmail || 'cliente@instantesdecarly.com.br';
+    let extraCount = Number(req.body.extraCount || 0);
+    let totalAmount = Number(req.body.totalAmount || 0);
+    let uniqueSelected = [...new Set(selectedPhotoIds)];
+    let slug = req.body.slug || albumId;
 
-    // 2. Filtra IDs únicos válidos e calcula excedente no servidor
-    const validPhotoIds = new Set((album.photos || []).map((p) => p.id));
-    const uniqueSelected = [...new Set(selectedPhotoIds)].filter((id) => validPhotoIds.has(id));
-    const packageLimit = Math.max(0, Number(album.package_included) || 0);
-    const extraPrice = Math.max(0, Number(album.extra_photo_price) || 0);
-    const extraCount = Math.max(0, uniqueSelected.length - packageLimit);
-    const totalAmount = Number((extraCount * extraPrice).toFixed(2));
+    // 1. Se o banco Supabase estiver configurado, valida dados seguros na nuvem
+    if (sbUrl && sbKey) {
+      try {
+        const albRes = await fetch(
+          `${sbUrl}/rest/v1/client_albums?id=eq.${encodeURIComponent(albumId)}&select=*`,
+          {
+            headers: {
+              apikey: sbKey,
+              Authorization: `Bearer ${sbKey}`
+            }
+          }
+        );
+        const rows = await albRes.json();
+        const album = rows?.[0];
+        if (album) {
+          const validPhotoIds = new Set((album.photos || []).map((p) => p.id));
+          uniqueSelected = uniqueSelected.filter((id) => validPhotoIds.has(id));
+          const packageLimit = Math.max(0, Number(album.package_included) || 0);
+          const extraPrice = Math.max(0, Number(album.extra_photo_price) || 0);
+          extraCount = Math.max(0, uniqueSelected.length - packageLimit);
+          totalAmount = Number((extraCount * extraPrice).toFixed(2));
+          clientName = album.client_name || clientName;
+          clientEmail = album.client_email || clientEmail;
+          slug = album.slug || slug;
+        }
+      } catch (_) {}
+    }
 
     if (extraCount <= 0 || totalAmount <= 0) {
       return res.status(200).json({ noPaymentRequired: true, totalAmount: 0 });
     }
 
-    // 3. Cria pagamento Pix imediato + Preferência Checkout Pro (Cartão) no Mercado Pago
-    const externalRef = `${album.id}:${Date.now()}`;
+    // 2. Cria pagamento Pix imediato na API do Mercado Pago
+    const externalRef = `${albumId}:${Date.now()}`;
     const mpPaymentRes = await fetch('https://api.mercadopago.com/v1/payments', {
       method: 'POST',
       headers: {
@@ -68,33 +79,76 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         transaction_amount: totalAmount,
-        description: `${extraCount} fotos extras — Álbum ${album.client_name}`,
+        description: `${extraCount} fotos extras — Álbum ${clientName}`,
         payment_method_id: 'pix',
         external_reference: externalRef,
         metadata: {
-          album_id: album.id,
+          album_id: albumId,
           selected_ids: uniqueSelected,
           extra_count: extraCount
         },
         payer: {
-          email: album.client_email || 'cliente@instantesdecarly.com.br'
+          email: clientEmail
         }
       })
     });
 
     const mpData = await mpPaymentRes.json();
     if (!mpPaymentRes.ok) {
-      return res.status(502).json({ error: 'Falha ao gerar cobrança no Mercado Pago.', details: mpData });
+      return res.status(502).json({ error: 'Falha ao gerar cobrança Pix no Mercado Pago.', details: mpData });
     }
 
     const txData = mpData.point_of_interaction?.transaction_data || {};
+    let checkoutUrl = txData.ticket_url || '';
+
+    // 3. Cria Checkout Pro (Link seguro para Cartão de Crédito parcelado)
+    try {
+      const origin = req.headers.origin || 'https://instantes-de-carly.vercel.app';
+      const prefRes = await fetch('https://api.mercadopago.com/checkout/preferences', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${mpToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          items: [
+            {
+              title: `${extraCount} fotos extras — Álbum ${clientName}`,
+              quantity: 1,
+              currency_id: 'BRL',
+              unit_price: totalAmount
+            }
+          ],
+          external_reference: externalRef,
+          metadata: {
+            album_id: albumId,
+            selected_ids: uniqueSelected,
+            extra_count: extraCount
+          },
+          back_urls: {
+            success: `${origin}/galeria?album=${encodeURIComponent(slug)}&payment=success`,
+            failure: `${origin}/galeria?album=${encodeURIComponent(slug)}&payment=failure`,
+            pending: `${origin}/galeria?album=${encodeURIComponent(slug)}&payment=pending`
+          },
+          auto_return: 'approved'
+        })
+      });
+
+      if (prefRes.ok) {
+        const prefData = await prefRes.json();
+        if (prefData.init_point) {
+          checkoutUrl = prefData.init_point;
+        }
+      }
+    } catch (_) {}
+
     return res.status(200).json({
       paymentId: mpData.id,
       totalAmount,
       extraCount,
       pixCopyPaste: txData.qr_code || '',
       pixQrBase64: txData.qr_code_base64 || '',
-      checkoutUrl: txData.ticket_url || ''
+      checkoutUrl
     });
   } catch (err) {
     return res.status(500).json({ error: 'Erro interno no checkout.', message: err.message });
