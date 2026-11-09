@@ -1,5 +1,11 @@
-window.SITE_DATA = {
-  "cmsVersion": 1794251039299,
+/**
+ * Instantes de Carly - Camada de Dados Autêntica
+ * Gerenciado via Painel Admin Visual (CMS)
+ * Paleta Solar: Amarelinho Bebê, Luz Dourada & Azul Iracema.
+ */
+
+const SITE_DATA = {
+  "cmsVersion": "2026-11-09T20:39:16.114Z",
   "brand": {
     "name": "Instantes de Carly",
     "founder": "Carliane Carvalho (Carly)",
@@ -587,190 +593,7 @@ window.SITE_DATA = {
     "googleReviewFormUrl": "https://search.google.com/local/writereview?placeid=ChIJjZQfEEERvikRuXdgNX7jr3s",
     "reviews": []
   },
-  "clientAlbums": [
-    {
-      "id": "alb_1794247339755",
-      "slug": "yan-gordinho",
-      "clientName": "Yan Gordinho",
-      "title": "Ensaio — Yan Gordinho",
-      "subtitle": "FORTALEZA, CEARÁ & REGIÃO METROPOLITANA",
-      "phase": "proofing",
-      "status": "awaiting_selection",
-      "protectionLevel": "watermark_lowres",
-      "watermarkEnabled": true,
-      "passwordEnabled": true,
-      "password": "1219",
-      "pinEnabled": false,
-      "downloadPin": "",
-      "packageName": "Ensaio Autoral",
-      "packageIncluded": 5,
-      "extrasEnabled": true,
-      "extraPhotoPrice": 1,
-      "allowHighResDownload": true,
-      "allowWebDownload": true,
-      "welcomeMessage": "Olá, Yan Gordinho! Escolham com carinho suas fotografias favoritas.",
-      "coverSrc": "assets/images/uploads/foto-20261109180616-01.jpg",
-      "coverFocal": "50% 35%",
-      "design": {
-        "coverStyle": "moldura",
-        "typography": "bold",
-        "colorTheme": "maresia",
-        "gridStyle": "horizontal",
-        "gridSpacing": "regular",
-        "gridSize": "large",
-        "gridNavStyle": "icons_only",
-        "coverLogoVisible": true,
-        "coverLogoColor": "auto"
-      },
-      "photos": [
-        {
-          "id": "ph_1794247353874_0",
-          "filename": "IMG-20260904-WA0065.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109180616-02.jpg"
-        },
-        {
-          "id": "ph_1794247353911_1",
-          "filename": "IMG-20250519-WA0035.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109180616-03.jpg"
-        },
-        {
-          "id": "ph_1794247353984_2",
-          "filename": "IMG-20250530-WA0102.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109180616-04.jpg"
-        },
-        {
-          "id": "ph_1794247354024_3",
-          "filename": "IMG-20250613-WA0074.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109180616-05.jpg"
-        },
-        {
-          "id": "ph_1794247354156_4",
-          "filename": "IMG-20250613-WA0063.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109180616-06.jpg"
-        },
-        {
-          "id": "ph_1794247354189_5",
-          "filename": "IMG-20250613-WA0079.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109180616-07.jpg"
-        },
-        {
-          "id": "ph_1794247354266_6",
-          "filename": "IMG-20250613-WA0073.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109180616-08.jpg"
-        },
-        {
-          "id": "ph_1794247354302_7",
-          "filename": "IMG-20250613-WA0077.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109180616-09.jpg"
-        },
-        {
-          "id": "ph_1794247367208_0",
-          "filename": "Gemini_Generated_Image_cn2estcn2estcn2e.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109180616-10.jpg"
-        },
-        {
-          "id": "ph_1794247367314_1",
-          "filename": "Gemini_Generated_Image_luk4ifluk4ifluk4.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109180616-11.jpg"
-        },
-        {
-          "id": "ph_1794247367347_2",
-          "filename": "WhatsApp Image 2026-09-09 at 21.12.32.jpeg",
-          "originalSrc": "assets/images/uploads/foto-20261109180616-12.jpg"
-        }
-      ],
-      "selectedIds": [],
-      "photoComments": {},
-      "deliveryFavorites": [],
-      "selectionLocked": false,
-      "paymentOrder": null,
-      "activityLog": [
-        {
-          "at": "2026-11-09T18:02:19.755Z",
-          "type": "created",
-          "text": "Álbum criado no painel."
-        }
-      ],
-      "antiPrintEnabled": true,
-      "coverKicker": "GALERIA OFICIAL EM ALTA RESOLUÇÃO",
-      "coverAuthor": "Carliane Carvalho"
-    },
-    {
-      "id": "alb_yanecarly",
-      "slug": "yanecarly",
-      "clientName": "yanecarly",
-      "title": "Ensaio — Yanzinho Gordinho Gostoso",
-      "subtitle": "FORTALEZA, CE",
-      "shootDate": "2026-11-09",
-      "welcomeMessage": "Escolham com calma as fotografias favoritas de vocês. Se desejarem guardar registros além do pacote contratado, o valor adicional é calculado automaticamente.",
-      "phase": "proofing",
-      "status": "awaiting_selection",
-      "protectionLevel": "watermark_lowres",
-      "watermarkEnabled": true,
-      "passwordEnabled": true,
-      "password": "1234",
-      "pinEnabled": true,
-      "downloadPin": "2026",
-      "extrasEnabled": true,
-      "packageName": "Ensaio Autoral",
-      "packageIncluded": 5,
-      "extraPhotoPrice": 1,
-      "coverSrc": "assets/images/carly-perfil.jpg",
-      "coverFocal": "50% 32%",
-      "design": {
-        "coverStyle": "centro",
-        "typography": "cinema",
-        "colorTheme": "dourado",
-        "gridStyle": "vertical",
-        "gridSpacing": "regular",
-        "gridSize": "regular",
-        "gridNavStyle": "icons_text",
-        "coverLogoVisible": true,
-        "coverLogoColor": "auto"
-      },
-      "selectionLocked": false,
-      "selectedIds": [],
-      "deliveryFavorites": [],
-      "photoComments": {},
-      "paymentOrder": null,
-      "activityLog": [],
-      "photos": [
-        {
-          "id": "yc_01",
-          "filename": "IMG_Carly.jpg",
-          "originalSrc": "assets/images/carly-perfil.jpg"
-        },
-        {
-          "id": "yc_02",
-          "filename": "IMG_7525.jpg",
-          "originalSrc": "assets/images/real/IMG_7525.jpg"
-        },
-        {
-          "id": "yc_03",
-          "filename": "IMG_7467.jpg",
-          "originalSrc": "assets/images/real/IMG_7467.jpg"
-        },
-        {
-          "id": "yc_04",
-          "filename": "IMG_6297.jpg",
-          "originalSrc": "assets/images/real/IMG_6297.jpg"
-        },
-        {
-          "id": "yc_05",
-          "filename": "IMG_6409.jpg",
-          "originalSrc": "assets/images/real/IMG_6409.jpg"
-        },
-        {
-          "id": "yc_06",
-          "filename": "IMG_6438.jpg",
-          "originalSrc": "assets/images/real/IMG_6438.jpg"
-        }
-      ],
-      "antiPrintEnabled": true,
-      "coverKicker": "GALERIA OFICIAL EM ALTA RESOLUÇÃO",
-      "coverAuthor": "Carliane Carvalho"
-    }
-  ],
+  "clientAlbums": [],
   "clientWatermarkConfig": {
     "enabled": true,
     "mode": "image",
@@ -779,13 +602,22 @@ window.SITE_DATA = {
     "pattern": "tiled",
     "opacity": 0.85,
     "scale": 0.15,
-    "updatedAt": 1794251039299
+    "updatedAt": 1794256756114
   },
   "clientPaymentConfig": {
     "enableMercadoPago": true,
     "enableDirectPix": true,
     "pixKey": "+5585985247276",
     "merchantName": "Carliane Carvalho",
-    "merchantCity": "FORTALEZA"
+    "merchantCity": "FORTALEZA",
+    "updatedAt": 1794256748811
   }
 };
+
+if (typeof window !== 'undefined') {
+  window.SITE_DATA = SITE_DATA;
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = SITE_DATA;
+}
