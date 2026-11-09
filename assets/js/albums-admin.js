@@ -1288,6 +1288,12 @@
         </div>
       ` : ''}
 
+      ${activeAlbum.status === 'selection_paid' ? `
+        <div class="alb-pix-alert-banner" style="background: rgba(39, 174, 96, 0.12); border-color: rgba(39, 174, 96, 0.35); color: #1e8449;">
+          <span>✅ <strong>Pagamento Confirmado:</strong> ${formatBRL(activeAlbum.paymentOrder?.totalAmount)} (${activeAlbum.paymentOrder?.extraCount || 0} fotos extras) pagos via ${activeAlbum.paymentOrder?.method || 'Mercado Pago'}. As ${calc.selectedCount} fotografias selecionadas estão prontas para edição!</span>
+        </div>
+      ` : ''}
+
       <div class="alb-phase-toggle-bar" role="tablist" aria-label="Fase atual do álbum">
         <button type="button" class="alb-phase-btn ${activeAlbum.phase === 'proofing' ? 'active' : ''}" data-set-phase="proofing">
           Fase 1 · Seleção de Fotos (${calc.selectedCount}/${calc.packageIncluded})
@@ -1908,18 +1914,78 @@
   }
 
   /* ==========================================================================
-     6. INICIALIZAÇÃO E SINCRONIZAÇÃO EM TEMPO REAL
+     6. SINCRONIZAÇÃO EM NUVEM DE PAGAMENTOS MERCADO PAGO E ESTADO
+     ========================================================================== */
+  async function syncCloudPayments() {
+    try {
+      const res = await fetch('/api/payments');
+      if (!res.ok) return;
+      const data = await res.json();
+      const payments = Array.isArray(data.payments) ? data.payments : [];
+      if (!payments.length || !albumsState || !Array.isArray(albumsState.albums)) return;
+
+      let changed = false;
+      payments.forEach((pay) => {
+        if (pay.status !== 'approved') return;
+        // Localiza por albumId ou se não houver ID exato, usa o primeiro álbum ativo
+        let alb = albumsState.albums.find(
+          (a) => a.id === pay.albumId || (pay.albumId && a.slug === pay.albumId)
+        );
+        if (!alb && albumsState.albums.length > 0) {
+          alb = albumsState.albums[0];
+        }
+
+        if (alb && alb.status !== 'selection_paid') {
+          alb.status = 'selection_paid';
+          alb.selectionLocked = true;
+          if (Array.isArray(pay.selectedIds) && pay.selectedIds.length > 0) {
+            alb.selectedIds = pay.selectedIds;
+          }
+          alb.paymentOrder = {
+            id: pay.id,
+            method: pay.paymentMethod || 'mercadopago',
+            status: 'approved',
+            extraCount: pay.extraCount || 0,
+            totalAmount: pay.amount,
+            paidAt: pay.paidAt || new Date().toISOString()
+          };
+          alb.activityLog = alb.activityLog || [];
+          if (!alb.activityLog.some((l) => l.text && l.text.includes(pay.id))) {
+            alb.activityLog.unshift({
+              at: pay.paidAt || new Date().toISOString(),
+              type: 'payment',
+              text: `Pagamento aprovado via Mercado Pago (${pay.id}): ${formatBRL(pay.amount)} por ${pay.extraCount || 0} fotos extras.`
+            });
+          }
+          changed = true;
+        }
+      });
+
+      if (changed) {
+        await window.AlbumsStore.saveState(albumsState);
+        renderAlbumsAdminPanel();
+      }
+    } catch (_) {}
+  }
+
+  /* ==========================================================================
+     7. INICIALIZAÇÃO E SINCRONIZAÇÃO EM TEMPO REAL
      ========================================================================== */
   document.addEventListener('DOMContentLoaded', async () => {
     albumsState = await window.AlbumsStore.loadState();
     selectedAlbumId = albumsState.albums?.[0]?.id || null;
     renderAlbumsAdminPanel();
 
+    // Consulta pagamentos reais na nuvem Mercado Pago na inicialização e a cada 15 segundos
+    syncCloudPayments();
+    setInterval(syncCloudPayments, 15000);
+
     document.querySelectorAll('.sidebar-tab').forEach((tabBtn) => {
       tabBtn.addEventListener('click', () => {
         setTimeout(() => {
           renderSidebarAlbumsSublist();
           syncPreviewIframeForAlbums();
+          syncCloudPayments();
         }, 20);
       });
     });

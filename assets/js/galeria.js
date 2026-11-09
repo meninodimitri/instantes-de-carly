@@ -492,6 +492,7 @@
     if (isProof) {
       updateProofingChrome(album);
       await ensureProtectedProofsReady(album);
+      syncLivePaymentForAlbum(album);
     } else {
       updateDeliveryChrome(album);
       if (els.lockedWrap) els.lockedWrap.hidden = true;
@@ -499,6 +500,34 @@
 
     renderFilterTabs(album);
     renderMasonryWall(album);
+  }
+
+  async function syncLivePaymentForAlbum(album) {
+    if (!album || isLocalEnv || album.status === 'selection_paid') return;
+    try {
+      const res = await fetch(`/api/payments?albumId=${encodeURIComponent(album.id)}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      const approved = (data.payments || []).find((p) => p.status === 'approved');
+      if (approved && album.status !== 'selection_paid') {
+        album.status = 'selection_paid';
+        album.selectionLocked = true;
+        if (Array.isArray(approved.selectedIds) && approved.selectedIds.length > 0) {
+          album.selectedIds = approved.selectedIds;
+        }
+        album.paymentOrder = {
+          id: approved.id,
+          method: approved.paymentMethod || 'mercadopago',
+          status: 'approved',
+          extraCount: approved.extraCount || 0,
+          totalAmount: approved.amount,
+          paidAt: approved.paidAt || new Date().toISOString()
+        };
+        await window.AlbumsStore.saveState(rootState);
+        updateProofingChrome(album);
+        renderMasonryWall(album);
+      }
+    } catch (_) {}
   }
 
   function hydrateCoverHero(album) {
