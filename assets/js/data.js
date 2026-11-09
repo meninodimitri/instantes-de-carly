@@ -5,7 +5,7 @@
  */
 
 const SITE_DATA = {
-  "cmsVersion": "2026-11-09T17:45:00.000Z",
+  "cmsVersion": "2026-11-09T18:05:01.544Z",
   "brand": {
     "name": "Instantes de Carly",
     "founder": "Carliane Carvalho (Carly)",
@@ -595,11 +595,11 @@ const SITE_DATA = {
   },
   "clientAlbums": [
     {
-      "id": "alb_1794239564035",
-      "slug": "yanecarly",
-      "clientName": "yanecarly",
-      "title": "Ensaio — Yanzinho Gordinho Gostoso",
-      "subtitle": "FORTALEZA, CE",
+      "id": "alb_1794247339755",
+      "slug": "yan-gordinho",
+      "clientName": "Yan Gordinho",
+      "title": "Ensaio — Yan Gordinho",
+      "subtitle": "FORTALEZA, CEARÁ & REGIÃO METROPOLITANA",
       "phase": "proofing",
       "status": "awaiting_selection",
       "protectionLevel": "watermark_lowres",
@@ -614,12 +614,12 @@ const SITE_DATA = {
       "extraPhotoPrice": 1,
       "allowHighResDownload": true,
       "allowWebDownload": true,
-      "welcomeMessage": "Olá, yanecarly! Escolham com carinho suas fotografias favoritas.",
-      "coverSrc": "assets/images/uploads/foto-20261109170111-01.jpg",
-      "coverFocal": "53% 54%",
+      "welcomeMessage": "Olá, Yan Gordinho! Escolham com carinho suas fotografias favoritas.",
+      "coverSrc": "assets/images/uploads/foto-20261109180501-01.jpg",
+      "coverFocal": "50% 35%",
       "design": {
-        "coverStyle": "contorno",
-        "typography": "sans",
+        "coverStyle": "moldura",
+        "typography": "bold",
         "colorTheme": "maresia",
         "gridStyle": "horizontal",
         "gridSpacing": "regular",
@@ -630,59 +630,59 @@ const SITE_DATA = {
       },
       "photos": [
         {
-          "id": "ph_1794239615540_0",
+          "id": "ph_1794247353874_0",
           "filename": "IMG-20260904-WA0065.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109170111-02.jpg"
+          "originalSrc": "assets/images/uploads/foto-20261109180501-02.jpg"
         },
         {
-          "id": "ph_1794239615577_1",
+          "id": "ph_1794247353911_1",
           "filename": "IMG-20250519-WA0035.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109170111-03.jpg"
+          "originalSrc": "assets/images/uploads/foto-20261109180501-03.jpg"
         },
         {
-          "id": "ph_1794239615656_2",
+          "id": "ph_1794247353984_2",
           "filename": "IMG-20250530-WA0102.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109170111-04.jpg"
+          "originalSrc": "assets/images/uploads/foto-20261109180501-04.jpg"
         },
         {
-          "id": "ph_1794239615698_3",
+          "id": "ph_1794247354024_3",
           "filename": "IMG-20250613-WA0074.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109170111-05.jpg"
+          "originalSrc": "assets/images/uploads/foto-20261109180501-05.jpg"
         },
         {
-          "id": "ph_1794239615827_4",
+          "id": "ph_1794247354156_4",
           "filename": "IMG-20250613-WA0063.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109170111-06.jpg"
+          "originalSrc": "assets/images/uploads/foto-20261109180501-06.jpg"
         },
         {
-          "id": "ph_1794239615855_5",
+          "id": "ph_1794247354189_5",
           "filename": "IMG-20250613-WA0079.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109170111-07.jpg"
+          "originalSrc": "assets/images/uploads/foto-20261109180501-07.jpg"
         },
         {
-          "id": "ph_1794239615923_6",
+          "id": "ph_1794247354266_6",
           "filename": "IMG-20250613-WA0073.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109170111-08.jpg"
+          "originalSrc": "assets/images/uploads/foto-20261109180501-08.jpg"
         },
         {
-          "id": "ph_1794239615967_7",
+          "id": "ph_1794247354302_7",
           "filename": "IMG-20250613-WA0077.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109170111-09.jpg"
+          "originalSrc": "assets/images/uploads/foto-20261109180501-09.jpg"
         },
         {
-          "id": "ph_1794239616067_8",
+          "id": "ph_1794247367208_0",
           "filename": "Gemini_Generated_Image_cn2estcn2estcn2e.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109170111-10.jpg"
+          "originalSrc": "assets/images/uploads/foto-20261109180501-10.jpg"
         },
         {
-          "id": "ph_1794239616163_9",
+          "id": "ph_1794247367314_1",
           "filename": "Gemini_Generated_Image_luk4ifluk4ifluk4.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109170111-11.jpg"
+          "originalSrc": "assets/images/uploads/foto-20261109180501-11.jpg"
         },
         {
-          "id": "ph_1794239616199_10",
+          "id": "ph_1794247367347_2",
           "filename": "WhatsApp Image 2026-09-09 at 21.12.32.jpeg",
-          "originalSrc": "assets/images/uploads/foto-20261109170111-12.jpg"
+          "originalSrc": "assets/images/uploads/foto-20261109180501-12.jpg"
         }
       ],
       "selectedIds": [],
@@ -692,13 +692,88 @@ const SITE_DATA = {
       "paymentOrder": null,
       "activityLog": [
         {
-          "at": "2026-11-09T15:52:44.035Z",
+          "at": "2026-11-09T18:02:19.755Z",
           "type": "created",
           "text": "Álbum criado no painel."
         }
       ],
       "antiPrintEnabled": true,
-      "coverKicker": "",
+      "coverKicker": "GALERIA OFICIAL EM ALTA RESOLUÇÃO",
+      "coverAuthor": "Carliane Carvalho"
+    },
+    {
+      "id": "alb_yanecarly",
+      "slug": "yanecarly",
+      "clientName": "yanecarly",
+      "title": "Ensaio — Yanzinho Gordinho Gostoso",
+      "subtitle": "FORTALEZA, CE",
+      "shootDate": "2026-11-09",
+      "welcomeMessage": "Escolham com calma as fotografias favoritas de vocês. Se desejarem guardar registros além do pacote contratado, o valor adicional é calculado automaticamente.",
+      "phase": "proofing",
+      "status": "awaiting_selection",
+      "protectionLevel": "watermark_lowres",
+      "watermarkEnabled": true,
+      "passwordEnabled": true,
+      "password": "1234",
+      "pinEnabled": true,
+      "downloadPin": "2026",
+      "extrasEnabled": true,
+      "packageName": "Ensaio Autoral",
+      "packageIncluded": 5,
+      "extraPhotoPrice": 1,
+      "coverSrc": "assets/images/carly-perfil.jpg",
+      "coverFocal": "50% 32%",
+      "design": {
+        "coverStyle": "centro",
+        "typography": "cinema",
+        "colorTheme": "dourado",
+        "gridStyle": "vertical",
+        "gridSpacing": "regular",
+        "gridSize": "regular",
+        "gridNavStyle": "icons_text",
+        "coverLogoVisible": true,
+        "coverLogoColor": "auto"
+      },
+      "selectionLocked": false,
+      "selectedIds": [],
+      "deliveryFavorites": [],
+      "photoComments": {},
+      "paymentOrder": null,
+      "activityLog": [],
+      "photos": [
+        {
+          "id": "yc_01",
+          "filename": "IMG_Carly.jpg",
+          "originalSrc": "assets/images/carly-perfil.jpg"
+        },
+        {
+          "id": "yc_02",
+          "filename": "IMG_7525.jpg",
+          "originalSrc": "assets/images/real/IMG_7525.jpg"
+        },
+        {
+          "id": "yc_03",
+          "filename": "IMG_7467.jpg",
+          "originalSrc": "assets/images/real/IMG_7467.jpg"
+        },
+        {
+          "id": "yc_04",
+          "filename": "IMG_6297.jpg",
+          "originalSrc": "assets/images/real/IMG_6297.jpg"
+        },
+        {
+          "id": "yc_05",
+          "filename": "IMG_6409.jpg",
+          "originalSrc": "assets/images/real/IMG_6409.jpg"
+        },
+        {
+          "id": "yc_06",
+          "filename": "IMG_6438.jpg",
+          "originalSrc": "assets/images/real/IMG_6438.jpg"
+        }
+      ],
+      "antiPrintEnabled": true,
+      "coverKicker": "GALERIA OFICIAL EM ALTA RESOLUÇÃO",
       "coverAuthor": "Carliane Carvalho"
     },
     {
@@ -709,9 +784,9 @@ const SITE_DATA = {
       "subtitle": "28 de Outubro, 2026 · Praia de Iracema",
       "shootDate": "2026-10-28",
       "welcomeMessage": "Cada fotografia aqui guarda o riso solto e o abraço de vocês naquela tarde dourada. Galeria liberada em alta resolução.",
-      "phase": "proofing",
+      "phase": "delivery",
       "status": "selection_paid",
-      "protectionLevel": "watermark_spotlight",
+      "protectionLevel": "watermark",
       "watermarkEnabled": true,
       "passwordEnabled": true,
       "password": "1234",
@@ -719,8 +794,8 @@ const SITE_DATA = {
       "downloadPin": "7788",
       "extrasEnabled": true,
       "packageName": "Ensaio Completo",
-      "packageIncluded": 5,
-      "extraPhotoPrice": 10,
+      "packageIncluded": 8,
+      "extraPhotoPrice": 20,
       "coverSrc": "assets/images/real/IMG_1186.jpg",
       "coverFocal": "50% 38%",
       "design": {
@@ -736,16 +811,13 @@ const SITE_DATA = {
       },
       "selectionLocked": true,
       "selectedIds": [
+        "d_01",
+        "d_02",
         "d_03",
-        "d_05",
-        "d_07",
-        "d_08",
-        "d_04",
-        "d_01"
+        "d_04"
       ],
       "deliveryFavorites": [
-        "d_01",
-        "d_04"
+        "d_01"
       ],
       "photoComments": {},
       "paymentOrder": {
@@ -756,23 +828,7 @@ const SITE_DATA = {
         "totalAmount": 10,
         "paidAt": "2026-11-09T09:57:01.000-04:00"
       },
-      "activityLog": [
-        {
-          "at": "2026-10-29T13:00:00.000Z",
-          "type": "selection",
-          "text": "Seleção concluída pelo cliente (8 fotos: 6 do pacote + 2 extras)."
-        },
-        {
-          "at": "2026-10-30T19:15:00.000Z",
-          "type": "payment",
-          "text": "Pagamento de R$ 40,00 aprovado via Mercado Pago Pix."
-        },
-        {
-          "at": "2026-11-02T16:40:00.000Z",
-          "type": "delivered",
-          "text": "Galeria de Entrega Final publicada em Alta Resolução."
-        }
-      ],
+      "activityLog": [],
       "photos": [
         {
           "id": "d_01",
@@ -793,26 +849,6 @@ const SITE_DATA = {
           "id": "d_04",
           "filename": "IMG_0978.jpg",
           "originalSrc": "assets/images/real/IMG_0978.jpg"
-        },
-        {
-          "id": "d_05",
-          "filename": "IMG_0997.jpg",
-          "originalSrc": "assets/images/real/IMG_0997.jpg"
-        },
-        {
-          "id": "d_06",
-          "filename": "IMG_1919.jpg",
-          "originalSrc": "assets/images/real/IMG_1919.jpg"
-        },
-        {
-          "id": "d_07",
-          "filename": "IMG_1943.jpg",
-          "originalSrc": "assets/images/real/IMG_1943.jpg"
-        },
-        {
-          "id": "d_08",
-          "filename": "IMG_2046.jpg",
-          "originalSrc": "assets/images/real/IMG_2046.jpg"
         }
       ],
       "antiPrintEnabled": true,
@@ -838,7 +874,7 @@ const SITE_DATA = {
       "extrasEnabled": true,
       "packageName": "Ensaio Afeto",
       "packageIncluded": 5,
-      "extraPhotoPrice": 20.00,
+      "extraPhotoPrice": 20,
       "coverSrc": "assets/images/carly-perfil.jpg",
       "coverFocal": "50% 32%",
       "design": {
@@ -853,110 +889,50 @@ const SITE_DATA = {
         "coverLogoColor": "auto"
       },
       "selectionLocked": false,
-      "selectedIds": ["p_02", "p_04", "p_05"],
+      "selectedIds": [
+        "p_02",
+        "p_04",
+        "p_05"
+      ],
       "deliveryFavorites": [],
       "photoComments": {},
       "paymentOrder": null,
       "activityLog": [],
       "photos": [
-        { "id": "p_01", "filename": "IMG_Carly.jpg", "originalSrc": "assets/images/carly-perfil.jpg" },
-        { "id": "p_02", "filename": "IMG_7525.jpg", "originalSrc": "assets/images/real/IMG_7525.jpg" },
-        { "id": "p_03", "filename": "IMG_7467.jpg", "originalSrc": "assets/images/real/IMG_7467.jpg" },
-        { "id": "p_04", "filename": "IMG_6297.jpg", "originalSrc": "assets/images/real/IMG_6297.jpg" },
-        { "id": "p_05", "filename": "IMG_6409.jpg", "originalSrc": "assets/images/real/IMG_6409.jpg" },
-        { "id": "p_06", "filename": "IMG_6438.jpg", "originalSrc": "assets/images/real/IMG_6438.jpg" }
+        {
+          "id": "p_01",
+          "filename": "IMG_Carly.jpg",
+          "originalSrc": "assets/images/carly-perfil.jpg"
+        },
+        {
+          "id": "p_02",
+          "filename": "IMG_7525.jpg",
+          "originalSrc": "assets/images/real/IMG_7525.jpg"
+        },
+        {
+          "id": "p_03",
+          "filename": "IMG_7467.jpg",
+          "originalSrc": "assets/images/real/IMG_7467.jpg"
+        },
+        {
+          "id": "p_04",
+          "filename": "IMG_6297.jpg",
+          "originalSrc": "assets/images/real/IMG_6297.jpg"
+        },
+        {
+          "id": "p_05",
+          "filename": "IMG_6409.jpg",
+          "originalSrc": "assets/images/real/IMG_6409.jpg"
+        },
+        {
+          "id": "p_06",
+          "filename": "IMG_6438.jpg",
+          "originalSrc": "assets/images/real/IMG_6438.jpg"
+        }
       ],
       "antiPrintEnabled": true,
       "coverKicker": "GALERIA OFICIAL EM ALTA RESOLUÇÃO",
       "coverAuthor": "Carliane Carvalho"
-    },
-    {
-      "id": "alb_demo_entrega_02",
-      "slug": "marina-e-pedro",
-      "clientName": "Marina & Pedro",
-      "title": "Marina & Pedro",
-      "subtitle": "28 de Outubro, 2026 · Praia de Iracema",
-      "shootDate": "2026-10-28",
-      "welcomeMessage": "Cada fotografia aqui guarda o riso solto e o abraço de vocês naquela tarde dourada. Galeria liberada em alta resolução.",
-      "phase": "delivery",
-      "status": "delivered",
-      "protectionLevel": "watermark",
-      "watermarkEnabled": true,
-      "passwordEnabled": true,
-      "password": "1234",
-      "pinEnabled": true,
-      "downloadPin": "7788",
-      "extrasEnabled": true,
-      "packageName": "Ensaio Completo",
-      "packageIncluded": 8,
-      "extraPhotoPrice": 20.00,
-      "coverSrc": "assets/images/real/IMG_1186.jpg",
-      "coverFocal": "50% 38%",
-      "design": {
-        "coverStyle": "borda",
-        "typography": "modern",
-        "colorTheme": "dourado",
-        "gridStyle": "vertical",
-        "gridSpacing": "regular",
-        "gridSize": "regular"
-      },
-      "selectionLocked": true,
-      "selectedIds": ["d_01", "d_02", "d_03", "d_04"],
-      "deliveryFavorites": ["d_01"],
-      "photoComments": {},
-      "paymentOrder": null,
-      "activityLog": [],
-      "photos": [
-        { "id": "d_01", "filename": "IMG_1186.jpg", "originalSrc": "assets/images/real/IMG_1186.jpg" },
-        { "id": "d_02", "filename": "IMG_1197.jpg", "originalSrc": "assets/images/real/IMG_1197.jpg" },
-        { "id": "d_03", "filename": "IMG_0975.jpg", "originalSrc": "assets/images/real/IMG_0975.jpg" },
-        { "id": "d_04", "filename": "IMG_0978.jpg", "originalSrc": "assets/images/real/IMG_0978.jpg" }
-      ]
-    },
-    {
-      "id": "alb_yanecarly",
-      "slug": "yanecarly",
-      "clientName": "yanecarly",
-      "title": "Ensaio — Yanzinho Gordinho Gostoso",
-      "subtitle": "FORTALEZA, CE",
-      "shootDate": "2026-11-09",
-      "welcomeMessage": "Escolham com calma as fotografias favoritas de vocês. Se desejarem guardar registros além do pacote contratado, o valor adicional é calculado automaticamente.",
-      "phase": "proofing",
-      "status": "awaiting_selection",
-      "protectionLevel": "watermark_lowres",
-      "watermarkEnabled": true,
-      "passwordEnabled": true,
-      "password": "1234",
-      "pinEnabled": true,
-      "downloadPin": "2026",
-      "extrasEnabled": true,
-      "packageName": "Ensaio Autoral",
-      "packageIncluded": 5,
-      "extraPhotoPrice": 1.00,
-      "coverSrc": "assets/images/carly-perfil.jpg",
-      "coverFocal": "50% 32%",
-      "design": {
-        "coverStyle": "centro",
-        "typography": "cinema",
-        "colorTheme": "dourado",
-        "gridStyle": "vertical",
-        "gridSpacing": "regular",
-        "gridSize": "regular"
-      },
-      "selectionLocked": false,
-      "selectedIds": [],
-      "deliveryFavorites": [],
-      "photoComments": {},
-      "paymentOrder": null,
-      "activityLog": [],
-      "photos": [
-        { "id": "yc_01", "filename": "IMG_Carly.jpg", "originalSrc": "assets/images/carly-perfil.jpg" },
-        { "id": "yc_02", "filename": "IMG_7525.jpg", "originalSrc": "assets/images/real/IMG_7525.jpg" },
-        { "id": "yc_03", "filename": "IMG_7467.jpg", "originalSrc": "assets/images/real/IMG_7467.jpg" },
-        { "id": "yc_04", "filename": "IMG_6297.jpg", "originalSrc": "assets/images/real/IMG_6297.jpg" },
-        { "id": "yc_05", "filename": "IMG_6409.jpg", "originalSrc": "assets/images/real/IMG_6409.jpg" },
-        { "id": "yc_06", "filename": "IMG_6438.jpg", "originalSrc": "assets/images/real/IMG_6438.jpg" }
-      ]
     }
   ],
   "clientWatermarkConfig": {
