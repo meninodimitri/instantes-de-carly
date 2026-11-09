@@ -5,7 +5,7 @@
  */
 
 const SITE_DATA = {
-  "cmsVersion": "2026-11-09T02:40:15.310Z",
+  "cmsVersion": "2026-11-09T02:57:59.602Z",
   "brand": {
     "name": "Instantes de Carly",
     "founder": "Carliane Carvalho (Carly)",
@@ -451,7 +451,7 @@ const SITE_DATA = {
       "categoryName": "Retratos",
       "aspect": "portrait",
       "image": "assets/images/real/IMG_2046.jpg",
-      "objectPosition": "center 25%",
+      "objectPosition": "center 51%",
       "location": "Ponte dos Ingleses",
       "caption": "A arquitetura histórica da orla emoldurando a expressão autêntica e serena."
     },
