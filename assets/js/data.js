@@ -5,7 +5,7 @@
  */
 
 const SITE_DATA = {
-  "cmsVersion": "2026-11-09T20:39:16.114Z",
+  "cmsVersion": "2026-11-09T20:42:21.184Z",
   "brand": {
     "name": "Instantes de Carly",
     "founder": "Carliane Carvalho (Carly)",
@@ -593,7 +593,115 @@ const SITE_DATA = {
     "googleReviewFormUrl": "https://search.google.com/local/writereview?placeid=ChIJjZQfEEERvikRuXdgNX7jr3s",
     "reviews": []
   },
-  "clientAlbums": [],
+  "clientAlbums": [
+    {
+      "id": "alb_1794256830543",
+      "slug": "yan-gordin",
+      "clientName": "Yan Gordin",
+      "title": "Ensaio — Yan Gordin",
+      "subtitle": "FORTALEZA, CEARÁ & REGIÃO METROPOLITANA",
+      "phase": "proofing",
+      "status": "awaiting_selection",
+      "protectionLevel": "watermark_lowres",
+      "watermarkEnabled": true,
+      "passwordEnabled": true,
+      "password": "1219",
+      "pinEnabled": false,
+      "downloadPin": "",
+      "packageName": "Ensaio Autoral",
+      "packageIncluded": 5,
+      "extrasEnabled": true,
+      "extraPhotoPrice": 1,
+      "allowHighResDownload": true,
+      "allowWebDownload": true,
+      "welcomeMessage": "Olá, Yan Gordin! Escolham com carinho suas fotografias favoritas.",
+      "coverSrc": "assets/images/uploads/foto-20261109204221-01.jpg",
+      "coverFocal": "50% 35%",
+      "design": {
+        "coverStyle": "moldura",
+        "typography": "bold",
+        "colorTheme": "iracema",
+        "gridStyle": "square",
+        "gridSpacing": "regular",
+        "gridSize": "large",
+        "gridNavStyle": "icons_only",
+        "coverLogoVisible": true,
+        "coverLogoColor": "auto"
+      },
+      "photos": [
+        {
+          "id": "ph_1794256845474_0",
+          "filename": "IMG-20260904-WA0065.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261109204221-02.jpg"
+        },
+        {
+          "id": "ph_1794256845509_1",
+          "filename": "IMG-20250519-WA0035.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261109204221-03.jpg"
+        },
+        {
+          "id": "ph_1794256845577_2",
+          "filename": "IMG-20250530-WA0102.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261109204221-04.jpg"
+        },
+        {
+          "id": "ph_1794256845618_3",
+          "filename": "IMG-20250613-WA0074.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261109204221-05.jpg"
+        },
+        {
+          "id": "ph_1794256845752_4",
+          "filename": "IMG-20250613-WA0063.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261109204221-06.jpg"
+        },
+        {
+          "id": "ph_1794256845782_5",
+          "filename": "IMG-20250613-WA0079.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261109204221-07.jpg"
+        },
+        {
+          "id": "ph_1794256845869_6",
+          "filename": "IMG-20250613-WA0073.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261109204221-08.jpg"
+        },
+        {
+          "id": "ph_1794256845907_7",
+          "filename": "IMG-20250613-WA0077.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261109204221-09.jpg"
+        },
+        {
+          "id": "ph_1794256846004_8",
+          "filename": "Gemini_Generated_Image_cn2estcn2estcn2e.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261109204221-10.jpg"
+        },
+        {
+          "id": "ph_1794256846093_9",
+          "filename": "Gemini_Generated_Image_luk4ifluk4ifluk4.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261109204221-11.jpg"
+        },
+        {
+          "id": "ph_1794256846123_10",
+          "filename": "WhatsApp Image 2026-09-09 at 21.12.32.jpeg",
+          "originalSrc": "assets/images/uploads/foto-20261109204221-12.jpg"
+        }
+      ],
+      "selectedIds": [],
+      "photoComments": {},
+      "deliveryFavorites": [],
+      "selectionLocked": false,
+      "paymentOrder": null,
+      "activityLog": [
+        {
+          "at": "2026-11-09T20:40:30.544Z",
+          "type": "created",
+          "text": "Álbum criado no painel."
+        }
+      ],
+      "antiPrintEnabled": true,
+      "coverKicker": "",
+      "coverAuthor": "Carliane Carvalho"
+    }
+  ],
   "clientWatermarkConfig": {
     "enabled": true,
     "mode": "image",
@@ -602,7 +710,7 @@ const SITE_DATA = {
     "pattern": "tiled",
     "opacity": 0.85,
     "scale": 0.15,
-    "updatedAt": 1794256756114
+    "updatedAt": 1794256907702
   },
   "clientPaymentConfig": {
     "enableMercadoPago": true,
