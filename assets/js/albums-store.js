@@ -1004,8 +1004,40 @@
     return crc.toString(16).toUpperCase().padStart(4, '0');
   }
 
+  function isValidCpf(s) {
+    if (s.length !== 11 || /^(\d)\1{10}$/.test(s)) return false;
+    let sum = 0;
+    for (let i = 0; i < 9; i++) sum += parseInt(s[i], 10) * (10 - i);
+    let r = 11 - (sum % 11);
+    let d1 = r >= 10 ? 0 : r;
+    if (d1 !== parseInt(s[9], 10)) return false;
+    sum = 0;
+    for (let i = 0; i < 10; i++) sum += parseInt(s[i], 10) * (11 - i);
+    r = 11 - (sum % 11);
+    let d2 = r >= 10 ? 0 : r;
+    return d2 === parseInt(s[10], 10);
+  }
+
+  function normalizePixKey(rawKey) {
+    const raw = String(rawKey || '').trim();
+    if (!raw) return '';
+    if (raw.includes('@')) return raw.toLowerCase();
+    if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(raw)) {
+      return raw.toLowerCase();
+    }
+    const digits = raw.replace(/\D/g, '');
+    if (digits.length === 14) return digits; // CNPJ
+    if (raw.startsWith('+55')) return `+${digits}`;
+    if (digits.length === 11) {
+      if (isValidCpf(digits)) return digits; // CPF válido
+      return `+55${digits}`; // Telefone celular celular sem +55 (ex: 85985247276)
+    }
+    if (digits.length === 10) return `+55${digits}`; // Telefone fixo (ex: 8532001122)
+    return raw;
+  }
+
   function generatePixPayload({ pixKey, merchantName, merchantCity, amount, txid }) {
-    const cleanKey = String(pixKey || '').trim();
+    const cleanKey = normalizePixKey(pixKey);
     const cleanName = sanitizeAscii(merchantName || 'ESTUDIO FOTOGRAFIA', 25) || 'ESTUDIO';
     const cleanCity = sanitizeAscii(merchantCity || 'FORTALEZA', 15) || 'FORTALEZA';
     const cleanTxid = sanitizeAscii(txid || 'FOTOSEXTRAS', 25).replace(/\s+/g, '') || '***';
@@ -1165,6 +1197,7 @@
     processUploadedAlbumFile,
     readWatermarkImageFile,
     formatLightroomCodes,
+    normalizePixKey,
     generatePixPayload,
     buildZipBlob,
     fetchImageAsBytes,

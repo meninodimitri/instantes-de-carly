@@ -1084,45 +1084,25 @@
      7. CHECKOUT SEGURO DE FOTOS EXTRAS (MERCADO PAGO + PIX DIRETO)
      ========================================================================== */
   function renderQrMatrix(canvas, payloadStr) {
-    if (!canvas) return;
+    if (!canvas || !payloadStr) return;
+    if (window.QRCode && typeof window.QRCode.toCanvas === 'function') {
+      window.QRCode.toCanvas(canvas, payloadStr, {
+        width: canvas.width || 168,
+        margin: 1,
+        color: {
+          dark: '#1B2733',
+          light: '#FFFFFF'
+        }
+      }, (err) => {
+        if (err) console.error('Erro ao renderizar QR Code:', err);
+      });
+      return;
+    }
+
     const ctx = canvas.getContext('2d');
     const size = canvas.width;
-    const modules = 29;
-    const pad = 10;
-    const cell = (size - pad * 2) / modules;
-
     ctx.fillStyle = '#FFFFFF';
     ctx.fillRect(0, 0, size, size);
-
-    const drawFinder = (mx, my) => {
-      ctx.fillStyle = '#1B2733';
-      ctx.fillRect(pad + mx * cell, pad + my * cell, 7 * cell, 7 * cell);
-      ctx.fillStyle = '#FFFFFF';
-      ctx.fillRect(pad + (mx + 1) * cell, pad + (my + 1) * cell, 5 * cell, 5 * cell);
-      ctx.fillStyle = '#1B2733';
-      ctx.fillRect(pad + (mx + 2) * cell, pad + (my + 2) * cell, 3 * cell, 3 * cell);
-    };
-
-    drawFinder(0, 0);
-    drawFinder(modules - 7, 0);
-    drawFinder(0, modules - 7);
-
-    let seed = 2166136261;
-    for (let i = 0; i < payloadStr.length; i++) {
-      seed ^= payloadStr.charCodeAt(i);
-      seed = Math.imul(seed, 16777619) >>> 0;
-    }
-
-    ctx.fillStyle = '#1B2733';
-    for (let r = 0; r < modules; r++) {
-      for (let c = 0; c < modules; c++) {
-        if ((r < 8 && c < 8) || (r < 8 && c >= modules - 8) || (r >= modules - 8 && c < 8)) continue;
-        seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
-        if (((seed >>> 16) ^ payloadStr.charCodeAt((r * modules + c) % payloadStr.length)) & 1) {
-          ctx.fillRect(Math.round(pad + c * cell), Math.round(pad + r * cell), Math.ceil(cell), Math.ceil(cell));
-        }
-      }
-    }
   }
 
   function openCheckoutModal() {
@@ -1178,7 +1158,13 @@
       txid
     });
 
-    if (els.directPixKeyLabel) els.directPixKeyLabel.textContent = payCfg.pixKey || 'contato@instantesdecarly.com.br';
+    const rawDirectKey = payCfg.pixKey || 'contato@instantesdecarly.com.br';
+    const digitsKey = rawDirectKey.replace(/\D/g, '');
+    let displayDirectKey = rawDirectKey;
+    if (digitsKey.length === 11 && !rawDirectKey.includes('@')) {
+      displayDirectKey = `(${digitsKey.slice(0, 2)}) ${digitsKey.slice(2, 7)}-${digitsKey.slice(7)}`;
+    }
+    if (els.directPixKeyLabel) els.directPixKeyLabel.textContent = displayDirectKey;
     if (els.directPixCode) els.directPixCode.value = directPayload;
     renderQrMatrix(els.directQrCanvas, directPayload);
 
@@ -1202,7 +1188,19 @@
         const data = await res.json();
         if (res.ok && data.pixCopyPaste) {
           if (els.mpPixCode) els.mpPixCode.value = data.pixCopyPaste;
-          renderQrMatrix(els.mpQrCanvas, data.pixCopyPaste);
+          if (data.pixQrBase64) {
+            const qrImg = new Image();
+            qrImg.onload = () => {
+              const ctx = els.mpQrCanvas?.getContext('2d');
+              if (ctx && els.mpQrCanvas) {
+                ctx.clearRect(0, 0, els.mpQrCanvas.width, els.mpQrCanvas.height);
+                ctx.drawImage(qrImg, 0, 0, els.mpQrCanvas.width, els.mpQrCanvas.height);
+              }
+            };
+            qrImg.src = `data:image/png;base64,${data.pixQrBase64}`;
+          } else {
+            renderQrMatrix(els.mpQrCanvas, data.pixCopyPaste);
+          }
           if (els.btnMpCardLink && data.checkoutUrl) {
             els.btnMpCardLink.onclick = () => window.open(data.checkoutUrl, '_blank', 'noopener');
           }
