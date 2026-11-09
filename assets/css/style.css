@@ -1180,6 +1180,11 @@ p, .lead-editorial, .proposta-text, .sobre-text {
   aspect-ratio: 4 / 5;
 }
 
+/* Vitrine do Acervo (Filtro 'todos'): Proporção editorial uniforme 3:2 para harmonia perfeita em todas as duplas */
+.portfolio-editorial-grid.is-acervo-overview .work-item .work-img-box {
+  aspect-ratio: 3 / 2 !important;
+}
+
 @media (max-width: 992px) and (min-width: 681px) {
   .portfolio-editorial-grid .work-img-box {
     aspect-ratio: 4 / 3 !important;

@@ -188,6 +188,20 @@ test.describe('2. Painel Administrativo Visual (admin.html)', () => {
 
     // O segundo item agora é o que era o primeiro antes
     expect(adminTitlesAfter[1]).toBe(adminTitlesBefore[0]);
+
+    // 4. Teste de ajuste de enquadramento vertical em tempo real no Preview
+    const cardDrawerBtn = vitrineCards.first().locator('.js-toggle-port-drawer');
+    await cardDrawerBtn.click();
+    await page.waitForTimeout(200);
+
+    const focalSlider = vitrineCards.first().locator('.js-port-focal');
+    await focalSlider.fill('75');
+    await focalSlider.dispatchEvent('input');
+    await page.waitForTimeout(200);
+
+    const firstPreviewImg = iframe.locator('#portfolio-grid .work-item img.work-img').first();
+    const focalStyle = await firstPreviewImg.evaluate((el) => el.style.objectPosition);
+    expect(focalStyle).toBe('center 75%');
   });
 
 });

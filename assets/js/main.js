@@ -166,6 +166,10 @@ function initCmsPreviewBridge() {
       }
     } else if (msg.type === 'CMS_SELECT_PORTFOLIO_CATEGORY' && msg.category) {
       selectPortfolioCategory(msg.category, { scrollToFilters: true });
+    } else if (msg.type === 'CMS_UPDATE_FOCAL' && msg.image) {
+      document.querySelectorAll(`#portfolio-grid img[src="${msg.image}"], #portfolio-grid img[alt*="${msg.image.split('/').pop()}"]`).forEach((img) => {
+        img.style.objectPosition = msg.objectPosition;
+      });
     }
   });
 
@@ -1090,7 +1094,7 @@ function renderPortfolioGrid(category) {
       : '';
 
     return `
-      <article class="work-item" data-index="${index}" data-category="${escapeHtml(photo.category)}" data-aspect="${escapeHtml(photo.aspect || 'landscape')}" data-col-span="${entry.colSpan}" data-row-aspect="${entry.rowAspect}" tabindex="0" role="button" aria-label="${ariaLabel}">
+      <article class="work-item" data-index="${index}" data-category="${escapeHtml(photo.category)}" data-aspect="${isOverview ? 'landscape' : escapeHtml(photo.aspect || 'landscape')}" data-col-span="${entry.colSpan}" data-row-aspect="${entry.rowAspect}" tabindex="0" role="button" aria-label="${ariaLabel}">
         <div class="work-frame">
           <div class="work-img-box">
             <img class="work-img" src="${escapeHtml(photo.image)}" alt="${escapeHtml(photo.title)} — ${escapeHtml(photo.location || '')}" loading="lazy" style="object-position: ${escapeHtml(objPos)};" />

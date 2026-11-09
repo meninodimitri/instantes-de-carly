@@ -882,6 +882,14 @@ function bindVitrineCardsEvents(listEl) {
       photo.objectPosition = `center ${val}%`;
       if (thumbImg) thumbImg.style.objectPosition = photo.objectPosition;
       if (focalLabel) focalLabel.textContent = `${val}%`;
+
+      // Atualização imediata em tempo real no Preview ao vivo (sem debounce)
+      sendToPreviewIframe({
+        type: 'CMS_UPDATE_FOCAL',
+        image: photo.image,
+        objectPosition: photo.objectPosition
+      });
+
       markDirtyAndSync(false);
     });
 
@@ -1035,6 +1043,14 @@ function bindGeneralPortfolioEvents(listEl, isTodas) {
       item.objectPosition = `center ${val}%`;
       if (thumbImg) thumbImg.style.objectPosition = item.objectPosition;
       if (focalLabel) focalLabel.textContent = `${val}%`;
+
+      // Atualização imediata em tempo real no Preview ao vivo (sem debounce)
+      sendToPreviewIframe({
+        type: 'CMS_UPDATE_FOCAL',
+        image: item.image,
+        objectPosition: item.objectPosition
+      });
+
       markDirtyAndSync(false);
     });
 

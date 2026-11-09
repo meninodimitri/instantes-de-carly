@@ -41,6 +41,14 @@ test.describe('1. Site Principal (index.html)', () => {
     const count = await workItems.count();
     expect(count).toBeGreaterThan(0);
 
+    // Verifica simetria editorial impecável na Vitrine do Acervo: alturas idênticas e alinhamento de linha
+    const tops = await page.locator('#portfolio-grid .work-item').evaluateAll(els => els.map(el => Math.round(el.getBoundingClientRect().top)));
+    if (tops.length >= 6) {
+      expect(tops[0]).toBe(tops[1]);
+      expect(tops[2]).toBe(tops[3]);
+      expect(tops[4]).toBe(tops[5]);
+    }
+
     const firstPill = page.locator('.work-collection-pill').first();
     await expect(firstPill).toBeVisible();
 
