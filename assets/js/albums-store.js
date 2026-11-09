@@ -443,20 +443,20 @@
       storageMode: 'local',
       watermarkConfig: {
         enabled: true,
-        mode: 'image',          // 'image' (PNG do fotógrafo) | 'text'
+        mode: 'text',          // 'image' | 'text'
         imageSrc: brand.defaultWatermarkImg,
-        text: brand.studioName.toUpperCase(),
+        text: 'INSTANTES DE CARLY',
         pattern: 'tiled',       // 'tiled' (grade diagonal) | 'center' (centralizada)
-        opacity: 0.45,          // 0.15 a 0.85
-        scale: 0.28,            // proporção em relação à foto
-        updatedAt: 1
+        opacity: 0.85,          // 0.15 a 0.85
+        scale: 0.15,            // proporção em relação à foto
+        updatedAt: Date.now()
       },
       paymentConfig: {
         enableMercadoPago: true,
         enableDirectPix: true,
-        pixKey: 'contato@instantesdecarly.com.br',
-        merchantName: brand.studioName,
-        merchantCity: brand.city
+        pixKey: '+5585985247276',
+        merchantName: 'Carliane Carvalho',
+        merchantCity: 'FORTALEZA'
       },
       albums: [
         {
@@ -479,7 +479,7 @@
           packageName: 'Ensaio Afeto',
           packageIncluded: 5,
           extraPhotoPrice: 20.00,
-          coverSrc: 'assets/images/real/IMG_7513.jpg',
+          coverSrc: 'assets/images/carly-perfil.jpg',
           coverFocal: '50% 32%',
           design: {
             coverStyle: 'borda',
@@ -490,7 +490,7 @@
             gridSize: 'regular'
           },
           selectionLocked: false,
-          selectedIds: ['p_01', 'p_02', 'p_04', 'p_05'],
+          selectedIds: ['p_02', 'p_04', 'p_05'],
           deliveryFavorites: [],
           photoComments: {
             p_02: 'Carly, amei essa luz! Pode suavizar só um fiozinho de cabelo no rosto?'
@@ -500,7 +500,7 @@
             { at: '2026-11-07T14:20:00.000Z', type: 'created', text: 'Galeria de seleção criada e protegida por senha.' }
           ],
           photos: [
-            { id: 'p_01', filename: 'IMG_7513.jpg', originalSrc: 'assets/images/real/IMG_7513.jpg' },
+            { id: 'p_01', filename: 'IMG_Carly.jpg', originalSrc: 'assets/images/carly-perfil.jpg' },
             { id: 'p_02', filename: 'IMG_7525.jpg', originalSrc: 'assets/images/real/IMG_7525.jpg' },
             { id: 'p_03', filename: 'IMG_7467.jpg', originalSrc: 'assets/images/real/IMG_7467.jpg' },
             { id: 'p_04', filename: 'IMG_6297.jpg', originalSrc: 'assets/images/real/IMG_6297.jpg' },
@@ -637,20 +637,57 @@
           root.albums.push(JSON.parse(JSON.stringify(cAlb)));
         } else {
           const localAlb = root.albums[existingIdx];
-          if ((!localAlb.photos || localAlb.photos.length === 0) && cAlb.photos && cAlb.photos.length > 0) {
-            root.albums[existingIdx] = JSON.parse(JSON.stringify(cAlb));
+          const merged = JSON.parse(JSON.stringify(cAlb));
+          // Preserva seleções de fotos e comentários feitos localmente pelo cliente
+          if (Array.isArray(localAlb.photos) && Array.isArray(merged.photos)) {
+            const localMap = new Map();
+            localAlb.photos.forEach((lp) => {
+              const k = lp.id || lp.originalSrc;
+              if (k) localMap.set(k, lp);
+            });
+            merged.photos.forEach((mp) => {
+              const k = mp.id || mp.originalSrc;
+              const lp = localMap.get(k);
+              if (lp) {
+                if (lp.selected) mp.selected = true;
+                if (lp.clientNote) mp.clientNote = lp.clientNote;
+              }
+            });
           }
+          if (Array.isArray(localAlb.selectedIds) && (!merged.selectedIds || merged.selectedIds.length === 0)) {
+            merged.selectedIds = localAlb.selectedIds;
+          }
+          if (localAlb.photoComments && (!merged.photoComments || Object.keys(merged.photoComments).length === 0)) {
+            merged.photoComments = localAlb.photoComments;
+          }
+          if (Array.isArray(localAlb.deliveryFavorites) && (!merged.deliveryFavorites || merged.deliveryFavorites.length === 0)) {
+            merged.deliveryFavorites = localAlb.deliveryFavorites;
+          }
+          if (localAlb.unlockedAt) merged.unlockedAt = localAlb.unlockedAt;
+          if (localAlb.payment && !merged.payment) merged.payment = localAlb.payment;
+          if (localAlb.paymentOrder && !merged.paymentOrder) merged.paymentOrder = localAlb.paymentOrder;
+          if (localAlb.status === 'selection_paid' && merged.status !== 'selection_paid') {
+            merged.status = 'selection_paid';
+            merged.selectionLocked = true;
+          }
+          root.albums[existingIdx] = merged;
         }
       });
     }
 
-    if (!root.watermarkConfig) {
+    // Aplica configurações centrais da nuvem com prioridade sobre defaults locais
+    if (activeSiteData && activeSiteData.clientWatermarkConfig) {
+      root.watermarkConfig = JSON.parse(JSON.stringify(activeSiteData.clientWatermarkConfig));
+    } else if (!root.watermarkConfig) {
       root.watermarkConfig = createInitialDemoState().watermarkConfig;
     }
     if (typeof root.watermarkConfig.enabled !== 'boolean') {
       root.watermarkConfig.enabled = true;
     }
-    if (!root.paymentConfig) {
+
+    if (activeSiteData && activeSiteData.clientPaymentConfig) {
+      root.paymentConfig = JSON.parse(JSON.stringify(activeSiteData.clientPaymentConfig));
+    } else if (!root.paymentConfig) {
       root.paymentConfig = createInitialDemoState().paymentConfig;
     }
     root.albums.forEach(normalizeAlbum);

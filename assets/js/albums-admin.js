@@ -259,7 +259,7 @@
 
     const seq = ++previewRenderSeq;
     const activeAlbum = getActiveAlbum();
-    const sampleSrc = activeAlbum?.photos?.[0]?.originalSrc || activeAlbum?.coverSrc || 'assets/images/real/IMG_7513.jpg';
+    const sampleSrc = activeAlbum?.photos?.[0]?.originalSrc || activeAlbum?.coverSrc || 'assets/images/carly-perfil.jpg';
     const wmEnabled = activeAlbum ? activeAlbum.watermarkEnabled !== false : true;
     const level = activeAlbum?.protectionLevel || 'watermark';
 
@@ -643,7 +643,7 @@
   function renderDesignSubTab(activeAlbum) {
     const presets = window.AlbumsStore.DESIGN_PRESETS;
     const design = activeAlbum.design || window.AlbumsStore.getDefaultDesign();
-    const coverSrc = activeAlbum.coverSrc || activeAlbum.photos?.[0]?.originalSrc || 'assets/images/real/IMG_7513.jpg';
+    const coverSrc = activeAlbum.coverSrc || activeAlbum.photos?.[0]?.originalSrc || 'assets/images/carly-perfil.jpg';
     const focal = parseFocalCoords(activeAlbum.coverFocal);
     const shortTitle = (activeAlbum.title || activeAlbum.clientName || 'Álbum').slice(0, 24);
 
@@ -1003,8 +1003,8 @@
 
           <div>
             <div class="alb-wm-live-card" id="adm-wm-live-card">
-              <img id="adm-wm-live-preview" class="adm-wm-base" src="assets/images/real/IMG_7513.jpg" alt="Prévia viva da proteção" />
-              <img id="adm-wm-live-reveal" class="adm-wm-reveal" src="assets/images/real/IMG_7513.jpg" alt="" hidden />
+              <img id="adm-wm-live-preview" class="adm-wm-base" src="assets/images/carly-perfil.jpg" alt="Prévia viva da proteção" />
+              <img id="adm-wm-live-reveal" class="adm-wm-reveal" src="assets/images/carly-perfil.jpg" alt="" hidden />
               <div class="alb-wm-live-badge">
                 <span>${activeProt === 'watermark_spotlight' ? 'Passe o mouse p/ testar' : 'Prévia real'}</span>
                 <strong id="adm-wm-live-caption">${escapeHtml(getProtectionLabel(activeProt, wmEnabled))}</strong>
@@ -1406,6 +1406,21 @@
     });
   }
 
+  function syncAdminStateDirty() {
+    if (typeof cmsData !== 'undefined' && cmsData && albumsState) {
+      cmsData.clientAlbums = albumsState.albums;
+      cmsData.clientWatermarkConfig = albumsState.watermarkConfig;
+      cmsData.clientPaymentConfig = albumsState.paymentConfig;
+      if (typeof markDirty === 'function') markDirty();
+    }
+  }
+
+  async function persistAlbumsStateAndSync(notifyMsg = null) {
+    await window.AlbumsStore.saveState(albumsState);
+    syncAdminStateDirty();
+    if (notifyMsg) notifyAdminToast(notifyMsg);
+  }
+
   function bindAlbumWorkspaceEvents(activeAlbum) {
     const panel = document.getElementById('panel-albums');
     if (!panel) return;
@@ -1415,6 +1430,7 @@
       clearTimeout(liveSaveTimer);
       liveSaveTimer = setTimeout(async () => {
         await window.AlbumsStore.saveState(albumsState);
+        syncAdminStateDirty();
       }, 350);
     };
 
@@ -1507,13 +1523,12 @@
         activeAlbum.status = nextPhase === 'delivery'
           ? 'delivered'
           : (activeAlbum.selectionLocked ? 'selection_completed' : 'awaiting_selection');
-        await window.AlbumsStore.saveState(albumsState);
-        renderAlbumsAdminPanel();
-        notifyAdminToast(
+        await persistAlbumsStateAndSync(
           nextPhase === 'delivery'
             ? 'Fase 2 ativada: álbum publicado como Entrega Final!'
             : 'Fase 1 ativada: galeria em modo protegido de seleção.'
         );
+        renderAlbumsAdminPanel();
       });
     });
 
@@ -1779,7 +1794,7 @@
     /* --- SUB-ABA 3: PROTEÇÃO & MARCA D'ÁGUA --- */
     document.getElementById('sw-alb-wm-enabled')?.addEventListener('change', async (e) => {
       activeAlbum.watermarkEnabled = Boolean(e.target.checked);
-      await window.AlbumsStore.saveState(albumsState);
+      await persistAlbumsStateAndSync();
       renderAlbumsAdminPanel();
     });
 
@@ -1787,9 +1802,8 @@
       btn.addEventListener('click', async () => {
         const nextProt = btn.getAttribute('data-set-prot');
         activeAlbum.protectionLevel = nextProt;
-        await window.AlbumsStore.saveState(albumsState);
+        await persistAlbumsStateAndSync(`Proteção alterada: ${getProtectionLabel(nextProt, activeAlbum.watermarkEnabled !== false)}`);
         renderAlbumsAdminPanel();
-        notifyAdminToast(`Proteção alterada: ${getProtectionLabel(nextProt, activeAlbum.watermarkEnabled !== false)}`);
       });
     });
 
@@ -1800,7 +1814,7 @@
           mode: btn.getAttribute('data-wm-mode'),
           updatedAt: Date.now()
         };
-        await window.AlbumsStore.saveState(albumsState);
+        await persistAlbumsStateAndSync();
         renderAlbumsAdminPanel();
       });
     });
@@ -1812,7 +1826,7 @@
           pattern: btn.getAttribute('data-wm-pattern'),
           updatedAt: Date.now()
         };
-        await window.AlbumsStore.saveState(albumsState);
+        await persistAlbumsStateAndSync();
         renderAlbumsAdminPanel();
       });
     });
@@ -1830,9 +1844,8 @@
           imageSrc: pngDataUrl,
           updatedAt: Date.now()
         };
-        await window.AlbumsStore.saveState(albumsState);
+        await persistAlbumsStateAndSync('Logo personalizada aplicada na marca d\'água!');
         renderAlbumsAdminPanel();
-        notifyAdminToast('Logo personalizada aplicada na marca d\'água!');
       } catch (_) {
         notifyAdminToast('Não foi possível ler a imagem da marca d\'água.');
       }
@@ -1846,9 +1859,8 @@
         imageSrc: defaults.defaultWatermarkImg,
         updatedAt: Date.now()
       };
-      await window.AlbumsStore.saveState(albumsState);
+      await persistAlbumsStateAndSync('Logo padrão do estúdio restaurada.');
       renderAlbumsAdminPanel();
-      notifyAdminToast('Logo padrão do estúdio restaurada.');
     });
 
     document.getElementById('wm-text-input')?.addEventListener('change', async (e) => {
@@ -1857,7 +1869,7 @@
         text: e.target.value.trim() || window.AlbumsStore.getBrandDefaults().studioName.toUpperCase(),
         updatedAt: Date.now()
       };
-      await window.AlbumsStore.saveState(albumsState);
+      await persistAlbumsStateAndSync();
       refreshWatermarkSamplePreview();
     });
 
@@ -1872,7 +1884,7 @@
         opacity: Math.min(0.85, Math.max(0.15, Number(opacityRange.value) / 100)),
         updatedAt: Date.now()
       };
-      await window.AlbumsStore.saveState(albumsState);
+      await persistAlbumsStateAndSync();
       refreshWatermarkSamplePreview();
     });
 
@@ -1887,7 +1899,7 @@
         scale: Math.min(0.60, Math.max(0.15, Number(scaleRange.value) / 100)),
         updatedAt: Date.now()
       };
-      await window.AlbumsStore.saveState(albumsState);
+      await persistAlbumsStateAndSync();
       refreshWatermarkSamplePreview();
     });
 
@@ -1895,7 +1907,7 @@
     document.getElementById('sw-alb-extras')?.addEventListener('change', async (e) => {
       flushTextMetaInputs();
       activeAlbum.extrasEnabled = Boolean(e.target.checked);
-      await window.AlbumsStore.saveState(albumsState);
+      await persistAlbumsStateAndSync();
       renderAlbumsAdminPanel();
     });
 
@@ -1905,7 +1917,7 @@
       if (activeAlbum.passwordEnabled && !activeAlbum.password) {
         activeAlbum.password = '1234';
       }
-      await window.AlbumsStore.saveState(albumsState);
+      await persistAlbumsStateAndSync();
       renderAlbumsAdminPanel();
     });
 
@@ -1915,7 +1927,7 @@
       if (activeAlbum.pinEnabled && !activeAlbum.downloadPin) {
         activeAlbum.downloadPin = '2026';
       }
-      await window.AlbumsStore.saveState(albumsState);
+      await persistAlbumsStateAndSync();
       renderAlbumsAdminPanel();
     });
 
@@ -1927,9 +1939,8 @@
 
     document.getElementById('btn-save-album-meta')?.addEventListener('click', async () => {
       flushTextMetaInputs();
-      await window.AlbumsStore.saveState(albumsState);
+      await persistAlbumsStateAndSync('Configurações do álbum salvas!');
       renderAlbumsAdminPanel();
-      notifyAdminToast('Configurações do álbum salvas!');
     });
 
     document.getElementById('btn-reset-demo-albums')?.addEventListener('click', async () => {

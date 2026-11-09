@@ -5,7 +5,7 @@
  */
 
 const SITE_DATA = {
-  "cmsVersion": "2026-11-09T17:03:37.301Z",
+  "cmsVersion": "2026-11-09T17:45:00.000Z",
   "brand": {
     "name": "Instantes de Carly",
     "founder": "Carliane Carvalho (Carly)",
@@ -838,8 +838,8 @@ const SITE_DATA = {
       "extrasEnabled": true,
       "packageName": "Ensaio Afeto",
       "packageIncluded": 5,
-      "extraPhotoPrice": 20,
-      "coverSrc": "assets/images/real/IMG_7513.jpg",
+      "extraPhotoPrice": 20.00,
+      "coverSrc": "assets/images/carly-perfil.jpg",
       "coverFocal": "50% 32%",
       "design": {
         "coverStyle": "borda",
@@ -853,53 +853,129 @@ const SITE_DATA = {
         "coverLogoColor": "auto"
       },
       "selectionLocked": false,
-      "selectedIds": [
-        "p_01",
-        "p_02",
-        "p_04",
-        "p_05"
-      ],
+      "selectedIds": ["p_02", "p_04", "p_05"],
       "deliveryFavorites": [],
       "photoComments": {},
       "paymentOrder": null,
       "activityLog": [],
       "photos": [
-        {
-          "id": "p_01",
-          "filename": "IMG_7513.jpg",
-          "originalSrc": "assets/images/real/IMG_7513.jpg"
-        },
-        {
-          "id": "p_02",
-          "filename": "IMG_7525.jpg",
-          "originalSrc": "assets/images/real/IMG_7525.jpg"
-        },
-        {
-          "id": "p_03",
-          "filename": "IMG_7467.jpg",
-          "originalSrc": "assets/images/real/IMG_7467.jpg"
-        },
-        {
-          "id": "p_04",
-          "filename": "IMG_6297.jpg",
-          "originalSrc": "assets/images/real/IMG_6297.jpg"
-        },
-        {
-          "id": "p_05",
-          "filename": "IMG_6409.jpg",
-          "originalSrc": "assets/images/real/IMG_6409.jpg"
-        },
-        {
-          "id": "p_06",
-          "filename": "IMG_6438.jpg",
-          "originalSrc": "assets/images/real/IMG_6438.jpg"
-        }
+        { "id": "p_01", "filename": "IMG_Carly.jpg", "originalSrc": "assets/images/carly-perfil.jpg" },
+        { "id": "p_02", "filename": "IMG_7525.jpg", "originalSrc": "assets/images/real/IMG_7525.jpg" },
+        { "id": "p_03", "filename": "IMG_7467.jpg", "originalSrc": "assets/images/real/IMG_7467.jpg" },
+        { "id": "p_04", "filename": "IMG_6297.jpg", "originalSrc": "assets/images/real/IMG_6297.jpg" },
+        { "id": "p_05", "filename": "IMG_6409.jpg", "originalSrc": "assets/images/real/IMG_6409.jpg" },
+        { "id": "p_06", "filename": "IMG_6438.jpg", "originalSrc": "assets/images/real/IMG_6438.jpg" }
       ],
       "antiPrintEnabled": true,
       "coverKicker": "GALERIA OFICIAL EM ALTA RESOLUÇÃO",
       "coverAuthor": "Carliane Carvalho"
+    },
+    {
+      "id": "alb_demo_entrega_02",
+      "slug": "marina-e-pedro",
+      "clientName": "Marina & Pedro",
+      "title": "Marina & Pedro",
+      "subtitle": "28 de Outubro, 2026 · Praia de Iracema",
+      "shootDate": "2026-10-28",
+      "welcomeMessage": "Cada fotografia aqui guarda o riso solto e o abraço de vocês naquela tarde dourada. Galeria liberada em alta resolução.",
+      "phase": "delivery",
+      "status": "delivered",
+      "protectionLevel": "watermark",
+      "watermarkEnabled": true,
+      "passwordEnabled": true,
+      "password": "1234",
+      "pinEnabled": true,
+      "downloadPin": "7788",
+      "extrasEnabled": true,
+      "packageName": "Ensaio Completo",
+      "packageIncluded": 8,
+      "extraPhotoPrice": 20.00,
+      "coverSrc": "assets/images/real/IMG_1186.jpg",
+      "coverFocal": "50% 38%",
+      "design": {
+        "coverStyle": "borda",
+        "typography": "modern",
+        "colorTheme": "dourado",
+        "gridStyle": "vertical",
+        "gridSpacing": "regular",
+        "gridSize": "regular"
+      },
+      "selectionLocked": true,
+      "selectedIds": ["d_01", "d_02", "d_03", "d_04"],
+      "deliveryFavorites": ["d_01"],
+      "photoComments": {},
+      "paymentOrder": null,
+      "activityLog": [],
+      "photos": [
+        { "id": "d_01", "filename": "IMG_1186.jpg", "originalSrc": "assets/images/real/IMG_1186.jpg" },
+        { "id": "d_02", "filename": "IMG_1197.jpg", "originalSrc": "assets/images/real/IMG_1197.jpg" },
+        { "id": "d_03", "filename": "IMG_0975.jpg", "originalSrc": "assets/images/real/IMG_0975.jpg" },
+        { "id": "d_04", "filename": "IMG_0978.jpg", "originalSrc": "assets/images/real/IMG_0978.jpg" }
+      ]
+    },
+    {
+      "id": "alb_yanecarly",
+      "slug": "yanecarly",
+      "clientName": "yanecarly",
+      "title": "Ensaio — Yanzinho Gordinho Gostoso",
+      "subtitle": "FORTALEZA, CE",
+      "shootDate": "2026-11-09",
+      "welcomeMessage": "Escolham com calma as fotografias favoritas de vocês. Se desejarem guardar registros além do pacote contratado, o valor adicional é calculado automaticamente.",
+      "phase": "proofing",
+      "status": "awaiting_selection",
+      "protectionLevel": "watermark_lowres",
+      "watermarkEnabled": true,
+      "passwordEnabled": true,
+      "password": "1234",
+      "pinEnabled": true,
+      "downloadPin": "2026",
+      "extrasEnabled": true,
+      "packageName": "Ensaio Autoral",
+      "packageIncluded": 5,
+      "extraPhotoPrice": 1.00,
+      "coverSrc": "assets/images/carly-perfil.jpg",
+      "coverFocal": "50% 32%",
+      "design": {
+        "coverStyle": "centro",
+        "typography": "cinema",
+        "colorTheme": "dourado",
+        "gridStyle": "vertical",
+        "gridSpacing": "regular",
+        "gridSize": "regular"
+      },
+      "selectionLocked": false,
+      "selectedIds": [],
+      "deliveryFavorites": [],
+      "photoComments": {},
+      "paymentOrder": null,
+      "activityLog": [],
+      "photos": [
+        { "id": "yc_01", "filename": "IMG_Carly.jpg", "originalSrc": "assets/images/carly-perfil.jpg" },
+        { "id": "yc_02", "filename": "IMG_7525.jpg", "originalSrc": "assets/images/real/IMG_7525.jpg" },
+        { "id": "yc_03", "filename": "IMG_7467.jpg", "originalSrc": "assets/images/real/IMG_7467.jpg" },
+        { "id": "yc_04", "filename": "IMG_6297.jpg", "originalSrc": "assets/images/real/IMG_6297.jpg" },
+        { "id": "yc_05", "filename": "IMG_6409.jpg", "originalSrc": "assets/images/real/IMG_6409.jpg" },
+        { "id": "yc_06", "filename": "IMG_6438.jpg", "originalSrc": "assets/images/real/IMG_6438.jpg" }
+      ]
     }
-  ]
+  ],
+  "clientWatermarkConfig": {
+    "enabled": true,
+    "mode": "text",
+    "imageSrc": "assets/images/logo-light.png",
+    "text": "INSTANTES DE CARLY",
+    "pattern": "tiled",
+    "opacity": 0.85,
+    "scale": 0.15,
+    "updatedAt": 1762700000000
+  },
+  "clientPaymentConfig": {
+    "enableMercadoPago": true,
+    "enableDirectPix": true,
+    "pixKey": "+5585985247276",
+    "merchantName": "Carliane Carvalho",
+    "merchantCity": "FORTALEZA"
+  }
 };
 
 if (typeof window !== 'undefined') {

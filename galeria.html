@@ -82,8 +82,8 @@
     <div class="auth-fullscreen-backdrop">
       <img
         id="pw-cover-img"
-        src="assets/images/real/IMG_7513.jpg"
-        alt="Capa do ensaio fotográfico"
+        src="assets/images/carly-perfil.jpg"
+        alt="Instantes de Carly — Carliane Carvalho"
         width="1920"
         height="1280"
         class="auth-bg-img"
@@ -546,28 +546,14 @@
 
   <div id="gal-toast" class="gal-toast" role="status" aria-live="polite" hidden></div>
 
+  <script src="assets/js/qrcode.min.js"></script>
   <script>
     (function () {
-      var q = new URLSearchParams(window.location.search);
-      var id = q.get('id') || q.get('album');
-      var prev = q.get('preview') === '1';
-      if (id && prev) {
-        var av = document.getElementById('album-view');
-        var dh = document.getElementById('delivery-hero');
-        if (av) av.hidden = false;
-        if (dh) dh.hidden = false;
-      } else if (id) {
-        var pv = document.getElementById('password-view');
-        if (pv) pv.hidden = false;
-      } else {
-        var pt = document.getElementById('portal-view');
-        if (pt) pt.hidden = false;
-      }
+      var stamp = Date.now();
+      document.write('<script src="assets/js/data.js?t=' + stamp + '"><\/script>');
+      document.write('<script src="assets/js/albums-store.js?t=' + stamp + '"><\/script>');
+      document.write('<script src="assets/js/galeria.js?t=' + stamp + '"><\/script>');
     })();
   </script>
-  <script src="assets/js/data.js"></script>
-  <script src="assets/js/qrcode.min.js"></script>
-  <script src="assets/js/albums-store.js"></script>
-  <script src="assets/js/galeria.js"></script>
 </body>
 </html>

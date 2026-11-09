@@ -382,7 +382,7 @@
     applyAlbumDesign(album);
     showOnlySection(els.pwView);
     document.body.classList.remove('is-proofing-protected');
-    const cover = album.coverSrc || album.photos?.[0]?.originalSrc || 'assets/images/real/IMG_7513.jpg';
+    const cover = album.coverSrc || album.photos?.[0]?.originalSrc || 'assets/images/carly-perfil.jpg';
     if (els.pwCoverImg) {
       els.pwCoverImg.src = cover;
       els.pwCoverImg.style.objectPosition = album.coverFocal || '50% 34%';
@@ -531,7 +531,7 @@
   }
 
   function hydrateCoverHero(album) {
-    const cover = album.coverSrc || album.photos?.[0]?.originalSrc || 'assets/images/real/IMG_1186.jpg';
+    const cover = album.coverSrc || album.photos?.[0]?.originalSrc || 'assets/images/carly-perfil.jpg';
     if (els.deliveryHeroImg) {
       els.deliveryHeroImg.src = cover;
       els.deliveryHeroImg.alt = album.title || album.clientName || 'Capa do ensaio';
@@ -1574,6 +1574,47 @@
     els.btnStartDownload?.addEventListener('click', executeDownloadFlow);
   }
 
+  let lastGalleryRevalidateAt = 0;
+  async function revalidateGalleryDataFromServer() {
+    const now = Date.now();
+    if (now - lastGalleryRevalidateAt < 8000) return;
+    lastGalleryRevalidateAt = now;
+
+    try {
+      const res = await fetch(`assets/js/data.js?t=${now}`, { cache: 'no-store' });
+      if (!res.ok) return;
+      const text = await res.text();
+      let freshData = null;
+      try {
+        const fn = new Function(`${text}; return typeof SITE_DATA !== 'undefined' ? SITE_DATA : null;`);
+        freshData = fn();
+      } catch (_) {}
+      if (!freshData || typeof freshData !== 'object') return;
+
+      const freshVer = String(freshData.cmsVersion || '');
+      const curVer = String((window.SITE_DATA && window.SITE_DATA.cmsVersion) || '');
+      if (!freshVer || freshVer <= curVer) return;
+
+      window.SITE_DATA = freshData;
+      rootState = await window.AlbumsStore.loadState();
+      if (currentAlbum) {
+        const updated = (rootState.albums || []).find(
+          (a) => a.id === currentAlbum.id || (a.slug && a.slug.toLowerCase() === currentAlbum.slug.toLowerCase())
+        );
+        if (updated) {
+          currentAlbum = updated;
+          runtimeProofMap.clear();
+          if (isAlbumUnlocked(currentAlbum)) {
+            await openAlbumExperience(currentAlbum);
+            if (els.lbDialog?.open) refreshLightboxUI();
+          } else {
+            renderPasswordGate(currentAlbum);
+          }
+        }
+      }
+    } catch (_) {}
+  }
+
   async function boot() {
     hydrateBrandStrings();
     setupAntiCopyProtection();
@@ -1582,6 +1623,38 @@
     bindEvents();
 
     rootState = await window.AlbumsStore.loadState();
+
+    // Sincronização BroadcastChannel entre abas abertas no mesmo aparelho em 0 segundos
+    try {
+      const syncChannel = new BroadcastChannel('instantes_carly_cms_sync');
+      syncChannel.onmessage = async (e) => {
+        if (e.data && e.data.type === 'CMS_PUBLISHED' && e.data.payload) {
+          window.SITE_DATA = e.data.payload;
+          rootState = await window.AlbumsStore.loadState();
+          if (currentAlbum) {
+            const updated = (rootState.albums || []).find(
+              (a) => a.id === currentAlbum.id || (a.slug && a.slug.toLowerCase() === currentAlbum.slug.toLowerCase())
+            );
+            if (updated) {
+              currentAlbum = updated;
+              runtimeProofMap.clear();
+              if (isAlbumUnlocked(currentAlbum)) {
+                await openAlbumExperience(currentAlbum);
+                if (els.lbDialog?.open) refreshLightboxUI();
+              } else {
+                renderPasswordGate(currentAlbum);
+              }
+            }
+          }
+        }
+      };
+    } catch (_) {}
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') revalidateGalleryDataFromServer();
+    });
+    window.addEventListener('focus', revalidateGalleryDataFromServer);
+    setInterval(revalidateGalleryDataFromServer, 12000);
 
     window.AlbumsStore.subscribe(async () => {
       rootState = await window.AlbumsStore.loadState();

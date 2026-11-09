@@ -2645,15 +2645,23 @@ async function handleMainPublishClick() {
   if (btn) btn.disabled = true;
 
   try {
-    // Sincroniza álbuns de clientes com o payload oficial do site antes de publicar
-    if (window.AlbumsStore && typeof window.AlbumsStore.loadState === 'function') {
-      try {
-        const albState = await window.AlbumsStore.loadState();
-        if (albState && Array.isArray(albState.albums)) {
+    // Sincroniza álbuns e configurações globais de clientes com o payload oficial do site antes de publicar
+    try {
+      const albState = (typeof albumsState !== 'undefined' && albumsState) 
+        ? albumsState 
+        : (window.AlbumsStore && typeof window.AlbumsStore.loadState === 'function' ? await window.AlbumsStore.loadState() : null);
+      if (albState) {
+        if (Array.isArray(albState.albums)) {
           cmsData.clientAlbums = albState.albums;
         }
-      } catch (_) {}
-    }
+        if (albState.watermarkConfig) {
+          cmsData.clientWatermarkConfig = albState.watermarkConfig;
+        }
+        if (albState.paymentConfig) {
+          cmsData.clientPaymentConfig = albState.paymentConfig;
+        }
+      }
+    } catch (_) {}
 
     // Sempre grava localmente e avisa outras abas abertas imediatamente (0s, sem F5)
     cmsData.cmsVersion = new Date().toISOString();
@@ -2670,10 +2678,12 @@ async function handleMainPublishClick() {
       if (!isLocalhost && result && result.cleanPayload) {
         cmsData = result.cleanPayload;
         await writeCmsSnapshot('draft_working', cmsData);
-        if (result.cleanPayload.clientAlbums && window.AlbumsStore && typeof window.AlbumsStore.saveState === 'function') {
+        if (window.AlbumsStore && typeof window.AlbumsStore.saveState === 'function') {
           try {
             const albState = await window.AlbumsStore.loadState();
-            albState.albums = result.cleanPayload.clientAlbums;
+            if (result.cleanPayload.clientAlbums) albState.albums = result.cleanPayload.clientAlbums;
+            if (result.cleanPayload.clientWatermarkConfig) albState.watermarkConfig = result.cleanPayload.clientWatermarkConfig;
+            if (result.cleanPayload.clientPaymentConfig) albState.paymentConfig = result.cleanPayload.clientPaymentConfig;
             await window.AlbumsStore.saveState(albState);
             if (typeof renderAlbumsAdminPanel === 'function') {
               renderAlbumsAdminPanel();
