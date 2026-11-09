@@ -618,14 +618,21 @@
     }
 
     if (els.btnFinishTop) {
-      if (album.selectionLocked) {
-        els.btnFinishTop.disabled = true;
-        els.btnFinishTop.textContent = 'Seleção concluída';
+      const isLocked = Boolean(album.selectionLocked);
+      els.btnFinishTop.disabled = isLocked || calc.selectedCount === 0;
+      const finishText = isLocked
+        ? 'Seleção concluída'
+        : (calc.hasExtras ? `Concluir e pagar extras (${formatBRL(calc.extraTotal)})` : 'Concluir seleção');
+      els.btnFinishTop.title = finishText;
+      let labelEl = els.btnFinishTop.querySelector('.btn-label');
+      let iconEl = els.btnFinishTop.querySelector('.topbar-btn-icon');
+      if (!labelEl || !iconEl) {
+        els.btnFinishTop.innerHTML = `
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="topbar-btn-icon" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+          <span class="btn-label">${escapeHtml(finishText)}</span>
+        `;
       } else {
-        els.btnFinishTop.disabled = calc.selectedCount === 0;
-        els.btnFinishTop.textContent = calc.hasExtras
-          ? `Concluir e pagar extras (${formatBRL(calc.extraTotal)})`
-          : 'Concluir seleção';
+        labelEl.textContent = finishText;
       }
     }
 
@@ -1678,6 +1685,17 @@
         }
         return;
       }
+      if (event.data.type === 'WATERMARK_LIVE_UPDATE') {
+        if (event.data.watermarkConfig) {
+          rootState.watermarkConfig = event.data.watermarkConfig;
+        }
+        runtimeProofMap.clear();
+        if (currentAlbum) {
+          renderMasonryGrid(currentAlbum);
+          if (els.lbDialog?.open) refreshLightboxUI();
+        }
+        return;
+      }
       if (event.data.type !== 'ALBUM_LIVE_UPDATE') return;
       const alb = event.data.album;
       if (!alb) return;
@@ -1705,18 +1723,26 @@
       return;
     }
 
-    let found = (rootState.albums || []).find(
-      (a) => (a.slug && a.slug.toLowerCase() === initialSlug) || (a.id && a.id.toLowerCase() === initialSlug)
-    );
+    const isMatchingSlug = (a, s) => {
+      if (!a || !s) return false;
+      const target = s.toLowerCase();
+      const slug = (a.slug || '').toLowerCase();
+      const id = (a.id || '').toLowerCase();
+      if (slug === target || id === target) return true;
+      if ((target === 'yanecarly' || target === 'yan-gordinho') && (slug === 'yan-gordinho' || slug === 'yanecarly' || id === 'alb_1794239564035' || id === 'alb_yanecarly')) {
+        return true;
+      }
+      return false;
+    };
+
+    let found = (rootState.albums || []).find((a) => isMatchingSlug(a, initialSlug));
 
     // Fallback inteligente para álbuns centrais publicados via SITE_DATA
     const activeSiteData = typeof SITE_DATA !== 'undefined'
       ? SITE_DATA
       : (typeof window !== 'undefined' && window.SITE_DATA ? window.SITE_DATA : null);
     if (!found && activeSiteData && Array.isArray(activeSiteData.clientAlbums)) {
-      found = activeSiteData.clientAlbums.find(
-        (a) => (a.slug && a.slug.toLowerCase() === initialSlug) || (a.id && a.id.toLowerCase() === initialSlug)
-      );
+      found = activeSiteData.clientAlbums.find((a) => isMatchingSlug(a, initialSlug));
       if (found) {
         rootState.albums = rootState.albums || [];
         rootState.albums.push(found);

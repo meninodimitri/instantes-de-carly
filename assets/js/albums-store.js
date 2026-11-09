@@ -443,8 +443,8 @@
       storageMode: 'local',
       watermarkConfig: {
         enabled: true,
-        mode: 'text',          // 'image' | 'text'
-        imageSrc: brand.defaultWatermarkImg,
+        mode: 'image',          // 'image' | 'text'
+        imageSrc: brand.defaultWatermarkImg || 'assets/images/logo-light.png',
         text: 'INSTANTES DE CARLY',
         pattern: 'tiled',       // 'tiled' (grade diagonal) | 'center' (centralizada)
         opacity: 0.85,          // 0.15 a 0.85
@@ -458,119 +458,7 @@
         merchantName: 'Carliane Carvalho',
         merchantCity: 'FORTALEZA'
       },
-      albums: [
-        {
-          id: 'alb_demo_selecao_01',
-          slug: 'ana-e-lucas',
-          clientName: 'Ana & Lucas',
-          title: 'Ana & Lucas — À Espera de Bento',
-          subtitle: 'Ensaio Gestante · Praia de Iracema',
-          shootDate: '2026-11-05',
-          welcomeMessage: 'Escolham com calma as fotografias favoritas de vocês. Se desejarem guardar registros além do pacote contratado, o valor adicional é calculado automaticamente.',
-          phase: 'proofing',
-          status: 'awaiting_selection',
-          protectionLevel: 'watermark',
-          watermarkEnabled: true,
-          passwordEnabled: true,
-          password: '1234',
-          pinEnabled: true,
-          downloadPin: '4580',
-          extrasEnabled: true,
-          packageName: 'Ensaio Afeto',
-          packageIncluded: 5,
-          extraPhotoPrice: 20.00,
-          coverSrc: 'assets/images/carly-perfil.jpg',
-          coverFocal: '50% 32%',
-          design: {
-            coverStyle: 'borda',
-            typography: 'serif',
-            colorTheme: 'dourado',
-            gridStyle: 'vertical',
-            gridSpacing: 'regular',
-            gridSize: 'regular'
-          },
-          selectionLocked: false,
-          selectedIds: ['p_02', 'p_04', 'p_05'],
-          deliveryFavorites: [],
-          photoComments: {
-            p_02: 'Carly, amei essa luz! Pode suavizar só um fiozinho de cabelo no rosto?'
-          },
-          paymentOrder: null,
-          activityLog: [
-            { at: '2026-11-07T14:20:00.000Z', type: 'created', text: 'Galeria de seleção criada e protegida por senha.' }
-          ],
-          photos: [
-            { id: 'p_01', filename: 'IMG_Carly.jpg', originalSrc: 'assets/images/carly-perfil.jpg' },
-            { id: 'p_02', filename: 'IMG_7525.jpg', originalSrc: 'assets/images/real/IMG_7525.jpg' },
-            { id: 'p_03', filename: 'IMG_7467.jpg', originalSrc: 'assets/images/real/IMG_7467.jpg' },
-            { id: 'p_04', filename: 'IMG_6297.jpg', originalSrc: 'assets/images/real/IMG_6297.jpg' },
-            { id: 'p_05', filename: 'IMG_6409.jpg', originalSrc: 'assets/images/real/IMG_6409.jpg' },
-            { id: 'p_06', filename: 'IMG_6438.jpg', originalSrc: 'assets/images/real/IMG_6438.jpg' },
-            { id: 'p_07', filename: 'IMG_2811.jpg', originalSrc: 'assets/images/real/IMG_2811.jpg' },
-            { id: 'p_08', filename: 'IMG_2819.jpg', originalSrc: 'assets/images/real/IMG_2819.jpg' },
-            { id: 'p_09', filename: 'IMG_2887.jpg', originalSrc: 'assets/images/real/IMG_2887.jpg' }
-          ]
-        },
-        {
-          id: 'alb_demo_entrega_02',
-          slug: 'marina-e-pedro',
-          clientName: 'Marina & Pedro',
-          title: 'Marina & Pedro',
-          subtitle: '28 de Outubro, 2026 · Praia de Iracema',
-          shootDate: '2026-10-28',
-          welcomeMessage: 'Cada fotografia aqui guarda o riso solto e o abraço de vocês naquela tarde dourada. Galeria liberada em alta resolução.',
-          phase: 'delivery',
-          status: 'delivered',
-          protectionLevel: 'watermark',
-          watermarkEnabled: true,
-          passwordEnabled: true,
-          password: '1234',
-          pinEnabled: true,
-          downloadPin: '7788',
-          extrasEnabled: true,
-          packageName: 'Ensaio Completo',
-          packageIncluded: 8,
-          extraPhotoPrice: 20.00,
-          coverSrc: 'assets/images/real/IMG_1186.jpg',
-          coverFocal: '50% 38%',
-          design: {
-            coverStyle: 'borda',
-            typography: 'modern',
-            colorTheme: 'dourado',
-            gridStyle: 'vertical',
-            gridSpacing: 'regular',
-            gridSize: 'regular'
-          },
-          selectionLocked: true,
-          selectedIds: ['d_01', 'd_02', 'd_03', 'd_04', 'd_05', 'd_06', 'd_07', 'd_08'],
-          deliveryFavorites: ['d_01', 'd_04'],
-          photoComments: {},
-          paymentOrder: {
-            id: 'ord_mp_99812',
-            method: 'mercadopago_pix',
-            status: 'approved',
-            extraCount: 2,
-            unitPrice: 20.00,
-            totalAmount: 40.00,
-            paidAt: '2026-10-30T19:15:00.000Z'
-          },
-          activityLog: [
-            { at: '2026-10-29T13:00:00.000Z', type: 'selection', text: 'Seleção concluída pelo cliente (8 fotos: 6 do pacote + 2 extras).' },
-            { at: '2026-10-30T19:15:00.000Z', type: 'payment', text: 'Pagamento de R$ 40,00 aprovado via Mercado Pago Pix.' },
-            { at: '2026-11-02T16:40:00.000Z', type: 'delivered', text: 'Galeria de Entrega Final publicada em Alta Resolução.' }
-          ],
-          photos: [
-            { id: 'd_01', filename: 'IMG_1186.jpg', originalSrc: 'assets/images/real/IMG_1186.jpg' },
-            { id: 'd_02', filename: 'IMG_1197.jpg', originalSrc: 'assets/images/real/IMG_1197.jpg' },
-            { id: 'd_03', filename: 'IMG_0975.jpg', originalSrc: 'assets/images/real/IMG_0975.jpg' },
-            { id: 'd_04', filename: 'IMG_0978.jpg', originalSrc: 'assets/images/real/IMG_0978.jpg' },
-            { id: 'd_05', filename: 'IMG_0997.jpg', originalSrc: 'assets/images/real/IMG_0997.jpg' },
-            { id: 'd_06', filename: 'IMG_1919.jpg', originalSrc: 'assets/images/real/IMG_1919.jpg' },
-            { id: 'd_07', filename: 'IMG_1943.jpg', originalSrc: 'assets/images/real/IMG_1943.jpg' },
-            { id: 'd_08', filename: 'IMG_2046.jpg', originalSrc: 'assets/images/real/IMG_2046.jpg' }
-          ]
-        }
-      ]
+      albums: []
     };
     state.albums.forEach(normalizeAlbum);
     return state;
@@ -627,57 +515,70 @@
     if (!root || !Array.isArray(root.albums) || root.albums.length === 0) {
       root = createInitialDemoState();
       if (cloudAlbums.length > 0) {
-        root.albums = JSON.parse(JSON.stringify(cloudAlbums));
+        root.albums = JSON.parse(JSON.stringify(cloudAlbums)).filter((a) => a && a.id && !a.id.startsWith('alb_demo_'));
       }
-    } else if (cloudAlbums.length > 0) {
-      // Mescla álbuns centrais do SITE_DATA para garantir disponibilidade cross-device (celular / PC)
-      cloudAlbums.forEach((cAlb) => {
-        const existingIdx = root.albums.findIndex((a) => a.id === cAlb.id || (cAlb.slug && a.slug === cAlb.slug));
-        if (existingIdx === -1) {
-          root.albums.push(JSON.parse(JSON.stringify(cAlb)));
-        } else {
-          const localAlb = root.albums[existingIdx];
-          const merged = JSON.parse(JSON.stringify(cAlb));
-          // Preserva seleções de fotos e comentários feitos localmente pelo cliente
-          if (Array.isArray(localAlb.photos) && Array.isArray(merged.photos)) {
-            const localMap = new Map();
-            localAlb.photos.forEach((lp) => {
-              const k = lp.id || lp.originalSrc;
-              if (k) localMap.set(k, lp);
-            });
-            merged.photos.forEach((mp) => {
-              const k = mp.id || mp.originalSrc;
-              const lp = localMap.get(k);
-              if (lp) {
-                if (lp.selected) mp.selected = true;
-                if (lp.clientNote) mp.clientNote = lp.clientNote;
-              }
-            });
+    } else {
+      // Purga imediatamente qualquer álbum demo residual do cache local / IndexedDB
+      root.albums = root.albums.filter((a) => a && a.id && !a.id.startsWith('alb_demo_'));
+      if (cloudAlbums.length > 0) {
+        // Mescla álbuns centrais do SITE_DATA para garantir disponibilidade cross-device (celular / PC)
+        cloudAlbums.forEach((cAlb) => {
+          if (cAlb.id && cAlb.id.startsWith('alb_demo_')) return;
+          const existingIdx = root.albums.findIndex((a) => a.id === cAlb.id || (cAlb.slug && a.slug === cAlb.slug));
+          if (existingIdx === -1) {
+            root.albums.push(JSON.parse(JSON.stringify(cAlb)));
+          } else {
+            const localAlb = root.albums[existingIdx];
+            const merged = JSON.parse(JSON.stringify(cAlb));
+            // Preserva seleções de fotos e comentários feitos localmente pelo cliente
+            if (Array.isArray(localAlb.photos) && Array.isArray(merged.photos)) {
+              const localMap = new Map();
+              localAlb.photos.forEach((lp) => {
+                const k = lp.id || lp.originalSrc;
+                if (k) localMap.set(k, lp);
+              });
+              merged.photos.forEach((mp) => {
+                const k = mp.id || mp.originalSrc;
+                const lp = localMap.get(k);
+                if (lp) {
+                  if (lp.selected) mp.selected = true;
+                  if (lp.clientNote) mp.clientNote = lp.clientNote;
+                }
+              });
+            }
+            if (Array.isArray(localAlb.selectedIds) && (!merged.selectedIds || merged.selectedIds.length === 0)) {
+              merged.selectedIds = localAlb.selectedIds;
+            }
+            if (localAlb.photoComments && (!merged.photoComments || Object.keys(merged.photoComments).length === 0)) {
+              merged.photoComments = localAlb.photoComments;
+            }
+            if (Array.isArray(localAlb.deliveryFavorites) && (!merged.deliveryFavorites || merged.deliveryFavorites.length === 0)) {
+              merged.deliveryFavorites = localAlb.deliveryFavorites;
+            }
+            if (localAlb.unlockedAt) merged.unlockedAt = localAlb.unlockedAt;
+            if (localAlb.payment && !merged.payment) merged.payment = localAlb.payment;
+            if (localAlb.paymentOrder && !merged.paymentOrder) merged.paymentOrder = localAlb.paymentOrder;
+            if (localAlb.status === 'selection_paid' && merged.status !== 'selection_paid') {
+              merged.status = 'selection_paid';
+              merged.selectionLocked = true;
+            }
+            root.albums[existingIdx] = merged;
           }
-          if (Array.isArray(localAlb.selectedIds) && (!merged.selectedIds || merged.selectedIds.length === 0)) {
-            merged.selectedIds = localAlb.selectedIds;
-          }
-          if (localAlb.photoComments && (!merged.photoComments || Object.keys(merged.photoComments).length === 0)) {
-            merged.photoComments = localAlb.photoComments;
-          }
-          if (Array.isArray(localAlb.deliveryFavorites) && (!merged.deliveryFavorites || merged.deliveryFavorites.length === 0)) {
-            merged.deliveryFavorites = localAlb.deliveryFavorites;
-          }
-          if (localAlb.unlockedAt) merged.unlockedAt = localAlb.unlockedAt;
-          if (localAlb.payment && !merged.payment) merged.payment = localAlb.payment;
-          if (localAlb.paymentOrder && !merged.paymentOrder) merged.paymentOrder = localAlb.paymentOrder;
-          if (localAlb.status === 'selection_paid' && merged.status !== 'selection_paid') {
-            merged.status = 'selection_paid';
-            merged.selectionLocked = true;
-          }
-          root.albums[existingIdx] = merged;
-        }
-      });
+        });
+      }
     }
 
-    // Aplica configurações centrais da nuvem com prioridade sobre defaults locais
-    if (activeSiteData && activeSiteData.clientWatermarkConfig) {
-      root.watermarkConfig = JSON.parse(JSON.stringify(activeSiteData.clientWatermarkConfig));
+    // Sincronização inteligente de watermarkConfig:
+    // Se o estado local foi editado mais recentemente que a nuvem, PRESERVA o local!
+    // A nuvem só sobrepõe se o estado local não tiver watermarkConfig OU se cloudWm.updatedAt for maior.
+    const cloudWm = activeSiteData && activeSiteData.clientWatermarkConfig;
+    if (cloudWm) {
+      const localWm = root.watermarkConfig;
+      const localUpdated = Number(localWm?.updatedAt) || 0;
+      const cloudUpdated = Number(cloudWm?.updatedAt) || 0;
+      if (!localWm || cloudUpdated > localUpdated) {
+        root.watermarkConfig = JSON.parse(JSON.stringify(cloudWm));
+      }
     } else if (!root.watermarkConfig) {
       root.watermarkConfig = createInitialDemoState().watermarkConfig;
     }
@@ -685,8 +586,14 @@
       root.watermarkConfig.enabled = true;
     }
 
-    if (activeSiteData && activeSiteData.clientPaymentConfig) {
-      root.paymentConfig = JSON.parse(JSON.stringify(activeSiteData.clientPaymentConfig));
+    const cloudPay = activeSiteData && activeSiteData.clientPaymentConfig;
+    if (cloudPay) {
+      const localPay = root.paymentConfig;
+      const localUpdated = Number(localPay?.updatedAt) || 0;
+      const cloudUpdated = Number(cloudPay?.updatedAt) || 0;
+      if (!localPay || cloudUpdated > localUpdated) {
+        root.paymentConfig = JSON.parse(JSON.stringify(cloudPay));
+      }
     } else if (!root.paymentConfig) {
       root.paymentConfig = createInitialDemoState().paymentConfig;
     }
@@ -696,8 +603,28 @@
 
   async function saveState(nextState, opts = {}) {
     nextState.version = Date.now();
+    if (nextState.watermarkConfig) {
+      if (!nextState.watermarkConfig.updatedAt) {
+        nextState.watermarkConfig.updatedAt = Date.now();
+      }
+      if (typeof window !== 'undefined' && window.SITE_DATA) {
+        window.SITE_DATA.clientWatermarkConfig = JSON.parse(JSON.stringify(nextState.watermarkConfig));
+      }
+    }
+    if (nextState.paymentConfig) {
+      if (!nextState.paymentConfig.updatedAt) {
+        nextState.paymentConfig.updatedAt = Date.now();
+      }
+      if (typeof window !== 'undefined' && window.SITE_DATA) {
+        window.SITE_DATA.clientPaymentConfig = JSON.parse(JSON.stringify(nextState.paymentConfig));
+      }
+    }
     if (Array.isArray(nextState.albums)) {
+      nextState.albums = nextState.albums.filter((a) => a && a.id && !a.id.startsWith('alb_demo_'));
       nextState.albums.forEach(normalizeAlbum);
+      if (typeof window !== 'undefined' && window.SITE_DATA) {
+        window.SITE_DATA.clientAlbums = JSON.parse(JSON.stringify(nextState.albums));
+      }
     }
     try {
       const db = await openAlbumsDb();

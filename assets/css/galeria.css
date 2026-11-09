@@ -1462,9 +1462,43 @@ body.theme-is-dark .auth-kicker-pill {
   height: 36px;
   border-radius: 50%;
   justify-content: center;
+  overflow: hidden;
 }
 .gallery-topbar[data-grid-nav="icons_only"] .topbar-btn-icon {
   margin: 0;
+}
+
+/* No Desktop / PC: o botão de ação principal (Concluir seleção) SEMPRE tem texto visível e formato de pílula legível */
+@media (min-width: 768px) {
+  .gallery-topbar #btn-finish-selection-top,
+  .gallery-topbar[data-grid-nav="icons_only"] #btn-finish-selection-top {
+    width: auto !important;
+    min-width: 140px !important;
+    height: 38px !important;
+    padding: 0 18px !important;
+    border-radius: 999px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
+  }
+  .gallery-topbar #btn-finish-selection-top .btn-label,
+  .gallery-topbar[data-grid-nav="icons_only"] #btn-finish-selection-top .btn-label {
+    display: inline-block !important;
+    font-size: 0.8125rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.02em !important;
+    white-space: nowrap !important;
+    color: inherit !important;
+  }
+  .gallery-topbar #btn-finish-selection-top .topbar-btn-icon,
+  .gallery-topbar[data-grid-nav="icons_only"] #btn-finish-selection-top .topbar-btn-icon {
+    display: inline-block !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+  }
 }
 
 .masonry-img-btn {

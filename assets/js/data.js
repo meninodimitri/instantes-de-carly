@@ -1,11 +1,5 @@
-/**
- * Instantes de Carly - Camada de Dados Autêntica
- * Gerenciado via Painel Admin Visual (CMS)
- * Paleta Solar: Amarelinho Bebê, Luz Dourada & Azul Iracema.
- */
-
-const SITE_DATA = {
-  "cmsVersion": "2026-11-09T18:06:16.127Z",
+window.SITE_DATA = {
+  "cmsVersion": 1794251039299,
   "brand": {
     "name": "Instantes de Carly",
     "founder": "Carliane Carvalho (Carly)",
@@ -775,175 +769,17 @@ const SITE_DATA = {
       "antiPrintEnabled": true,
       "coverKicker": "GALERIA OFICIAL EM ALTA RESOLUÇÃO",
       "coverAuthor": "Carliane Carvalho"
-    },
-    {
-      "id": "alb_demo_entrega_02",
-      "slug": "marina-e-pedro",
-      "clientName": "Marina & Pedro",
-      "title": "Marina & Pedro",
-      "subtitle": "28 de Outubro, 2026 · Praia de Iracema",
-      "shootDate": "2026-10-28",
-      "welcomeMessage": "Cada fotografia aqui guarda o riso solto e o abraço de vocês naquela tarde dourada. Galeria liberada em alta resolução.",
-      "phase": "delivery",
-      "status": "selection_paid",
-      "protectionLevel": "watermark",
-      "watermarkEnabled": true,
-      "passwordEnabled": true,
-      "password": "1234",
-      "pinEnabled": true,
-      "downloadPin": "7788",
-      "extrasEnabled": true,
-      "packageName": "Ensaio Completo",
-      "packageIncluded": 8,
-      "extraPhotoPrice": 20,
-      "coverSrc": "assets/images/real/IMG_1186.jpg",
-      "coverFocal": "50% 38%",
-      "design": {
-        "coverStyle": "borda",
-        "typography": "modern",
-        "colorTheme": "dourado",
-        "gridStyle": "vertical",
-        "gridSpacing": "regular",
-        "gridSize": "regular",
-        "gridNavStyle": "icons_text",
-        "coverLogoVisible": true,
-        "coverLogoColor": "auto"
-      },
-      "selectionLocked": true,
-      "selectedIds": [
-        "d_01",
-        "d_02",
-        "d_03",
-        "d_04"
-      ],
-      "deliveryFavorites": [
-        "d_01"
-      ],
-      "photoComments": {},
-      "paymentOrder": {
-        "id": "187578063675",
-        "method": "master",
-        "status": "approved",
-        "extraCount": 1,
-        "totalAmount": 10,
-        "paidAt": "2026-11-09T09:57:01.000-04:00"
-      },
-      "activityLog": [],
-      "photos": [
-        {
-          "id": "d_01",
-          "filename": "IMG_1186.jpg",
-          "originalSrc": "assets/images/real/IMG_1186.jpg"
-        },
-        {
-          "id": "d_02",
-          "filename": "IMG_1197.jpg",
-          "originalSrc": "assets/images/real/IMG_1197.jpg"
-        },
-        {
-          "id": "d_03",
-          "filename": "IMG_0975.jpg",
-          "originalSrc": "assets/images/real/IMG_0975.jpg"
-        },
-        {
-          "id": "d_04",
-          "filename": "IMG_0978.jpg",
-          "originalSrc": "assets/images/real/IMG_0978.jpg"
-        }
-      ],
-      "antiPrintEnabled": true,
-      "coverKicker": "GALERIA OFICIAL EM ALTA RESOLUÇÃO",
-      "coverAuthor": "Carliane Carvalho"
-    },
-    {
-      "id": "alb_demo_selecao_01",
-      "slug": "ana-e-lucas",
-      "clientName": "Ana & Lucas",
-      "title": "Ana & Lucas — À Espera de Bento",
-      "subtitle": "Ensaio Gestante · Praia de Iracema",
-      "shootDate": "2026-11-05",
-      "welcomeMessage": "Escolham com calma as fotografias favoritas de vocês. Se desejarem guardar registros além do pacote contratado, o valor adicional é calculado automaticamente.",
-      "phase": "proofing",
-      "status": "awaiting_selection",
-      "protectionLevel": "watermark",
-      "watermarkEnabled": true,
-      "passwordEnabled": true,
-      "password": "1234",
-      "pinEnabled": true,
-      "downloadPin": "4580",
-      "extrasEnabled": true,
-      "packageName": "Ensaio Afeto",
-      "packageIncluded": 5,
-      "extraPhotoPrice": 20,
-      "coverSrc": "assets/images/carly-perfil.jpg",
-      "coverFocal": "50% 32%",
-      "design": {
-        "coverStyle": "borda",
-        "typography": "serif",
-        "colorTheme": "dourado",
-        "gridStyle": "vertical",
-        "gridSpacing": "regular",
-        "gridSize": "regular",
-        "gridNavStyle": "icons_text",
-        "coverLogoVisible": true,
-        "coverLogoColor": "auto"
-      },
-      "selectionLocked": false,
-      "selectedIds": [
-        "p_02",
-        "p_04",
-        "p_05"
-      ],
-      "deliveryFavorites": [],
-      "photoComments": {},
-      "paymentOrder": null,
-      "activityLog": [],
-      "photos": [
-        {
-          "id": "p_01",
-          "filename": "IMG_Carly.jpg",
-          "originalSrc": "assets/images/carly-perfil.jpg"
-        },
-        {
-          "id": "p_02",
-          "filename": "IMG_7525.jpg",
-          "originalSrc": "assets/images/real/IMG_7525.jpg"
-        },
-        {
-          "id": "p_03",
-          "filename": "IMG_7467.jpg",
-          "originalSrc": "assets/images/real/IMG_7467.jpg"
-        },
-        {
-          "id": "p_04",
-          "filename": "IMG_6297.jpg",
-          "originalSrc": "assets/images/real/IMG_6297.jpg"
-        },
-        {
-          "id": "p_05",
-          "filename": "IMG_6409.jpg",
-          "originalSrc": "assets/images/real/IMG_6409.jpg"
-        },
-        {
-          "id": "p_06",
-          "filename": "IMG_6438.jpg",
-          "originalSrc": "assets/images/real/IMG_6438.jpg"
-        }
-      ],
-      "antiPrintEnabled": true,
-      "coverKicker": "GALERIA OFICIAL EM ALTA RESOLUÇÃO",
-      "coverAuthor": "Carliane Carvalho"
     }
   ],
   "clientWatermarkConfig": {
     "enabled": true,
-    "mode": "text",
+    "mode": "image",
     "imageSrc": "assets/images/logo-light.png",
     "text": "INSTANTES DE CARLY",
     "pattern": "tiled",
     "opacity": 0.85,
     "scale": 0.15,
-    "updatedAt": 1762700000000
+    "updatedAt": 1794251039299
   },
   "clientPaymentConfig": {
     "enableMercadoPago": true,
@@ -953,11 +789,3 @@ const SITE_DATA = {
     "merchantCity": "FORTALEZA"
   }
 };
-
-if (typeof window !== 'undefined') {
-  window.SITE_DATA = SITE_DATA;
-}
-
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = SITE_DATA;
-}

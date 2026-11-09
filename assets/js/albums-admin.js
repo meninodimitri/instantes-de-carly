@@ -1415,9 +1415,20 @@
     }
   }
 
+  function broadcastWatermarkUpdate() {
+    const iframe = document.getElementById('cms-preview-iframe');
+    if (iframe && iframe.contentWindow && albumsState) {
+      iframe.contentWindow.postMessage({
+        type: 'WATERMARK_LIVE_UPDATE',
+        watermarkConfig: JSON.parse(JSON.stringify(albumsState.watermarkConfig))
+      }, '*');
+    }
+  }
+
   async function persistAlbumsStateAndSync(notifyMsg = null) {
     await window.AlbumsStore.saveState(albumsState);
     syncAdminStateDirty();
+    broadcastWatermarkUpdate();
     if (notifyMsg) notifyAdminToast(notifyMsg);
   }
 
@@ -1816,6 +1827,7 @@
         };
         await persistAlbumsStateAndSync();
         renderAlbumsAdminPanel();
+        refreshWatermarkSamplePreview();
       });
     });
 
@@ -1828,6 +1840,7 @@
         };
         await persistAlbumsStateAndSync();
         renderAlbumsAdminPanel();
+        refreshWatermarkSamplePreview();
       });
     });
 

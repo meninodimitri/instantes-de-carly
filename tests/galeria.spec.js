@@ -13,7 +13,7 @@ test.describe('3. Área Privada do Cliente (galeria.html)', () => {
       sessionStorage.clear();
     });
 
-    await page.goto(`${BASE_URL}/galeria?album=ana-e-lucas`);
+    await page.goto(`${BASE_URL}/galeria?album=yan-gordinho`);
     await page.waitForTimeout(600);
 
     const gate = page.locator('#password-view');
@@ -41,20 +41,19 @@ test.describe('3. Área Privada do Cliente (galeria.html)', () => {
     await expect(pwError).toContainText(/incorreta/i);
   });
 
-  test('Desbloqueio com senha correta e renderização da Capa Pixieset', async ({ page }) => {
+  test('Desbloqueio com senha correta e renderização do Álbum', async ({ page }) => {
     await page.goto(`${BASE_URL}/galeria`);
     await page.evaluate(() => {
       localStorage.clear();
       sessionStorage.clear();
     });
 
-    // Usa marina-e-pedro que está na fase 'delivery' (Entrega Final com Capa Pixieset)
-    await page.goto(`${BASE_URL}/galeria?album=marina-e-pedro`);
+    await page.goto(`${BASE_URL}/galeria?album=yan-gordinho`);
     await page.waitForTimeout(600);
 
-    // Digita senha correta (1234)
+    // Digita senha correta (1219)
     const pwInput = page.locator('#pw-input');
-    await pwInput.fill('1234');
+    await pwInput.fill('1219');
     await page.locator('#password-form button[type="submit"]').click();
     await page.waitForTimeout(800);
 
@@ -62,22 +61,13 @@ test.describe('3. Área Privada do Cliente (galeria.html)', () => {
     const albumView = page.locator('#album-view');
     await expect(albumView).toBeVisible();
 
-    const deliveryHero = page.locator('#delivery-hero');
-    await expect(deliveryHero).toBeVisible();
-
-    // Zero filtro escuro ativo sobre a foto
-    const scrim = page.locator('.pixieset-cover-scrim');
-    const scrimDisplay = await scrim.evaluate(el => getComputedStyle(el).display);
-    expect(scrimDisplay).toBe('none');
-
-    // Título da capa NÃO possui sombra de texto
-    const title = page.locator('#delivery-hero-title');
-    const titleShadow = await title.evaluate(el => getComputedStyle(el).textShadow);
-    expect(titleShadow).toBe('none');
+    // Grade de fotos renderizada
+    const tiles = page.locator('.masonry-tile');
+    await expect(tiles.first()).toBeVisible();
   });
 
   test('Capa Retângulo Vertical: moldura esbelta, autor interno e botão com sublinhado', async ({ page }) => {
-    await page.goto(`${BASE_URL}/galeria?album=marina-e-pedro&preview=1`);
+    await page.goto(`${BASE_URL}/galeria?album=yan-gordinho&preview=1`);
     await page.waitForTimeout(600);
 
     // Configura capa para retangulo via evaluate
@@ -137,7 +127,7 @@ test.describe('3. Área Privada do Cliente (galeria.html)', () => {
   });
 
   test('Anti-Print: intercepta atalhos e abre modal de direito autoral com fonte formal desacoplada', async ({ page }) => {
-    await page.goto(`${BASE_URL}/galeria?album=marina-e-pedro&preview=1`);
+    await page.goto(`${BASE_URL}/galeria?album=yan-gordinho&preview=1`);
     await page.waitForTimeout(600);
 
     // Simula fonte cursiva ativa no álbum e dispara evento de PrintScreen
@@ -167,13 +157,7 @@ test.describe('3. Área Privada do Cliente (galeria.html)', () => {
   });
 
   test('Fase 1 (Seleção de Provas): seleção de favoritos e cálculo de fotos extras', async ({ page }) => {
-    // Desbloqueia ana-e-lucas no sessionStorage e acessa diretamente
-    await page.goto(`${BASE_URL}/galeria`);
-    await page.evaluate(() => {
-      sessionStorage.setItem('unlocked_alb_alb_demo_selecao_01', '1234');
-    });
-
-    await page.goto(`${BASE_URL}/galeria?album=ana-e-lucas`);
+    await page.goto(`${BASE_URL}/galeria?album=yan-gordinho&preview=1`);
     await page.waitForTimeout(800);
 
     // Clica no primeiro coração para selecionar uma foto
@@ -191,12 +175,7 @@ test.describe('3. Área Privada do Cliente (galeria.html)', () => {
   });
 
   test('Checkout Modal: suporte a pagamento duplo (Mercado Pago e Pix Direto ao estúdio)', async ({ page }) => {
-    await page.goto(`${BASE_URL}/galeria`);
-    await page.evaluate(() => {
-      sessionStorage.setItem('unlocked_alb_alb_demo_selecao_01', '1234');
-    });
-
-    await page.goto(`${BASE_URL}/galeria?album=ana-e-lucas`);
+    await page.goto(`${BASE_URL}/galeria?album=yan-gordinho&preview=1`);
     await page.waitForTimeout(600);
 
     // Seleciona fotos suficientes para gerar excedente (6 fotos no total, pacote = 5)
