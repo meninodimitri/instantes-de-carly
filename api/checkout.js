@@ -19,9 +19,10 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Dados de seleção inválidos.' });
     }
 
-    const mpToken = process.env.MP_ACCESS_TOKEN;
-    const sbUrl = process.env.SUPABASE_URL;
-    const sbKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const rawToken = (process.env.MP_ACCESS_TOKEN || '').trim();
+    const mpToken = rawToken.replace(/^Bearer\s+/i, '').trim();
+    const sbUrl = (process.env.SUPABASE_URL || '').trim();
+    const sbKey = (process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
 
     if (!mpToken) {
       return res.status(503).json({

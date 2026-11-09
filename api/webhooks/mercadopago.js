@@ -11,10 +11,11 @@ export default async function handler(req, res) {
   }
 
   try {
-    const mpToken = process.env.MP_ACCESS_TOKEN;
-    const webhookSecret = process.env.MP_WEBHOOK_SECRET;
-    const sbUrl = process.env.SUPABASE_URL;
-    const sbKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const rawToken = (process.env.MP_ACCESS_TOKEN || '').trim();
+    const mpToken = rawToken.replace(/^Bearer\s+/i, '').trim();
+    const webhookSecret = (process.env.MP_WEBHOOK_SECRET || '').trim();
+    const sbUrl = (process.env.SUPABASE_URL || '').trim();
+    const sbKey = (process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
 
     const paymentId = req.body?.data?.id || req.query?.['data.id'] || req.query?.id || req.body?.id;
     if (!paymentId || !mpToken) {
