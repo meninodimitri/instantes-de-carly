@@ -1032,7 +1032,19 @@ function renderPortfolioGrid(category) {
     ? getAcervoCoverPhotos(allItems, SITE_DATA.categories)
     : allItems.filter((p) => p.category === category);
 
-  const packedRows = packEditorialRows(rawFiltered);
+  // Na Vitrine do Acervo (todos): A ordem definida pelo fotógrafo é 100% estrita e sagrada.
+  // NUNCA chamar packEditorialRows para a vitrine, pois ele reordena as fotos para agrupar orientações (landscape/portrait)!
+  const packedRows = isOverview
+    ? rawFiltered.map((photo, i) => {
+        const isLastOdd = (rawFiltered.length % 2 !== 0) && (i === rawFiltered.length - 1);
+        return {
+          photo,
+          colSpan: isLastOdd ? 'center-6' : '6',
+          rowAspect: '3/2'
+        };
+      })
+    : packEditorialRows(rawFiltered);
+
   visiblePhotos = packedRows.map((entry) => entry.photo);
 
   gridContainer.classList.toggle('is-filtered', !isOverview);

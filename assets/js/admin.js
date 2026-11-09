@@ -596,19 +596,19 @@ function renderPortfolioAdmin() {
       return;
     }
 
-    listEl.innerHTML = vitrineItems.map(({ photo, realIdx, cat, catPhotos, catIdx }) => {
+    listEl.innerHTML = vitrineItems.map(({ photo, realIdx, cat, catPhotos }, vIdx) => {
       const focalPct = parseFocalPercent(photo.objectPosition);
-      const numStr = (catIdx + 1).toString().padStart(2, '0');
+      const numStr = (vIdx + 1).toString().padStart(2, '0');
       const cardKey = `vitrine-${cat.id}-${photo.id ?? realIdx}`;
       const isOpen = expandedPortfolioKeys.has(cardKey);
 
       return `
-        <article class="cms-compact-card photo-editor-card-v3 is-vitrine-card ${isOpen ? 'is-open' : ''}" data-real-idx="${realIdx}" data-cat-id="${escapeAttr(cat.id)}" data-cat-idx="${catIdx}" data-card-key="${escapeAttr(cardKey)}">
+        <article class="cms-compact-card photo-editor-card-v3 is-vitrine-card ${isOpen ? 'is-open' : ''}" data-real-idx="${realIdx}" data-cat-id="${escapeAttr(cat.id)}" data-v-idx="${vIdx}" data-card-key="${escapeAttr(cardKey)}">
           <div class="cms-compact-summary">
             <div class="cms-compact-left">
               <div class="cms-quick-order">
-                <button type="button" class="cms-quick-order-btn js-vitrine-up" ${catIdx === 0 ? 'disabled' : ''} title="Subir esta capa na vitrine">▲</button>
-                <button type="button" class="cms-quick-order-btn js-vitrine-down" ${catIdx === vitrineItems.length - 1 ? 'disabled' : ''} title="Descer esta capa na vitrine">▼</button>
+                <button type="button" class="cms-quick-order-btn js-vitrine-up" ${vIdx === 0 ? 'disabled' : ''} title="Subir esta capa na vitrine">▲</button>
+                <button type="button" class="cms-quick-order-btn js-vitrine-down" ${vIdx === vitrineItems.length - 1 ? 'disabled' : ''} title="Descer esta capa na vitrine">▼</button>
               </div>
 
               <div class="cms-compact-thumb" data-aspect="${escapeAttr(photo.aspect || 'landscape')}">
@@ -690,8 +690,8 @@ function renderPortfolioAdmin() {
 
             <div class="photo-card-toolbar">
               <div class="order-btns">
-                <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-vitrine-up" ${catIdx === 0 ? 'disabled' : ''} title="Mover categoria para cima na Vitrine do site">↑ Subir Capa</button>
-                <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-vitrine-down" ${catIdx === vitrineItems.length - 1 ? 'disabled' : ''} title="Mover categoria para baixo na Vitrine do site">↓ Descer Capa</button>
+                <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-vitrine-up" ${vIdx === 0 ? 'disabled' : ''} title="Mover categoria para cima na Vitrine do site">↑ Subir Capa</button>
+                <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-vitrine-down" ${vIdx === vitrineItems.length - 1 ? 'disabled' : ''} title="Mover categoria para baixo na Vitrine do site">↓ Descer Capa</button>
               </div>
               <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-vitrine-open-cat" data-cat-id="${escapeAttr(cat.id)}">
                 Ver todas as fotos de ${escapeAttr(cat.name)} (${catPhotos.length}) →
@@ -934,33 +934,26 @@ function bindVitrineCardsEvents(listEl) {
 
     // Reordenar Capas na Vitrine (Subir / Descer)
     const handleMoveUp = () => {
-      if (catIdx <= 0) return;
-      const prevCat = editableCats[catIdx - 1];
-      const realA = cmsData.categories.findIndex((c) => c.id === catId);
-      const realB = cmsData.categories.findIndex((c) => c.id === prevCat.id);
-      if (realA !== -1 && realB !== -1) {
-        const tmp = cmsData.categories[realA];
-        cmsData.categories[realA] = cmsData.categories[realB];
-        cmsData.categories[realB] = tmp;
-        markDirtyAndSync(true);
-        renderPortfolioAdmin();
-        showToast('Ordem da vitrine atualizada!', 'success');
-      }
+      const idxInCats = cmsData.categories.findIndex((c) => c.id === catId);
+      // Índice 0 é 'todos'; o primeiro da vitrine é índice 1
+      if (idxInCats <= 1) return;
+      const tmp = cmsData.categories[idxInCats - 1];
+      cmsData.categories[idxInCats - 1] = cmsData.categories[idxInCats];
+      cmsData.categories[idxInCats] = tmp;
+      markDirtyAndSync(true);
+      renderPortfolioAdmin();
+      showToast('Ordem da vitrine atualizada!', 'success');
     };
 
     const handleMoveDown = () => {
-      if (catIdx >= editableCats.length - 1) return;
-      const nextCat = editableCats[catIdx + 1];
-      const realA = cmsData.categories.findIndex((c) => c.id === catId);
-      const realB = cmsData.categories.findIndex((c) => c.id === nextCat.id);
-      if (realA !== -1 && realB !== -1) {
-        const tmp = cmsData.categories[realA];
-        cmsData.categories[realA] = cmsData.categories[realB];
-        cmsData.categories[realB] = tmp;
-        markDirtyAndSync(true);
-        renderPortfolioAdmin();
-        showToast('Ordem da vitrine atualizada!', 'success');
-      }
+      const idxInCats = cmsData.categories.findIndex((c) => c.id === catId);
+      if (idxInCats === -1 || idxInCats >= cmsData.categories.length - 1) return;
+      const tmp = cmsData.categories[idxInCats + 1];
+      cmsData.categories[idxInCats + 1] = cmsData.categories[idxInCats];
+      cmsData.categories[idxInCats] = tmp;
+      markDirtyAndSync(true);
+      renderPortfolioAdmin();
+      showToast('Ordem da vitrine atualizada!', 'success');
     };
 
     card.querySelectorAll('.js-vitrine-up').forEach((b) => b.addEventListener('click', handleMoveUp));

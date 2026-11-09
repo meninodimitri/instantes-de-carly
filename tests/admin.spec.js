@@ -170,12 +170,24 @@ test.describe('2. Painel Administrativo Visual (admin.html)', () => {
     await pillVitrine.click();
     await expect(vitrineCards).toHaveCount(7);
 
-    const firstCatNameBefore = await vitrineCards.first().locator('.admin-cat-pill').first().textContent();
-    await firstDownBtn.click();
-    await page.waitForTimeout(300);
+    // Verifica que a ordem no Preview do site espelha 1:1 a ordem dos cartões do Admin
+    const iframe = page.frameLocator('#cms-preview-iframe');
+    await page.waitForTimeout(500);
 
-    const secondCatNameAfter = await vitrineCards.nth(1).locator('.admin-cat-pill').first().textContent();
-    expect(secondCatNameAfter?.trim()).toBe(firstCatNameBefore?.trim());
+    const adminTitlesBefore = await page.locator('#portfolio-cards-list .is-vitrine-card .js-port-title').evaluateAll(els => els.map(e => e.value.trim()));
+    const previewTitlesBefore = await iframe.locator('#portfolio-grid .work-item .work-title').allTextContents();
+    expect(previewTitlesBefore.map(t => t.trim())).toEqual(adminTitlesBefore);
+
+    // Desce o primeiro item
+    await firstDownBtn.click();
+    await page.waitForTimeout(500);
+
+    const adminTitlesAfter = await page.locator('#portfolio-cards-list .is-vitrine-card .js-port-title').evaluateAll(els => els.map(e => e.value.trim()));
+    const previewTitlesAfter = await iframe.locator('#portfolio-grid .work-item .work-title').allTextContents();
+    expect(previewTitlesAfter.map(t => t.trim())).toEqual(adminTitlesAfter);
+
+    // O segundo item agora é o que era o primeiro antes
+    expect(adminTitlesAfter[1]).toBe(adminTitlesBefore[0]);
   });
 
 });
