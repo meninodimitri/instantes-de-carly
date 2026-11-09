@@ -5,7 +5,7 @@
  */
 
 const SITE_DATA = {
-  "cmsVersion": "2026-11-08T14:01:27.829Z",
+  "cmsVersion": "2026-11-09T02:13:34.628Z",
   "brand": {
     "name": "Instantes de Carly",
     "founder": "Carliane Carvalho (Carly)",
@@ -371,7 +371,8 @@ const SITE_DATA = {
       "image": "assets/images/real/298-IMG_7907.jpg",
       "objectPosition": "center 25%",
       "location": "Ponte dos Ingleses",
-      "caption": "Quando a luz dourada do fim de tarde cearense encontra o sorriso de quem vive o próprio tempo."
+      "caption": "Quando a luz dourada do fim de tarde cearense encontra o sorriso de quem vive o próprio tempo.",
+      "isAcervoCover": true
     },
     {
       "id": 3,
@@ -393,7 +394,8 @@ const SITE_DATA = {
       "image": "assets/images/real/206-IMG_7814.jpg",
       "objectPosition": "center 25%",
       "location": "Ponte dos Ingleses",
-      "caption": "Uma fase nova, muitas descobertas e registros luminosos para celebrar quem ela é na sua essência."
+      "caption": "Uma fase nova, muitas descobertas e registros luminosos para celebrar quem ela é na sua essência.",
+      "isAcervoCover": false
     },
     {
       "id": 5,
@@ -518,7 +520,8 @@ const SITE_DATA = {
       "image": "assets/images/real/219-IMG_7828.jpg",
       "objectPosition": "center 25%",
       "location": "Praia de Iracema",
-      "caption": "A alegria leve de comemorar a juventude diante do horizonte do mar cearense."
+      "caption": "A alegria leve de comemorar a juventude diante do horizonte do mar cearense.",
+      "isAcervoCover": false
     },
     {
       "id": 16,
@@ -549,12 +552,12 @@ const SITE_DATA = {
       "name": "Acervo Completo"
     },
     {
-      "id": "gestantes",
-      "name": "Gestantes & Maternidade"
-    },
-    {
       "id": "casais",
       "name": "Casais"
+    },
+    {
+      "id": "gestantes",
+      "name": "Gestantes & Maternidade"
     },
     {
       "id": "familias",
