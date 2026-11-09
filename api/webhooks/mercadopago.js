@@ -16,7 +16,7 @@ export default async function handler(req, res) {
     const sbUrl = process.env.SUPABASE_URL;
     const sbKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-    const paymentId = req.body?.data?.id || req.query?.['data.id'];
+    const paymentId = req.body?.data?.id || req.query?.['data.id'] || req.query?.id || req.body?.id;
     if (!paymentId || !mpToken) {
       return res.status(200).json({ ignored: true });
     }
