@@ -752,6 +752,33 @@ button, input, select, textarea {
   color: var(--cms-gold);
 }
 
+.admin-cat-pill-vitrine {
+  border-color: rgba(200, 169, 107, 0.5);
+  background-color: #FAF6EF;
+  color: #7A5B1E;
+}
+
+.admin-cat-pill-vitrine:hover {
+  border-color: var(--cms-gold);
+  color: #4A350D;
+}
+
+.admin-cat-pill-vitrine.active {
+  background-color: var(--cms-gold);
+  border-color: var(--cms-gold);
+  color: #1A1A1A;
+  box-shadow: 0 2px 8px rgba(200, 169, 107, 0.35);
+}
+
+.admin-cat-pill-sep {
+  display: inline-block;
+  width: 1px;
+  height: 24px;
+  background-color: var(--cms-border);
+  margin: 0 4px;
+  align-self: center;
+}
+
 /* ==========================================================================
    5. CARTÕES DE FOTOS (PORTFÓLIO & CAPA) E CARTÕES DE PACOTES
    ========================================================================== */
@@ -899,6 +926,43 @@ button, input, select, textarea {
 .order-btns {
   display: inline-flex;
   gap: 6px;
+}
+
+.cms-quick-order {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 3px;
+  justify-content: center;
+  align-self: center;
+  margin-right: 4px;
+}
+
+.cms-quick-order-btn {
+  background: #FFFFFF;
+  border: 1px solid var(--cms-border);
+  color: var(--cms-text-muted);
+  width: 26px;
+  height: 22px;
+  padding: 0;
+  border-radius: 4px;
+  font-size: 0.70rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cms-quick-order-btn:hover:not(:disabled) {
+  border-color: var(--cms-navy);
+  color: var(--cms-navy);
+  background: var(--cms-surface);
+}
+
+.cms-quick-order-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
 
 /* Cartões Genéricos de Seção / Pacote / Categoria */

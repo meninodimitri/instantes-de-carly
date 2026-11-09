@@ -164,6 +164,8 @@ function initCmsPreviewBridge() {
       if (heroCinemaController) {
         heroCinemaController.selectSlide(msg.slideIndex);
       }
+    } else if (msg.type === 'CMS_SELECT_PORTFOLIO_CATEGORY' && msg.category) {
+      selectPortfolioCategory(msg.category, { scrollToFilters: true });
     }
   });
 

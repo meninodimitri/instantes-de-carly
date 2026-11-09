@@ -135,4 +135,47 @@ test.describe('2. Painel Administrativo Visual (admin.html)', () => {
     await expect(workspace).not.toHaveClass(/force-mobile-preview/);
   });
 
+  test('Portfólio: Vitrine do Acervo (7 capas) vs Todas as Fotos (17) e reordenação', async ({ page }) => {
+    // Garante que está na aba Portfólio
+    const tabPortfolio = page.locator('button.sidebar-tab[data-tab="portfolio"]');
+    await tabPortfolio.click();
+    await page.waitForTimeout(300);
+
+    const pillVitrine = page.locator('.admin-cat-pill[data-filter-cat="vitrine"]');
+    const pillTodas = page.locator('.admin-cat-pill[data-filter-cat="todas"]');
+
+    // 1. Vitrine é a aba inicial ativa com 7 capas
+    await expect(pillVitrine).toBeVisible();
+    await expect(pillVitrine).toHaveClass(/active/);
+    await expect(pillVitrine).toContainText('Vitrine do Acervo');
+
+    const vitrineCards = page.locator('#portfolio-cards-list .is-vitrine-card');
+    await expect(vitrineCards).toHaveCount(7);
+
+    // O primeiro card tem botão de subir desabilitado e descer habilitado
+    const firstUpBtn = vitrineCards.first().locator('.js-vitrine-up').first();
+    const firstDownBtn = vitrineCards.first().locator('.js-vitrine-down').first();
+    await expect(firstUpBtn).toBeDisabled();
+    await expect(firstDownBtn).toBeEnabled();
+
+    // 2. Alterna para "Todas as Fotos"
+    await pillTodas.click();
+    await expect(pillTodas).toHaveClass(/active/);
+    await expect(pillVitrine).not.toHaveClass(/active/);
+
+    const allCards = page.locator('#portfolio-cards-list .photo-editor-card-v3');
+    await expect(allCards).toHaveCount(17);
+
+    // 3. Volta para Vitrine e testa reordenação da primeira capa
+    await pillVitrine.click();
+    await expect(vitrineCards).toHaveCount(7);
+
+    const firstCatNameBefore = await vitrineCards.first().locator('.admin-cat-pill').first().textContent();
+    await firstDownBtn.click();
+    await page.waitForTimeout(300);
+
+    const secondCatNameAfter = await vitrineCards.nth(1).locator('.admin-cat-pill').first().textContent();
+    expect(secondCatNameAfter?.trim()).toBe(firstCatNameBefore?.trim());
+  });
+
 });

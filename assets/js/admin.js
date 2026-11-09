@@ -13,7 +13,7 @@ let cmsData = JSON.parse(JSON.stringify(SITE_DATA));
 let isDirty = false;
 let activeTab = 'portfolio';
 let activeSubTab = 'sec-hero';
-let adminPortfolioFilter = 'todos';
+let adminPortfolioFilter = 'vitrine';
 let adminPortfolioSearch = '';
 let previewDebounceTimer = null;
 let galleryPickerCallback = null;
@@ -475,14 +475,35 @@ function renderAdminPortfolioFilterPills() {
   if (!container) return;
 
   const cats = cmsData.categories || [];
-  if (!cats.some((c) => c.id === adminPortfolioFilter)) {
-    adminPortfolioFilter = 'todos';
+  const editableCats = cats.filter((c) => c.id !== 'todos');
+
+  // Contagem de capas da Vitrine (uma para cada categoria com fotos)
+  let vitrineCount = 0;
+  editableCats.forEach((cat) => {
+    const hasPhoto = (cmsData.portfolio || []).some((p) => p.category === cat.id);
+    if (hasPhoto) vitrineCount++;
+  });
+  const totalPhotos = (cmsData.portfolio || []).length;
+
+  if (adminPortfolioFilter !== 'vitrine' && adminPortfolioFilter !== 'todas' && !cats.some((c) => c.id === adminPortfolioFilter)) {
+    adminPortfolioFilter = 'vitrine';
   }
 
-  container.innerHTML = cats.map((cat) => {
-    const count = cat.id === 'todos'
-      ? (cmsData.portfolio || []).length
-      : (cmsData.portfolio || []).filter((p) => p.category === cat.id).length;
+  const isVitrine = adminPortfolioFilter === 'vitrine' || adminPortfolioFilter === 'todos';
+  const isTodas = adminPortfolioFilter === 'todas';
+
+  let html = `
+    <button type="button" class="admin-cat-pill admin-cat-pill-vitrine ${isVitrine ? 'active' : ''}" data-filter-cat="vitrine" title="Vitrine do Acervo: As fotos-capa que aparecem na entrada do site (1 por categoria)">
+      ✨ Vitrine do Acervo (${vitrineCount} capas)
+    </button>
+    <button type="button" class="admin-cat-pill ${isTodas ? 'active' : ''}" data-filter-cat="todas" title="Banco Geral: Gerencie e visualize todas as fotografias enviadas">
+      📁 Todas as Fotos (${totalPhotos})
+    </button>
+    <span class="admin-cat-pill-sep" aria-hidden="true"></span>
+  `;
+
+  html += editableCats.map((cat) => {
+    const count = (cmsData.portfolio || []).filter((p) => p.category === cat.id).length;
     const isAct = cat.id === adminPortfolioFilter;
     return `
       <button type="button" class="admin-cat-pill ${isAct ? 'active' : ''}" data-filter-cat="${escapeAttr(cat.id)}">
@@ -491,10 +512,25 @@ function renderAdminPortfolioFilterPills() {
     `;
   }).join('');
 
+  container.innerHTML = html;
+
   container.querySelectorAll('.admin-cat-pill').forEach((pill) => {
     pill.addEventListener('click', () => {
       adminPortfolioFilter = pill.getAttribute('data-filter-cat');
       renderPortfolioAdmin();
+
+      // Sincroniza o preview ao vivo para o filtro correspondente
+      if (adminPortfolioFilter === 'vitrine' || adminPortfolioFilter === 'todas') {
+        sendToPreviewIframe({
+          type: 'CMS_SELECT_PORTFOLIO_CATEGORY',
+          category: 'todos'
+        });
+      } else {
+        sendToPreviewIframe({
+          type: 'CMS_SELECT_PORTFOLIO_CATEGORY',
+          category: adminPortfolioFilter
+        });
+      }
     });
   });
 }
@@ -517,9 +553,165 @@ function renderPortfolioAdmin() {
   const editableCats = (cmsData.categories || []).filter((c) => c.id !== 'todos');
   const query = adminPortfolioSearch.trim().toLowerCase();
 
+  const isVitrine = adminPortfolioFilter === 'vitrine' || adminPortfolioFilter === 'todos';
+  const isTodas = adminPortfolioFilter === 'todas';
+
+  if (isVitrine) {
+    // =========================================================================
+    // MODO VITRINE DO ACERVO: APENAS AS FOTOS-CAPA (1 POR CATEGORIA)
+    // A ordem dos cartões reflete a ordem real das categorias na vitrine!
+    // =========================================================================
+    const vitrineItems = [];
+    editableCats.forEach((cat) => {
+      const catPhotos = (cmsData.portfolio || []).filter((p) => p.category === cat.id);
+      if (!catPhotos.length) return;
+      const explicitCover = catPhotos.find((p) => p.isAcervoCover === true);
+      const coverPhoto = explicitCover || catPhotos[0];
+      const realIdx = cmsData.portfolio.indexOf(coverPhoto);
+      const catIdx = editableCats.indexOf(cat);
+
+      if (query) {
+        const matchSearch = (coverPhoto.title || '').toLowerCase().includes(query)
+          || (coverPhoto.location || '').toLowerCase().includes(query)
+          || (cat.name || '').toLowerCase().includes(query)
+          || (coverPhoto.caption || '').toLowerCase().includes(query);
+        if (!matchSearch) return;
+      }
+
+      vitrineItems.push({
+        photo: coverPhoto,
+        realIdx,
+        cat,
+        catPhotos,
+        catIdx
+      });
+    });
+
+    if (vitrineItems.length === 0) {
+      listEl.innerHTML = `
+        <div class="cms-section-card" style="text-align: center; color: var(--cms-text-muted);">
+          Nenhuma capa encontrada na Vitrine do Acervo com este termo de busca.
+        </div>
+      `;
+      return;
+    }
+
+    listEl.innerHTML = vitrineItems.map(({ photo, realIdx, cat, catPhotos, catIdx }) => {
+      const focalPct = parseFocalPercent(photo.objectPosition);
+      const numStr = (catIdx + 1).toString().padStart(2, '0');
+      const cardKey = `vitrine-${cat.id}-${photo.id ?? realIdx}`;
+      const isOpen = expandedPortfolioKeys.has(cardKey);
+
+      return `
+        <article class="cms-compact-card photo-editor-card-v3 is-vitrine-card ${isOpen ? 'is-open' : ''}" data-real-idx="${realIdx}" data-cat-id="${escapeAttr(cat.id)}" data-cat-idx="${catIdx}" data-card-key="${escapeAttr(cardKey)}">
+          <div class="cms-compact-summary">
+            <div class="cms-compact-left">
+              <div class="cms-quick-order">
+                <button type="button" class="cms-quick-order-btn js-vitrine-up" ${catIdx === 0 ? 'disabled' : ''} title="Subir esta capa na vitrine">▲</button>
+                <button type="button" class="cms-quick-order-btn js-vitrine-down" ${catIdx === vitrineItems.length - 1 ? 'disabled' : ''} title="Descer esta capa na vitrine">▼</button>
+              </div>
+
+              <div class="cms-compact-thumb" data-aspect="${escapeAttr(photo.aspect || 'landscape')}">
+                <span class="cms-compact-num">#${numStr}</span>
+                <img src="${escapeAttr(photo.image)}" alt="${escapeAttr(photo.title)}" style="object-position: center ${focalPct}%;" />
+              </div>
+
+              <div class="cms-compact-main">
+                <input type="text" class="cms-inline-title-input js-port-title" value="${escapeAttr(photo.title || '')}" placeholder="Título da fotografia de capa…" aria-label="Título da fotografia" />
+                <div class="cms-compact-subrow" style="align-items: center; gap: 8px;">
+                  <span class="admin-cat-pill" style="padding: 2px 8px; font-size: 0.70rem; font-weight: 700; background: var(--cms-surface); border-color: var(--cms-border);">
+                    ${escapeAttr(cat.name)}
+                  </span>
+                  <span style="font-size: 0.70rem; color: var(--cms-text-muted);">${catPhotos.length} foto(s) no acervo</span>
+                </div>
+
+                ${catPhotos.length > 1 ? `
+                  <div style="display: flex; align-items: center; gap: 6px; margin-top: 4px;">
+                    <label style="font-size: 0.68rem; color: var(--cms-text-muted); white-space: nowrap; font-weight: 600;">Trocar Foto da Capa:</label>
+                    <select class="cms-select-compact js-vitrine-select-cover" title="Escolha qual foto deste ensaio será a foto-capa na Vitrine do Acervo">
+                      ${catPhotos.map((p, pIdx) => {
+                        const isSelected = p === photo;
+                        const pName = p.title ? p.title : `Foto #${(pIdx + 1).toString().padStart(2, '0')}`;
+                        return `<option value="${escapeAttr(p.id ?? pIdx)}" ${isSelected ? 'selected' : ''}>${escapeAttr(pName)}</option>`;
+                      }).join('')}
+                    </select>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+
+            <div class="cms-compact-right">
+              <span style="font-size: 0.70rem; font-weight: 700; color: #10b981; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); border-radius: 999px; padding: 3px 8px; white-space: nowrap;">
+                ★ Capa da Vitrine
+              </span>
+
+              <button type="button" class="cms-drawer-btn js-toggle-port-drawer" aria-expanded="${isOpen ? 'true' : 'false'}">
+                ${isOpen ? 'Fechar ▲' : 'Editar ▾'}
+              </button>
+            </div>
+          </div>
+
+          <div class="cms-compact-drawer" ${isOpen ? '' : 'hidden'}>
+            <div class="field-grid">
+              <div class="field-group">
+                <label class="field-label">Local do Ensaio</label>
+                <input type="text" class="cms-input js-port-location" value="${escapeAttr(photo.location || '')}" placeholder="Ex: Praia de Iracema" />
+              </div>
+
+              <div class="field-group">
+                <label class="field-label">Formato na Grade</label>
+                <select class="cms-select js-port-aspect">
+                  <option value="landscape" ${photo.aspect !== 'portrait' ? 'selected' : ''}>Horizontal (Paisagem 3:2)</option>
+                  <option value="portrait" ${photo.aspect === 'portrait' ? 'selected' : ''}>Vertical (Retrato 3:4)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field-grid" style="align-items: center;">
+              <div class="field-group" style="margin-bottom: 10px;">
+                <label class="field-label" style="display: flex; justify-content: space-between;">
+                  <span>Enquadramento Vertical</span>
+                  <strong class="focal-val-label">${focalPct}%</strong>
+                </label>
+                <input type="range" min="0" max="100" value="${focalPct}" class="js-port-focal" style="width: 100%;" />
+              </div>
+
+              <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px;">
+                <input type="file" accept="image/jpeg,image/png,image/webp" class="js-port-replace-input" hidden />
+                <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-port-replace-btn">Trocar Foto</button>
+                <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-port-send-hero" title="Enviar também para o topo do site">+ Enviar p/ Capa do Site</button>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">História / Legenda Afetiva</label>
+              <textarea class="cms-textarea js-port-caption" style="min-height: 60px;">${escapeAttr(photo.caption || '')}</textarea>
+            </div>
+
+            <div class="photo-card-toolbar">
+              <div class="order-btns">
+                <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-vitrine-up" ${catIdx === 0 ? 'disabled' : ''} title="Mover categoria para cima na Vitrine do site">↑ Subir Capa</button>
+                <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-vitrine-down" ${catIdx === vitrineItems.length - 1 ? 'disabled' : ''} title="Mover categoria para baixo na Vitrine do site">↓ Descer Capa</button>
+              </div>
+              <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-vitrine-open-cat" data-cat-id="${escapeAttr(cat.id)}">
+                Ver todas as fotos de ${escapeAttr(cat.name)} (${catPhotos.length}) →
+              </button>
+            </div>
+          </div>
+        </article>
+      `;
+    }).join('');
+
+    bindVitrineCardsEvents(listEl);
+    return;
+  }
+
+  // =========================================================================
+  // MODO TODAS AS FOTOS OU CATEGORIA ESPECÍFICA
+  // =========================================================================
   const indexedItems = (cmsData.portfolio || []).map((photo, realIdx) => ({ photo, realIdx }));
   const filtered = indexedItems.filter(({ photo }) => {
-    const matchCat = adminPortfolioFilter === 'todos' || photo.category === adminPortfolioFilter;
+    const matchCat = isTodas || photo.category === adminPortfolioFilter;
     const matchSearch = !query
       || (photo.title || '').toLowerCase().includes(query)
       || (photo.location || '').toLowerCase().includes(query)
@@ -536,13 +728,19 @@ function renderPortfolioAdmin() {
     return;
   }
 
+  const catPhotosForFilter = isTodas ? [] : (cmsData.portfolio || []).filter((p) => p.category === adminPortfolioFilter);
+
   listEl.innerHTML = filtered.map(({ photo, realIdx }) => {
     const focalPct = parseFocalPercent(photo.objectPosition);
     const isUploadedNew = String(photo.image || '').startsWith('data:image/');
-    const numStr = (realIdx + 1).toString().padStart(2, '0');
+    const catPhotoIdx = isTodas ? realIdx : catPhotosForFilter.indexOf(photo);
+    const numStr = (catPhotoIdx + 1).toString().padStart(2, '0');
     const isAcervoCover = isEffectiveAcervoCover(photo, cmsData.portfolio);
     const cardKey = String(photo.id ?? realIdx);
     const isOpen = expandedPortfolioKeys.has(cardKey);
+
+    const isFirstInOrder = isTodas ? (realIdx === 0) : (catPhotoIdx === 0);
+    const isLastInOrder = isTodas ? (realIdx === cmsData.portfolio.length - 1) : (catPhotoIdx === catPhotosForFilter.length - 1);
 
     return `
       <article class="cms-compact-card photo-editor-card-v3 ${isOpen ? 'is-open' : ''}" data-real-idx="${realIdx}" data-card-key="${escapeAttr(cardKey)}">
@@ -618,8 +816,8 @@ function renderPortfolioAdmin() {
 
           <div class="photo-card-toolbar">
             <div class="order-btns">
-              <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-port-up" ${realIdx === 0 ? 'disabled' : ''}>↑ Subir</button>
-              <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-port-down" ${realIdx === cmsData.portfolio.length - 1 ? 'disabled' : ''}>↓ Descer</button>
+              <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-port-up" ${isFirstInOrder ? 'disabled' : ''}>↑ Subir</button>
+              <button type="button" class="cms-btn cms-btn-outline cms-btn-sm js-port-down" ${isLastInOrder ? 'disabled' : ''}>↓ Descer</button>
             </div>
             <button type="button" class="cms-btn cms-btn-danger cms-btn-sm js-port-delete">Excluir Foto</button>
           </div>
@@ -628,8 +826,160 @@ function renderPortfolioAdmin() {
     `;
   }).join('');
 
-  // Bind eventos dos cartões compactos do portfólio
-  listEl.querySelectorAll('.photo-editor-card-v3').forEach((card) => {
+  bindGeneralPortfolioEvents(listEl, isTodas);
+}
+
+function bindVitrineCardsEvents(listEl) {
+  const editableCats = (cmsData.categories || []).filter((c) => c.id !== 'todos');
+
+  listEl.querySelectorAll('.is-vitrine-card').forEach((card) => {
+    const realIdx = parseInt(card.getAttribute('data-real-idx'), 10);
+    const catId = card.getAttribute('data-cat-id');
+    const catIdx = parseInt(card.getAttribute('data-cat-idx'), 10);
+    const cardKey = card.getAttribute('data-card-key');
+    const photo = cmsData.portfolio[realIdx];
+    if (!photo) return;
+
+    const thumbImg = card.querySelector('.cms-compact-thumb img');
+    const thumbFrame = card.querySelector('.cms-compact-thumb');
+    const focalLabel = card.querySelector('.focal-val-label');
+    const drawer = card.querySelector('.cms-compact-drawer');
+    const toggleBtn = card.querySelector('.js-toggle-port-drawer');
+
+    toggleBtn?.addEventListener('click', () => {
+      const willOpen = drawer.hidden;
+      drawer.hidden = !willOpen;
+      card.classList.toggle('is-open', willOpen);
+      toggleBtn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+      toggleBtn.textContent = willOpen ? 'Fechar ▲' : 'Editar ▾';
+      if (willOpen) expandedPortfolioKeys.add(cardKey);
+      else expandedPortfolioKeys.delete(cardKey);
+    });
+
+    card.querySelector('.js-port-title')?.addEventListener('input', (e) => {
+      photo.title = e.target.value;
+      markDirtyAndSync(false);
+    });
+
+    card.querySelector('.js-port-location')?.addEventListener('input', (e) => {
+      photo.location = e.target.value;
+      markDirtyAndSync(false);
+    });
+
+    card.querySelector('.js-port-caption')?.addEventListener('input', (e) => {
+      photo.caption = e.target.value;
+      markDirtyAndSync(false);
+    });
+
+    card.querySelector('.js-port-aspect')?.addEventListener('change', (e) => {
+      photo.aspect = e.target.value;
+      if (thumbFrame) thumbFrame.setAttribute('data-aspect', photo.aspect);
+      markDirtyAndSync(true);
+    });
+
+    card.querySelector('.js-port-focal')?.addEventListener('input', (e) => {
+      const val = e.target.value;
+      photo.objectPosition = `center ${val}%`;
+      if (thumbImg) thumbImg.style.objectPosition = photo.objectPosition;
+      if (focalLabel) focalLabel.textContent = `${val}%`;
+      markDirtyAndSync(false);
+    });
+
+    // Seletor rápido de qual foto assume a capa desta categoria
+    card.querySelector('.js-vitrine-select-cover')?.addEventListener('change', (e) => {
+      const selectedId = e.target.value;
+      const catPhotos = (cmsData.portfolio || []).filter((p) => p.category === catId);
+      catPhotos.forEach((p, pIdx) => {
+        const match = String(p.id ?? pIdx) === String(selectedId);
+        p.isAcervoCover = match;
+      });
+      markDirtyAndSync(true);
+      renderPortfolioAdmin();
+      showToast('Foto de capa da categoria atualizada na Vitrine!', 'success');
+    });
+
+    // Trocar imagem
+    const repInput = card.querySelector('.js-port-replace-input');
+    card.querySelector('.js-port-replace-btn')?.addEventListener('click', () => repInput?.click());
+    repInput?.addEventListener('change', async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      try {
+        const res = await compressAndReadImage(file);
+        photo.image = res.dataUrl;
+        photo.aspect = res.aspect;
+        markDirtyAndSync(true);
+        renderPortfolioAdmin();
+        showToast(`Foto substituída e otimizada (${formatBytes(res.originalBytes)} → ${formatBytes(res.compressedBytes)})`, 'success');
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    });
+
+    // Copiar para Capa (Hero)
+    card.querySelector('.js-port-send-hero')?.addEventListener('click', () => {
+      cmsData.heroSlides.push({
+        id: String(cmsData.heroSlides.length + 1).padStart(2, '0'),
+        image: photo.image,
+        category: photo.categoryName || 'Ensaio Autoral',
+        shortLabel: photo.categoryName || 'Ensaio',
+        title: photo.title || 'Instantes de Carly',
+        location: photo.location || 'Fortaleza, Ceará',
+        quote: `“${photo.caption || 'Memórias reais registradas com calma e afeto.'}”`,
+        objectPosition: photo.objectPosition || 'center 35%'
+      });
+      markDirtyAndSync(true);
+      showToast(`"${photo.title || 'Foto'}" adicionada à Capa do Site!`, 'success');
+    });
+
+    // Reordenar Capas na Vitrine (Subir / Descer)
+    const handleMoveUp = () => {
+      if (catIdx <= 0) return;
+      const prevCat = editableCats[catIdx - 1];
+      const realA = cmsData.categories.findIndex((c) => c.id === catId);
+      const realB = cmsData.categories.findIndex((c) => c.id === prevCat.id);
+      if (realA !== -1 && realB !== -1) {
+        const tmp = cmsData.categories[realA];
+        cmsData.categories[realA] = cmsData.categories[realB];
+        cmsData.categories[realB] = tmp;
+        markDirtyAndSync(true);
+        renderPortfolioAdmin();
+        showToast('Ordem da vitrine atualizada!', 'success');
+      }
+    };
+
+    const handleMoveDown = () => {
+      if (catIdx >= editableCats.length - 1) return;
+      const nextCat = editableCats[catIdx + 1];
+      const realA = cmsData.categories.findIndex((c) => c.id === catId);
+      const realB = cmsData.categories.findIndex((c) => c.id === nextCat.id);
+      if (realA !== -1 && realB !== -1) {
+        const tmp = cmsData.categories[realA];
+        cmsData.categories[realA] = cmsData.categories[realB];
+        cmsData.categories[realB] = tmp;
+        markDirtyAndSync(true);
+        renderPortfolioAdmin();
+        showToast('Ordem da vitrine atualizada!', 'success');
+      }
+    };
+
+    card.querySelectorAll('.js-vitrine-up').forEach((b) => b.addEventListener('click', handleMoveUp));
+    card.querySelectorAll('.js-vitrine-down').forEach((b) => b.addEventListener('click', handleMoveDown));
+
+    // Abrir categoria completa
+    card.querySelector('.js-vitrine-open-cat')?.addEventListener('click', () => {
+      adminPortfolioFilter = catId;
+      renderPortfolioAdmin();
+      sendToPreviewIframe({
+        type: 'CMS_SELECT_PORTFOLIO_CATEGORY',
+        category: catId
+      });
+    });
+  });
+}
+
+function bindGeneralPortfolioEvents(listEl, isTodas) {
+  listEl.querySelectorAll('.photo-editor-card-v3:not(.is-vitrine-card)').forEach((card) => {
     const idx = parseInt(card.getAttribute('data-real-idx'), 10);
     const cardKey = card.getAttribute('data-card-key');
     const item = cmsData.portfolio[idx];
@@ -732,7 +1082,6 @@ function renderPortfolioAdmin() {
     // Chave ON/OFF: Definir como Capa da Categoria no Acervo Completo
     card.querySelector('.js-port-acervo-switch')?.addEventListener('change', (e) => {
       if (!e.target.checked) {
-        // Toda categoria tem 1 capa; mantém ligada caso já seja a única/atual
         e.target.checked = true;
         showToast('Escolha outra foto desta categoria caso queira trocar a capa do Acervo.', 'info');
         return;
@@ -751,21 +1100,51 @@ function renderPortfolioAdmin() {
 
     // Subir / Descer / Excluir
     card.querySelector('.js-port-up')?.addEventListener('click', () => {
-      if (idx <= 0) return;
-      const tmp = cmsData.portfolio[idx - 1];
-      cmsData.portfolio[idx - 1] = cmsData.portfolio[idx];
-      cmsData.portfolio[idx] = tmp;
-      markDirtyAndSync(true);
-      renderPortfolioAdmin();
+      if (isTodas) {
+        if (idx <= 0) return;
+        const tmp = cmsData.portfolio[idx - 1];
+        cmsData.portfolio[idx - 1] = cmsData.portfolio[idx];
+        cmsData.portfolio[idx] = tmp;
+        markDirtyAndSync(true);
+        renderPortfolioAdmin();
+      } else {
+        const catPhotos = (cmsData.portfolio || []).filter((p) => p.category === item.category);
+        const catItemIdx = catPhotos.indexOf(item);
+        if (catItemIdx <= 0) return;
+        const targetPhoto = catPhotos[catItemIdx - 1];
+        const realA = cmsData.portfolio.indexOf(item);
+        const realB = cmsData.portfolio.indexOf(targetPhoto);
+        if (realA !== -1 && realB !== -1) {
+          cmsData.portfolio[realA] = targetPhoto;
+          cmsData.portfolio[realB] = item;
+          markDirtyAndSync(true);
+          renderPortfolioAdmin();
+        }
+      }
     });
 
     card.querySelector('.js-port-down')?.addEventListener('click', () => {
-      if (idx >= cmsData.portfolio.length - 1) return;
-      const tmp = cmsData.portfolio[idx + 1];
-      cmsData.portfolio[idx + 1] = cmsData.portfolio[idx];
-      cmsData.portfolio[idx] = tmp;
-      markDirtyAndSync(true);
-      renderPortfolioAdmin();
+      if (isTodas) {
+        if (idx >= cmsData.portfolio.length - 1) return;
+        const tmp = cmsData.portfolio[idx + 1];
+        cmsData.portfolio[idx + 1] = cmsData.portfolio[idx];
+        cmsData.portfolio[idx] = tmp;
+        markDirtyAndSync(true);
+        renderPortfolioAdmin();
+      } else {
+        const catPhotos = (cmsData.portfolio || []).filter((p) => p.category === item.category);
+        const catItemIdx = catPhotos.indexOf(item);
+        if (catItemIdx >= catPhotos.length - 1) return;
+        const targetPhoto = catPhotos[catItemIdx + 1];
+        const realA = cmsData.portfolio.indexOf(item);
+        const realB = cmsData.portfolio.indexOf(targetPhoto);
+        if (realA !== -1 && realB !== -1) {
+          cmsData.portfolio[realA] = targetPhoto;
+          cmsData.portfolio[realB] = item;
+          markDirtyAndSync(true);
+          renderPortfolioAdmin();
+        }
+      }
     });
 
     card.querySelector('.js-port-delete')?.addEventListener('click', () => {
