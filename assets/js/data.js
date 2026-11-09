@@ -5,7 +5,7 @@
  */
 
 const SITE_DATA = {
-  "cmsVersion": "2026-11-09T02:34:48.361Z",
+  "cmsVersion": "2026-11-09T02:36:05.726Z",
   "brand": {
     "name": "Instantes de Carly",
     "founder": "Carliane Carvalho (Carly)",
@@ -552,6 +552,10 @@ const SITE_DATA = {
       "name": "Acervo Completo"
     },
     {
+      "id": "retratos",
+      "name": "Retratos"
+    },
+    {
       "id": "gestantes",
       "name": "Gestantes & Maternidade"
     },
@@ -562,10 +566,6 @@ const SITE_DATA = {
     {
       "id": "familias",
       "name": "Famílias"
-    },
-    {
-      "id": "retratos",
-      "name": "Retratos"
     },
     {
       "id": "15anos",
