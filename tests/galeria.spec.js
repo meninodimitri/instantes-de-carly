@@ -190,4 +190,70 @@ test.describe('3. Área Privada do Cliente (galeria.html)', () => {
     await expect(selStat).toContainText(/Selecionadas:\s*\d+\s*\/\s*5/);
   });
 
+  test('Checkout Modal: suporte a pagamento duplo (Mercado Pago e Pix Direto ao estúdio)', async ({ page }) => {
+    await page.goto(`${BASE_URL}/galeria`);
+    await page.evaluate(() => {
+      sessionStorage.setItem('unlocked_alb_alb_demo_selecao_01', '1234');
+    });
+
+    await page.goto(`${BASE_URL}/galeria?album=ana-e-lucas`);
+    await page.waitForTimeout(600);
+
+    // Seleciona fotos suficientes para gerar excedente (6 fotos no total, pacote = 5)
+    const hearts = page.locator('.masonry-tile .tile-heart-btn');
+    const heartCount = await hearts.count();
+    for (let i = 0; i < Math.min(6, heartCount); i++) {
+      const isFav = await hearts.nth(i).evaluate(el => el.classList.contains('active'));
+      if (!isFav) {
+        await hearts.nth(i).click();
+        await page.waitForTimeout(150);
+      }
+    }
+
+    // Abre modal de checkout clicando em Concluir Seleção na topbar
+    const finishBtn = page.locator('#btn-finish-selection-top');
+    await expect(finishBtn).toBeVisible();
+    await finishBtn.click();
+    await page.waitForTimeout(400);
+
+    // Modal de checkout visível
+    const chkDialog = page.locator('#checkout-dialog');
+    await expect(chkDialog).toBeVisible();
+
+    // Box de pagamento de extras exibido
+    const payBox = page.locator('#chk-payment-box');
+    await expect(payBox).toBeVisible();
+
+    // Abas de pagamento: Mercado Pago e Pix Direto
+    const tabMp = page.locator('.pay-tab[data-pay-tab="mp"]');
+    const tabDirect = page.locator('.pay-tab[data-pay-tab="direct"]');
+    await expect(tabMp).toBeVisible();
+    await expect(tabDirect).toBeVisible();
+    await expect(tabMp).toHaveClass(/active/);
+
+    // Painel Mercado Pago ativo por padrão com QR code e botão de cartão
+    const paneMp = page.locator('#pay-pane-mp');
+    await expect(paneMp).toBeVisible();
+    const btnCard = page.locator('#btn-mp-card-link');
+    await expect(btnCard).toBeVisible();
+    await expect(btnCard).toContainText('Pagar com cartão de crédito');
+
+    // Alterna para aba Pix Direto ao estúdio (0% taxa)
+    await tabDirect.click();
+    await page.waitForTimeout(200);
+    await expect(tabDirect).toHaveClass(/active/);
+
+    // Painel Pix Direto visível com chave e botão de envio no WhatsApp
+    const paneDirect = page.locator('#pay-pane-direct');
+    await expect(paneDirect).toBeVisible();
+    const btnDirectConfirm = page.locator('#btn-confirm-direct-pix');
+    await expect(btnDirectConfirm).toBeVisible();
+    await expect(btnDirectConfirm).toContainText('Já realizei o Pix');
+
+    // Fecha modal
+    await page.locator('#chk-close').click();
+    await page.waitForTimeout(200);
+    await expect(chkDialog).not.toBeVisible();
+  });
+
 });
