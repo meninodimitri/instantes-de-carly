@@ -616,8 +616,11 @@
       } catch (__) {}
     }
 
-    const cloudAlbums = (typeof window !== 'undefined' && window.SITE_DATA && Array.isArray(window.SITE_DATA.clientAlbums))
-      ? window.SITE_DATA.clientAlbums
+    const activeSiteData = typeof SITE_DATA !== 'undefined'
+      ? SITE_DATA
+      : (typeof window !== 'undefined' && window.SITE_DATA ? window.SITE_DATA : null);
+    const cloudAlbums = (activeSiteData && Array.isArray(activeSiteData.clientAlbums))
+      ? activeSiteData.clientAlbums
       : [];
 
     let root = saved;

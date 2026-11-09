@@ -1637,8 +1637,11 @@
     );
 
     // Fallback inteligente para álbuns centrais publicados via SITE_DATA
-    if (!found && window.SITE_DATA && Array.isArray(window.SITE_DATA.clientAlbums)) {
-      found = window.SITE_DATA.clientAlbums.find(
+    const activeSiteData = typeof SITE_DATA !== 'undefined'
+      ? SITE_DATA
+      : (typeof window !== 'undefined' && window.SITE_DATA ? window.SITE_DATA : null);
+    if (!found && activeSiteData && Array.isArray(activeSiteData.clientAlbums)) {
+      found = activeSiteData.clientAlbums.find(
         (a) => (a.slug && a.slug.toLowerCase() === initialSlug) || (a.id && a.id.toLowerCase() === initialSlug)
       );
       if (found) {

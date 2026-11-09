@@ -2478,6 +2478,10 @@ function serializeDataJsContent(dataObject) {
 
 const SITE_DATA = ${JSON.stringify(dataObject, null, 2)};
 
+if (typeof window !== 'undefined') {
+  window.SITE_DATA = SITE_DATA;
+}
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = SITE_DATA;
 }
