@@ -1260,8 +1260,19 @@
   async function finalizeFreeSelection() {
     const calc = window.AlbumsStore.calculateSelectionPricing(currentAlbum);
     const brand = window.AlbumsStore.getBrandDefaults();
+    const orderCode = `SEL-${Date.now().toString().slice(-5)}`;
+
     currentAlbum.selectionLocked = true;
     currentAlbum.status = 'selection_completed';
+    currentAlbum.paymentOrder = {
+      id: orderCode,
+      method: 'free_package',
+      status: 'approved',
+      extraCount: 0,
+      unitPrice: 0,
+      totalAmount: 0,
+      createdAt: new Date().toISOString()
+    };
     currentAlbum.activityLog = currentAlbum.activityLog || [];
     currentAlbum.activityLog.unshift({
       at: new Date().toISOString(),
@@ -1275,7 +1286,32 @@
     renderMasonryWall(currentAlbum);
     showToast('Seleção confirmada com sucesso!');
 
-    const msg = `Olá ${brand.shortName}! Concluí a escolha das ${calc.selectedCount} fotografias do meu ensaio "${currentAlbum.clientName}". Minha seleção já está pronta para edição final!`;
+    // Sincroniza em nuvem para o painel admin do fotógrafo em tempo real
+    try {
+      fetch('/api/selection', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          albumId: currentAlbum.id,
+          slug: currentAlbum.slug,
+          clientName: currentAlbum.clientName,
+          selectedIds: currentAlbum.selectedIds,
+          photoComments: currentAlbum.photoComments,
+          status: 'selection_completed',
+          method: 'free_package',
+          orderCode,
+          totalAmount: 0,
+          extraCount: 0
+        })
+      }).catch(() => {});
+    } catch (_) {}
+
+    const selectedList = (currentAlbum.selectedIds || []).map((id, idx) => {
+      const p = (currentAlbum.photos || []).find((x) => x.id === id);
+      return `${idx + 1}. ${p?.filename || id}`;
+    }).slice(0, 15).join('\n');
+
+    const msg = `Olá ${brand.shortName}! Concluí a escolha das ${calc.selectedCount} fotografias do meu ensaio "${currentAlbum.clientName}". Minha seleção já está pronta para edição final!\n\n📸 *Fotografias Escolhidas:*\n${selectedList}`;
     window.open(`https://wa.me/${brand.whatsappNumber}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener');
   }
 
@@ -1304,6 +1340,26 @@
     updateProofingChrome(currentAlbum);
     renderMasonryWall(currentAlbum);
     showToast('Pagamento aprovado. Seleção liberada para edição.');
+
+    // Sincroniza em nuvem
+    try {
+      fetch('/api/selection', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          albumId: currentAlbum.id,
+          slug: currentAlbum.slug,
+          clientName: currentAlbum.clientName,
+          selectedIds: currentAlbum.selectedIds,
+          photoComments: currentAlbum.photoComments,
+          status: 'selection_paid',
+          method: 'mercadopago',
+          orderCode: currentAlbum.paymentOrder.id,
+          totalAmount: calc.extraTotal,
+          extraCount: calc.extraCount
+        })
+      }).catch(() => {});
+    } catch (_) {}
   }
 
   async function finalizeDirectPixWithWhatsapp() {
@@ -1334,7 +1390,32 @@
     updateProofingChrome(currentAlbum);
     renderMasonryWall(currentAlbum);
 
-    const msg = `Olá ${brand.shortName}! Concluí a seleção do álbum "${currentAlbum.clientName}" (${calc.selectedCount} fotos no total, sendo ${calc.extraCount} extras = ${formatBRL(calc.extraTotal)}). Segue o comprovante do Pix (${orderCode}).`;
+    // Sincroniza em nuvem para o painel admin do fotógrafo em tempo real
+    try {
+      fetch('/api/selection', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          albumId: currentAlbum.id,
+          slug: currentAlbum.slug,
+          clientName: currentAlbum.clientName,
+          selectedIds: currentAlbum.selectedIds,
+          photoComments: currentAlbum.photoComments,
+          status: 'awaiting_pix_confirm',
+          method: 'direct_pix',
+          orderCode,
+          totalAmount: calc.extraTotal,
+          extraCount: calc.extraCount
+        })
+      }).catch(() => {});
+    } catch (_) {}
+
+    const selectedList = (currentAlbum.selectedIds || []).map((id, idx) => {
+      const p = (currentAlbum.photos || []).find((x) => x.id === id);
+      return `${idx + 1}. ${p?.filename || id}`;
+    }).slice(0, 15).join('\n');
+
+    const msg = `Olá ${brand.shortName}! Concluí a seleção do álbum "${currentAlbum.clientName}" (${calc.selectedCount} fotos no total, sendo ${calc.extraCount} extras = ${formatBRL(calc.extraTotal)}).\n\n📸 *Fotografias Escolhidas:*\n${selectedList}\n\nSegue o comprovante do Pix (${orderCode}).`;
     window.open(`https://wa.me/${brand.whatsappNumber}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener');
   }
 
@@ -1725,13 +1806,14 @@
 
     const isMatchingSlug = (a, s) => {
       if (!a || !s) return false;
-      const target = s.toLowerCase();
-      const slug = (a.slug || '').toLowerCase();
-      const id = (a.id || '').toLowerCase();
+      const target = s.toLowerCase().trim();
+      const slug = (a.slug || '').toLowerCase().trim();
+      const id = (a.id || '').toLowerCase().trim();
       if (slug === target || id === target) return true;
-      if ((target === 'yanecarly' || target === 'yan-gordinho') && (slug === 'yan-gordinho' || slug === 'yanecarly' || id === 'alb_1794239564035' || id === 'alb_yanecarly')) {
-        return true;
-      }
+      const cleanTarget = target.replace(/[^a-z0-9]/g, '');
+      const cleanSlug = slug.replace(/[^a-z0-9]/g, '');
+      if (cleanTarget === cleanSlug) return true;
+      if ((cleanTarget === 'yangordinho' && cleanSlug === 'yangordin') || (cleanTarget === 'yangordin' && cleanSlug === 'yangordinho')) return true;
       return false;
     };
 

@@ -549,6 +549,12 @@
             if (Array.isArray(localAlb.selectedIds) && (!merged.selectedIds || merged.selectedIds.length === 0)) {
               merged.selectedIds = localAlb.selectedIds;
             }
+            if (Array.isArray(merged.selectedIds) && merged.selectedIds.length > 0 && Array.isArray(merged.photos)) {
+              const selSet = new Set(merged.selectedIds);
+              merged.photos.forEach((mp) => {
+                if (selSet.has(mp.id)) mp.selected = true;
+              });
+            }
             if (localAlb.photoComments && (!merged.photoComments || Object.keys(merged.photoComments).length === 0)) {
               merged.photoComments = localAlb.photoComments;
             }

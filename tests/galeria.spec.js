@@ -157,7 +157,29 @@ test.describe('3. Área Privada do Cliente (galeria.html)', () => {
   });
 
   test('Fase 1 (Seleção de Provas): seleção de favoritos e cálculo de fotos extras', async ({ page }) => {
-    await page.goto(`${BASE_URL}/galeria?album=yan-gordinho&preview=1`);
+    // Intercepta SITE_DATA antes da página carregar para garantir estado destravado no teste
+    await page.addInitScript(() => {
+      try { localStorage.clear(); } catch (e) {}
+      let _siteData = undefined;
+      Object.defineProperty(window, 'SITE_DATA', {
+        configurable: true,
+        enumerable: true,
+        get() { return _siteData; },
+        set(val) {
+          _siteData = val;
+          if (val && Array.isArray(val.clientAlbums)) {
+            val.clientAlbums.forEach(a => {
+              a.selectionLocked = false;
+              a.selectedIds = [];
+              a.status = 'awaiting_selection';
+              a.paymentOrder = null;
+            });
+          }
+        }
+      });
+    });
+
+    await page.goto(`${BASE_URL}/galeria?album=yan-gordin&preview=1`);
     await page.waitForTimeout(800);
 
     // Clica no primeiro coração para selecionar uma foto
@@ -168,15 +190,36 @@ test.describe('3. Área Privada do Cliente (galeria.html)', () => {
     await favBtn.click();
     await page.waitForTimeout(300);
 
-    // Contador da topbar deve refletir o formato da franquia (ex: Selecionadas: 3 / 5)
+    // Contador da topbar deve refletir o formato da franquia (ex: Selecionadas: 1 / 5)
     const selStat = page.locator('#top-sel-stat');
     await expect(selStat).toBeVisible();
     await expect(selStat).toContainText(/Selecionadas:\s*\d+\s*\/\s*5/);
   });
 
   test('Checkout Modal: suporte a pagamento duplo (Mercado Pago e Pix Direto ao estúdio)', async ({ page }) => {
-    await page.goto(`${BASE_URL}/galeria?album=yan-gordinho&preview=1`);
-    await page.waitForTimeout(600);
+    await page.addInitScript(() => {
+      try { localStorage.clear(); } catch (e) {}
+      let _siteData = undefined;
+      Object.defineProperty(window, 'SITE_DATA', {
+        configurable: true,
+        enumerable: true,
+        get() { return _siteData; },
+        set(val) {
+          _siteData = val;
+          if (val && Array.isArray(val.clientAlbums)) {
+            val.clientAlbums.forEach(a => {
+              a.selectionLocked = false;
+              a.selectedIds = [];
+              a.status = 'awaiting_selection';
+              a.paymentOrder = null;
+            });
+          }
+        }
+      });
+    });
+
+    await page.goto(`${BASE_URL}/galeria?album=yan-gordin&preview=1`);
+    await page.waitForTimeout(800);
 
     // Seleciona fotos suficientes para gerar excedente (6 fotos no total, pacote = 5)
     const hearts = page.locator('.masonry-tile .tile-heart-btn');

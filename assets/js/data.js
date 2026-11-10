@@ -5,7 +5,7 @@
  */
 
 const SITE_DATA = {
-  "cmsVersion": "2026-11-09T20:48:32.024Z",
+  "cmsVersion": 1794258800000,
   "brand": {
     "name": "Instantes de Carly",
     "founder": "Carliane Carvalho (Carly)",
@@ -601,7 +601,7 @@ const SITE_DATA = {
       "title": "Ensaio — Yan Gordin",
       "subtitle": "FORTALEZA, CEARÁ & REGIÃO METROPOLITANA",
       "phase": "proofing",
-      "status": "awaiting_selection",
+      "status": "awaiting_pix_confirm",
       "protectionLevel": "watermark_lowres",
       "watermarkEnabled": true,
       "passwordEnabled": true,
@@ -685,12 +685,32 @@ const SITE_DATA = {
           "originalSrc": "assets/images/uploads/foto-20261109204832-12.jpg"
         }
       ],
-      "selectedIds": [],
+      "selectedIds": [
+        "ph_1794256845474_0",
+        "ph_1794256845509_1",
+        "ph_1794256845577_2",
+        "ph_1794256845618_3",
+        "ph_1794256845752_4",
+        "ph_1794256845782_5"
+      ],
       "photoComments": {},
       "deliveryFavorites": [],
-      "selectionLocked": false,
-      "paymentOrder": null,
+      "selectionLocked": true,
+      "paymentOrder": {
+        "id": "PIX-17942",
+        "method": "direct_pix",
+        "status": "pending_receipt",
+        "extraCount": 1,
+        "unitPrice": 1,
+        "totalAmount": 1,
+        "createdAt": "2026-11-09T20:53:00.000Z"
+      },
       "activityLog": [
+        {
+          "at": "2026-11-09T20:53:00.000Z",
+          "type": "pix_pending",
+          "text": "Seleção concluída (6 fotos) via Pix Direto (R$ 1,00) — aguardando comprovante (PIX-17942)."
+        },
         {
           "at": "2026-11-09T20:40:30.544Z",
           "type": "created",

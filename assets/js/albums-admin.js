@@ -1604,6 +1604,25 @@
       await window.AlbumsStore.saveState(albumsState);
       renderAlbumsAdminPanel();
       notifyAdminToast('Pagamento Pix confirmado!');
+
+      // Sincroniza aprovação na nuvem para desbloquear o cliente
+      try {
+        fetch('/api/selection', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            albumId: activeAlbum.id,
+            slug: activeAlbum.slug,
+            clientName: activeAlbum.clientName,
+            selectedIds: activeAlbum.selectedIds,
+            status: 'selection_paid',
+            method: 'direct_pix',
+            orderCode: activeAlbum.paymentOrder?.id || 'PIX-CONFIRMED',
+            totalAmount: activeAlbum.paymentOrder?.totalAmount || 0,
+            extraCount: activeAlbum.paymentOrder?.extraCount || 0
+          })
+        }).catch(() => {});
+      } catch (_) {}
     });
 
     /* --- SUB-ABA 1: FOTOS --- */
@@ -1975,72 +1994,116 @@
   }
 
   /* ==========================================================================
-     6. SINCRONIZAÇÃO EM NUVEM DE PAGAMENTOS MERCADO PAGO E ESTADO
+     6. SINCRONIZAÇÃO EM NUVEM DE SELEÇÕES DO CLIENTE E PAGAMENTOS
      ========================================================================== */
   async function syncCloudPayments() {
     try {
-      const res = await fetch('/api/payments');
-      if (!res.ok) return;
-      const data = await res.json();
-      const payments = Array.isArray(data.payments) ? data.payments : [];
-      if (!payments.length || !albumsState || !Array.isArray(albumsState.albums)) return;
-
+      if (!albumsState || !Array.isArray(albumsState.albums)) return;
       let changed = false;
 
-      // 1. Higienização automática de falsos positivos (ex: pagamentos antigos que não pertencem a este álbum)
-      albumsState.albums.forEach((a) => {
-        if (a.paymentOrder && (a.paymentOrder.totalAmount === 117.8 || (a.paymentOrder.extraCount === 0 && a.status === 'selection_paid' && (!a.selectedIds || a.selectedIds.length === 0)))) {
-          const hasLegit = payments.some(
-            (p) => p.status === 'approved' && p.albumId && (p.albumId === a.id || (a.slug && p.albumId.toLowerCase() === a.slug.toLowerCase()))
+      // 1. Sincroniza seleções diretas de clientes (Pix Direto e pacotes inclusos via /api/selection)
+      try {
+        const selRes = await fetch('/api/selection');
+        if (selRes.ok) {
+          const selData = await selRes.json();
+          const selections = Array.isArray(selData.selections) ? selData.selections : [];
+          selections.forEach((sel) => {
+            const targetId = String(sel.albumId || sel.slug || '').trim();
+            if (!targetId) return;
+            const alb = albumsState.albums.find(
+              (a) => a.id === targetId || (a.slug && a.slug.toLowerCase() === targetId.toLowerCase())
+            );
+            if (!alb) return;
+
+            if (Array.isArray(sel.selectedIds) && sel.selectedIds.length > 0) {
+              const currentCount = (alb.selectedIds || []).length;
+              if (currentCount !== sel.selectedIds.length || alb.status !== sel.status) {
+                alb.selectedIds = sel.selectedIds;
+                alb.selectionLocked = true;
+                alb.status = sel.status || 'awaiting_pix_confirm';
+                alb.paymentOrder = {
+                  id: sel.id,
+                  method: sel.method || 'direct_pix',
+                  status: sel.status === 'selection_paid' ? 'approved' : 'pending_receipt',
+                  extraCount: sel.extraCount || 0,
+                  totalAmount: sel.totalAmount || 0,
+                  createdAt: sel.updatedAt || new Date().toISOString()
+                };
+                alb.activityLog = alb.activityLog || [];
+                if (!alb.activityLog.some((l) => l.text && l.text.includes(sel.id))) {
+                  alb.activityLog.unshift({
+                    at: sel.updatedAt || new Date().toISOString(),
+                    type: sel.status === 'awaiting_pix_confirm' ? 'pix_pending' : 'selection',
+                    text: `Seleção recebida do cliente (${sel.selectedIds.length} fotos) via ${sel.method === 'direct_pix' ? 'Pix Direto' : 'Pacote'} (${sel.id}).`
+                  });
+                }
+                changed = true;
+              }
+            }
+          });
+        }
+      } catch (_) {}
+
+      // 2. Higienização automática de falsos positivos antigos do Mercado Pago
+      const res = await fetch('/api/payments');
+      if (res.ok) {
+        const data = await res.json();
+        const payments = Array.isArray(data.payments) ? data.payments : [];
+
+        albumsState.albums.forEach((a) => {
+          if (a.paymentOrder && (a.paymentOrder.totalAmount === 117.8 || (a.paymentOrder.extraCount === 0 && a.status === 'selection_paid' && (!a.selectedIds || a.selectedIds.length === 0)))) {
+            const hasLegit = payments.some(
+              (p) => p.status === 'approved' && p.albumId && (p.albumId === a.id || (a.slug && p.albumId.toLowerCase() === a.slug.toLowerCase()))
+            );
+            if (!hasLegit) {
+              a.status = 'awaiting_selection';
+              a.selectionLocked = false;
+              a.paymentOrder = null;
+              if (Array.isArray(a.activityLog)) {
+                a.activityLog = a.activityLog.filter((l) => !l.text || (!l.text.includes('117,80') && !l.text.includes('Pagamento aprovado')));
+              }
+              changed = true;
+            }
+          }
+        });
+
+        // 3. Vinculação estrita e segura de pagamentos aprovados do Mercado Pago
+        payments.forEach((pay) => {
+          if (pay.status !== 'approved') return;
+          const targetId = String(pay.albumId || '').trim();
+          if (!targetId) return;
+
+          let alb = albumsState.albums.find(
+            (a) => a.id === targetId || (a.slug && a.slug.toLowerCase() === targetId.toLowerCase())
           );
-          if (!hasLegit) {
-            a.status = 'awaiting_selection';
-            a.selectionLocked = false;
-            a.paymentOrder = null;
-            if (Array.isArray(a.activityLog)) {
-              a.activityLog = a.activityLog.filter((l) => !l.text || (!l.text.includes('117,80') && !l.text.includes('Pagamento aprovado')));
+          if (!alb) return;
+
+          if (alb && alb.status !== 'selection_paid') {
+            alb.status = 'selection_paid';
+            alb.selectionLocked = true;
+            if (Array.isArray(pay.selectedIds) && pay.selectedIds.length > 0) {
+              alb.selectedIds = pay.selectedIds;
+            }
+            alb.paymentOrder = {
+              id: pay.id,
+              method: pay.paymentMethod || 'mercadopago',
+              status: 'approved',
+              extraCount: pay.extraCount || 0,
+              totalAmount: pay.amount,
+              paidAt: pay.paidAt || new Date().toISOString()
+            };
+            alb.activityLog = alb.activityLog || [];
+            if (!alb.activityLog.some((l) => l.text && l.text.includes(pay.id))) {
+              alb.activityLog.unshift({
+                at: pay.paidAt || new Date().toISOString(),
+                type: 'payment',
+                text: `Pagamento aprovado via Mercado Pago (${pay.id}): ${formatBRL(pay.amount)} por ${pay.extraCount || 0} fotos extras.`
+              });
             }
             changed = true;
           }
-        }
-      });
-
-      // 2. Vinculação estrita e segura de pagamentos aprovados do Mercado Pago
-      payments.forEach((pay) => {
-        if (pay.status !== 'approved') return;
-        const targetId = String(pay.albumId || '').trim();
-        if (!targetId) return; // NUNCA faz fallback para o primeiro álbum!
-
-        let alb = albumsState.albums.find(
-          (a) => a.id === targetId || (a.slug && a.slug.toLowerCase() === targetId.toLowerCase())
-        );
-        if (!alb) return;
-
-        if (alb && alb.status !== 'selection_paid') {
-          alb.status = 'selection_paid';
-          alb.selectionLocked = true;
-          if (Array.isArray(pay.selectedIds) && pay.selectedIds.length > 0) {
-            alb.selectedIds = pay.selectedIds;
-          }
-          alb.paymentOrder = {
-            id: pay.id,
-            method: pay.paymentMethod || 'mercadopago',
-            status: 'approved',
-            extraCount: pay.extraCount || 0,
-            totalAmount: pay.amount,
-            paidAt: pay.paidAt || new Date().toISOString()
-          };
-          alb.activityLog = alb.activityLog || [];
-          if (!alb.activityLog.some((l) => l.text && l.text.includes(pay.id))) {
-            alb.activityLog.unshift({
-              at: pay.paidAt || new Date().toISOString(),
-              type: 'payment',
-              text: `Pagamento aprovado via Mercado Pago (${pay.id}): ${formatBRL(pay.amount)} por ${pay.extraCount || 0} fotos extras.`
-            });
-          }
-          changed = true;
-        }
-      });
+        });
+      }
 
       if (changed) {
         await window.AlbumsStore.saveState(albumsState);
@@ -2057,9 +2120,13 @@
     selectedAlbumId = albumsState.albums?.[0]?.id || null;
     renderAlbumsAdminPanel();
 
-    // Consulta pagamentos reais na nuvem Mercado Pago na inicialização e a cada 15 segundos
+    // Consulta nuvem a cada 6 segundos e ao focar a aba (sem exigir Alt+F5)
     syncCloudPayments();
-    setInterval(syncCloudPayments, 15000);
+    setInterval(syncCloudPayments, 6000);
+    window.addEventListener('focus', syncCloudPayments);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') syncCloudPayments();
+    });
 
     document.querySelectorAll('.sidebar-tab').forEach((tabBtn) => {
       tabBtn.addEventListener('click', () => {
