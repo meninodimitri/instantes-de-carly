@@ -5,7 +5,7 @@
  */
 
 const SITE_DATA = {
-  "cmsVersion": "2026-11-12T02:31:08.188Z",
+  "cmsVersion": "2026-11-12T02:38:25.421Z",
   "brand": {
     "name": "Instantes de Carly",
     "founder": "Carliane Carvalho (Carly)",
@@ -618,7 +618,7 @@ const SITE_DATA = {
       "coverSrc": "assets/images/uploads/foto-20261112021441-01.jpg",
       "coverFocal": "50% 35%",
       "design": {
-        "coverStyle": "moldura",
+        "coverStyle": "alegria",
         "typography": "sans",
         "colorTheme": "maresia",
         "gridStyle": "square",
