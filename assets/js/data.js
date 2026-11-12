@@ -5,7 +5,7 @@
  */
 
 const SITE_DATA = {
-  "cmsVersion": "2026-11-12T02:14:41.037Z",
+  "cmsVersion": "2026-11-12T02:28:24.734Z",
   "brand": {
     "name": "Instantes de Carly",
     "founder": "Carliane Carvalho (Carly)",
@@ -600,8 +600,8 @@ const SITE_DATA = {
       "clientName": "Teste Definitivo",
       "title": "Ensaio — Teste Definitivo",
       "subtitle": "FORTALEZA, CEARÁ & REGIÃO METROPOLITANA",
-      "phase": "proofing",
-      "status": "awaiting_selection",
+      "phase": "delivery",
+      "status": "selection_paid",
       "protectionLevel": "watermark_lowres",
       "watermarkEnabled": true,
       "passwordEnabled": true,
@@ -632,64 +632,57 @@ const SITE_DATA = {
         {
           "id": "ph_1794449607242_0",
           "filename": "IMG-20260904-WA0065.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261112021441-02.jpg"
-        },
-        {
-          "id": "ph_1794449607274_1",
-          "filename": "IMG-20250519-WA0035.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261112021441-03.jpg"
+          "originalSrc": "assets/images/uploads/foto-20261112021441-02.jpg",
+          "selected": true
         },
         {
           "id": "ph_1794449607343_2",
           "filename": "IMG-20250530-WA0102.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261112021441-04.jpg"
+          "originalSrc": "assets/images/uploads/foto-20261112021441-04.jpg",
+          "selected": true
         },
         {
           "id": "ph_1794449607380_3",
           "filename": "IMG-20250613-WA0074.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261112021441-05.jpg"
+          "originalSrc": "assets/images/uploads/foto-20261112021441-05.jpg",
+          "selected": true
         },
         {
           "id": "ph_1794449607491_4",
           "filename": "IMG-20250613-WA0063.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261112021441-06.jpg"
-        },
-        {
-          "id": "ph_1794449607515_5",
-          "filename": "IMG-20250613-WA0079.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261112021441-07.jpg"
-        },
-        {
-          "id": "ph_1794449607575_6",
-          "filename": "IMG-20250613-WA0073.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261112021441-08.jpg"
-        },
-        {
-          "id": "ph_1794449607602_7",
-          "filename": "IMG-20250613-WA0077.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261112021441-09.jpg"
+          "originalSrc": "assets/images/uploads/foto-20261112021441-06.jpg",
+          "selected": true
         },
         {
           "id": "ph_1794449607693_8",
           "filename": "Gemini_Generated_Image_cn2estcn2estcn2e.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261112021441-10.jpg"
+          "originalSrc": "assets/images/uploads/foto-20261112021441-10.jpg",
+          "selected": true
         },
         {
-          "id": "ph_1794449607773_9",
-          "filename": "Gemini_Generated_Image_luk4ifluk4ifluk4.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261112021441-11.jpg"
-        },
-        {
-          "id": "ph_1794449607799_10",
-          "filename": "WhatsApp Image 2026-09-09 at 21.12.32.jpeg",
-          "originalSrc": "assets/images/uploads/foto-20261112021441-12.jpg"
+          "id": "ph_1794450348027_0",
+          "filename": "IMG-20250519-WA0035.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261112022824-01.jpg"
         }
       ],
-      "selectedIds": [],
+      "selectedIds": [
+        "ph_1794449607242_0",
+        "ph_1794449607343_2",
+        "ph_1794449607380_3",
+        "ph_1794449607491_4",
+        "ph_1794449607693_8"
+      ],
       "photoComments": {},
       "deliveryFavorites": [],
-      "selectionLocked": false,
-      "paymentOrder": null,
+      "selectionLocked": true,
+      "paymentOrder": {
+        "id": "188089054601",
+        "method": "pix",
+        "status": "approved",
+        "extraCount": 1,
+        "totalAmount": 1,
+        "paidAt": "2026-11-11T22:19:02.000-04:00"
+      },
       "activityLog": [
         {
           "at": "2026-11-12T02:10:05.990Z",
