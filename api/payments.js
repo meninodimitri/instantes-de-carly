@@ -16,7 +16,24 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { albumId } = req.query || {};
+    const { albumId, paymentId } = req.query || {};
+    let results = [];
+
+    // Consulta direta por paymentId (zero latência de indexação ao confirmar Pix em tempo real)
+    if (paymentId) {
+      try {
+        const directRes = await fetch(`https://api.mercadopago.com/v1/payments/${encodeURIComponent(String(paymentId))}`, {
+          headers: {
+            Authorization: `Bearer ${mpToken}`
+          }
+        });
+        if (directRes.ok) {
+          const single = await directRes.json();
+          if (single && single.id) results.push(single);
+        }
+      } catch (_) {}
+    }
+
     const url = new URL('https://api.mercadopago.com/v1/payments/search');
     url.searchParams.set('sort', 'date_created');
     url.searchParams.set('criteria', 'desc');
@@ -28,32 +45,46 @@ export default async function handler(req, res) {
       }
     });
 
-    if (!mpRes.ok) {
-      return res.status(200).json({ payments: [] });
+    if (mpRes.ok) {
+      const data = await mpRes.json();
+      const searched = Array.isArray(data.results) ? data.results : [];
+      const seenIds = new Set(results.map((r) => String(r.id)));
+      searched.forEach((item) => {
+        if (item && !seenIds.has(String(item.id))) {
+          results.push(item);
+        }
+      });
     }
 
-    const data = await mpRes.json();
-    const results = Array.isArray(data.results) ? data.results : [];
-
-    const payments = results.map((p) => ({
-      id: String(p.id),
-      status: p.status, // 'approved', 'pending', etc.
-      statusDetail: p.status_detail,
-      amount: p.transaction_amount,
-      paidAt: p.date_approved || p.date_created,
-      paymentMethod: p.payment_method_id,
-      albumId: p.metadata?.album_id || '',
-      albumSlug: p.metadata?.album_slug || p.metadata?.slug || '',
-      selectedIds: p.metadata?.selected_ids || [],
-      extraCount: p.metadata?.extra_count || 0,
-      clientEmail: p.payer?.email || ''
-    }));
+    const payments = results.map((p) => {
+      let parsedComments = {};
+      if (p.metadata?.photo_comments_json) {
+        try {
+          parsedComments = JSON.parse(p.metadata.photo_comments_json);
+        } catch (_) {}
+      }
+      return {
+        id: String(p.id),
+        status: p.status, // 'approved', 'pending', etc.
+        statusDetail: p.status_detail,
+        amount: p.transaction_amount,
+        paidAt: p.date_approved || p.date_created,
+        paymentMethod: p.payment_method_id,
+        albumId: p.metadata?.album_id || '',
+        albumSlug: p.metadata?.album_slug || p.metadata?.slug || '',
+        selectedIds: p.metadata?.selected_ids || [],
+        photoComments: parsedComments,
+        extraCount: p.metadata?.extra_count || 0,
+        clientEmail: p.payer?.email || ''
+      };
+    });
 
     if (albumId) {
       const q = String(albumId).trim().toLowerCase();
       const filtered = payments.filter((p) =>
         (p.albumId && p.albumId.toLowerCase() === q) ||
-        (p.albumSlug && p.albumSlug.toLowerCase() === q)
+        (p.albumSlug && p.albumSlug.toLowerCase() === q) ||
+        (paymentId && p.id === String(paymentId))
       );
       return res.status(200).json({ payments: filtered });
     }

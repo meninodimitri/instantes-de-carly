@@ -521,7 +521,12 @@
       // Purga imediatamente qualquer álbum demo residual do cache local / IndexedDB
       root.albums = root.albums.filter((a) => a && a.id && !a.id.startsWith('alb_demo_'));
       if (cloudAlbums.length > 0) {
-        // Mescla álbuns centrais do SITE_DATA para garantir disponibilidade cross-device (celular / PC)
+        const rawCmsVer = activeSiteData && activeSiteData.cmsVersion;
+        const cmsVersionMs = typeof rawCmsVer === 'number'
+          ? rawCmsVer
+          : (Date.parse(String(rawCmsVer || '')) || 0);
+
+        // Mescla álbuns centrais do SITE_DATA preservando edições locais mais recentes do Admin
         cloudAlbums.forEach((cAlb) => {
           if (cAlb.id && cAlb.id.startsWith('alb_demo_')) return;
           const existingIdx = root.albums.findIndex((a) => a.id === cAlb.id || (cAlb.slug && a.slug === cAlb.slug));
@@ -529,25 +534,32 @@
             root.albums.push(JSON.parse(JSON.stringify(cAlb)));
           } else {
             const localAlb = root.albums[existingIdx];
-            const merged = JSON.parse(JSON.stringify(cAlb));
-            // Preserva seleções de fotos e comentários feitos localmente pelo cliente
-            if (Array.isArray(localAlb.photos) && Array.isArray(merged.photos)) {
-              const localMap = new Map();
-              localAlb.photos.forEach((lp) => {
-                const k = lp.id || lp.originalSrc;
-                if (k) localMap.set(k, lp);
+            const localAdminUpdated = Number(localAlb.updatedAt) || 0;
+            const cloudAdminUpdated = Math.max(Number(cAlb.updatedAt) || 0, cmsVersionMs);
+            const localHasNewerConfig = localAdminUpdated > cloudAdminUpdated;
+
+            const merged = JSON.parse(JSON.stringify(localHasNewerConfig ? localAlb : cAlb));
+            const secondary = localHasNewerConfig ? cAlb : localAlb;
+
+            // Mescla metadados de fotos (selected / clientNote) sem perder alterações de capa/design
+            if (Array.isArray(secondary.photos) && Array.isArray(merged.photos)) {
+              const secMap = new Map();
+              secondary.photos.forEach((sp) => {
+                const k = sp.id || sp.originalSrc;
+                if (k) secMap.set(k, sp);
               });
               merged.photos.forEach((mp) => {
                 const k = mp.id || mp.originalSrc;
-                const lp = localMap.get(k);
-                if (lp) {
-                  if (lp.selected) mp.selected = true;
-                  if (lp.clientNote) mp.clientNote = lp.clientNote;
+                const sp = secMap.get(k);
+                if (sp) {
+                  if (sp.selected) mp.selected = true;
+                  if (sp.clientNote && !mp.clientNote) mp.clientNote = sp.clientNote;
                 }
               });
             }
-            if (Array.isArray(localAlb.selectedIds) && (!merged.selectedIds || merged.selectedIds.length === 0)) {
-              merged.selectedIds = localAlb.selectedIds;
+
+            if (Array.isArray(secondary.selectedIds) && (!merged.selectedIds || merged.selectedIds.length === 0)) {
+              merged.selectedIds = secondary.selectedIds;
             }
             if (Array.isArray(merged.selectedIds) && merged.selectedIds.length > 0 && Array.isArray(merged.photos)) {
               const selSet = new Set(merged.selectedIds);
@@ -555,16 +567,24 @@
                 if (selSet.has(mp.id)) mp.selected = true;
               });
             }
-            if (localAlb.photoComments && (!merged.photoComments || Object.keys(merged.photoComments).length === 0)) {
-              merged.photoComments = localAlb.photoComments;
+
+            // Mescla observações de fotos de forma aditiva (nuvem + local)
+            const mergedComments = { ...(merged.photoComments || {}) };
+            if (secondary.photoComments && typeof secondary.photoComments === 'object') {
+              Object.entries(secondary.photoComments).forEach(([pid, txt]) => {
+                const clean = String(txt || '').trim();
+                if (clean && !mergedComments[pid]) mergedComments[pid] = clean;
+              });
             }
-            if (Array.isArray(localAlb.deliveryFavorites) && (!merged.deliveryFavorites || merged.deliveryFavorites.length === 0)) {
-              merged.deliveryFavorites = localAlb.deliveryFavorites;
+            merged.photoComments = mergedComments;
+
+            if (Array.isArray(secondary.deliveryFavorites) && (!merged.deliveryFavorites || merged.deliveryFavorites.length === 0)) {
+              merged.deliveryFavorites = secondary.deliveryFavorites;
             }
             if (localAlb.unlockedAt) merged.unlockedAt = localAlb.unlockedAt;
-            if (localAlb.payment && !merged.payment) merged.payment = localAlb.payment;
-            if (localAlb.paymentOrder && !merged.paymentOrder) merged.paymentOrder = localAlb.paymentOrder;
-            if (localAlb.status === 'selection_paid' && merged.status !== 'selection_paid') {
+            if (secondary.payment && !merged.payment) merged.payment = secondary.payment;
+            if (secondary.paymentOrder && !merged.paymentOrder) merged.paymentOrder = secondary.paymentOrder;
+            if (secondary.status === 'selection_paid' && merged.status !== 'selection_paid') {
               merged.status = 'selection_paid';
               merged.selectionLocked = true;
             }
@@ -627,7 +647,15 @@
     }
     if (Array.isArray(nextState.albums)) {
       nextState.albums = nextState.albums.filter((a) => a && a.id && !a.id.startsWith('alb_demo_'));
-      nextState.albums.forEach(normalizeAlbum);
+      const stampNow = opts.updatedAtOverride || Date.now();
+      nextState.albums.forEach((alb) => {
+        normalizeAlbum(alb);
+        if (opts.isClientAction) {
+          alb.clientUpdatedAt = stampNow;
+        } else if (!opts.fromCloudSync) {
+          alb.updatedAt = stampNow;
+        }
+      });
       if (typeof window !== 'undefined' && window.SITE_DATA) {
         window.SITE_DATA.clientAlbums = JSON.parse(JSON.stringify(nextState.albums));
       }

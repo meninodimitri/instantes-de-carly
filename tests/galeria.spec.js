@@ -13,7 +13,7 @@ test.describe('3. Área Privada do Cliente (galeria.html)', () => {
       sessionStorage.clear();
     });
 
-    await page.goto(`${BASE_URL}/galeria?album=yan-gordinho`);
+    await page.goto(`${BASE_URL}/galeria?album=teste-definitivo`);
     await page.waitForTimeout(600);
 
     const gate = page.locator('#password-view');
@@ -48,12 +48,12 @@ test.describe('3. Área Privada do Cliente (galeria.html)', () => {
       sessionStorage.clear();
     });
 
-    await page.goto(`${BASE_URL}/galeria?album=yan-gordinho`);
+    await page.goto(`${BASE_URL}/galeria?album=teste-definitivo`);
     await page.waitForTimeout(600);
 
-    // Digita senha correta (1219)
+    // Digita senha correta do álbum (1212)
     const pwInput = page.locator('#pw-input');
-    await pwInput.fill('1219');
+    await pwInput.fill('1212');
     await page.locator('#password-form button[type="submit"]').click();
     await page.waitForTimeout(800);
 
@@ -67,7 +67,7 @@ test.describe('3. Área Privada do Cliente (galeria.html)', () => {
   });
 
   test('Capa Retângulo Vertical: moldura esbelta, autor interno e botão com sublinhado', async ({ page }) => {
-    await page.goto(`${BASE_URL}/galeria?album=yan-gordinho&preview=1`);
+    await page.goto(`${BASE_URL}/galeria?album=teste-definitivo&preview=1`);
     await page.waitForTimeout(600);
 
     // Configura capa para retangulo via evaluate
@@ -127,7 +127,7 @@ test.describe('3. Área Privada do Cliente (galeria.html)', () => {
   });
 
   test('Anti-Print: intercepta atalhos e abre modal de direito autoral com fonte formal desacoplada', async ({ page }) => {
-    await page.goto(`${BASE_URL}/galeria?album=yan-gordinho&preview=1`);
+    await page.goto(`${BASE_URL}/galeria?album=teste-definitivo&preview=1`);
     await page.waitForTimeout(600);
 
     // Simula fonte cursiva ativa no álbum e dispara evento de PrintScreen
@@ -157,29 +157,17 @@ test.describe('3. Área Privada do Cliente (galeria.html)', () => {
   });
 
   test('Fase 1 (Seleção de Provas): seleção de favoritos e cálculo de fotos extras', async ({ page }) => {
-    // Intercepta SITE_DATA antes da página carregar para garantir estado destravado no teste
     await page.addInitScript(() => {
       try { localStorage.clear(); } catch (e) {}
-      let _siteData = undefined;
-      Object.defineProperty(window, 'SITE_DATA', {
-        configurable: true,
-        enumerable: true,
-        get() { return _siteData; },
-        set(val) {
-          _siteData = val;
-          if (val && Array.isArray(val.clientAlbums)) {
-            val.clientAlbums.forEach(a => {
-              a.selectionLocked = false;
-              a.selectedIds = [];
-              a.status = 'awaiting_selection';
-              a.paymentOrder = null;
-            });
-          }
-        }
-      });
+    });
+    await page.route('**/assets/js/data.js*', async route => {
+      const resp = await route.fetch();
+      let body = await resp.text();
+      body += `\n;(function(){ if (window.SITE_DATA && Array.isArray(window.SITE_DATA.clientAlbums)) { window.SITE_DATA.clientAlbums.forEach(a => { a.phase = 'proofing'; a.selectionLocked = false; a.selectedIds = []; a.photoComments = {}; a.status = 'awaiting_selection'; a.paymentOrder = null; }); } })();\n`;
+      await route.fulfill({ response: resp, body });
     });
 
-    await page.goto(`${BASE_URL}/galeria?album=yan-gordin&preview=1`);
+    await page.goto(`${BASE_URL}/galeria?album=teste-definitivo&preview=1`);
     await page.waitForTimeout(800);
 
     // Clica no primeiro coração para selecionar uma foto
@@ -199,26 +187,15 @@ test.describe('3. Área Privada do Cliente (galeria.html)', () => {
   test('Checkout Modal: suporte a pagamento duplo (Mercado Pago e Pix Direto ao estúdio)', async ({ page }) => {
     await page.addInitScript(() => {
       try { localStorage.clear(); } catch (e) {}
-      let _siteData = undefined;
-      Object.defineProperty(window, 'SITE_DATA', {
-        configurable: true,
-        enumerable: true,
-        get() { return _siteData; },
-        set(val) {
-          _siteData = val;
-          if (val && Array.isArray(val.clientAlbums)) {
-            val.clientAlbums.forEach(a => {
-              a.selectionLocked = false;
-              a.selectedIds = [];
-              a.status = 'awaiting_selection';
-              a.paymentOrder = null;
-            });
-          }
-        }
-      });
+    });
+    await page.route('**/assets/js/data.js*', async route => {
+      const resp = await route.fetch();
+      let body = await resp.text();
+      body += `\n;(function(){ if (window.SITE_DATA && Array.isArray(window.SITE_DATA.clientAlbums)) { window.SITE_DATA.clientAlbums.forEach(a => { a.phase = 'proofing'; a.selectionLocked = false; a.selectedIds = []; a.photoComments = {}; a.status = 'awaiting_selection'; a.paymentOrder = null; }); } })();\n`;
+      await route.fulfill({ response: resp, body });
     });
 
-    await page.goto(`${BASE_URL}/galeria?album=yan-gordin&preview=1`);
+    await page.goto(`${BASE_URL}/galeria?album=teste-definitivo&preview=1`);
     await page.waitForTimeout(800);
 
     // Seleciona fotos suficientes para gerar excedente (6 fotos no total, pacote = 5)

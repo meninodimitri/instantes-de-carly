@@ -2684,7 +2684,9 @@ async function handleMainPublishClick() {
             if (result.cleanPayload.clientAlbums) albState.albums = result.cleanPayload.clientAlbums;
             if (result.cleanPayload.clientWatermarkConfig) albState.watermarkConfig = result.cleanPayload.clientWatermarkConfig;
             if (result.cleanPayload.clientPaymentConfig) albState.paymentConfig = result.cleanPayload.clientPaymentConfig;
-            await window.AlbumsStore.saveState(albState);
+            await window.AlbumsStore.saveState(albState, {
+              updatedAtOverride: Date.parse(cmsData.cmsVersion) || Date.now()
+            });
             if (typeof renderAlbumsAdminPanel === 'function') {
               renderAlbumsAdminPanel();
             }

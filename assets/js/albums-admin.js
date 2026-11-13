@@ -368,6 +368,20 @@
           </div>
         ` : ''}
 
+        ${commentEntries.length > 0 ? `
+          <div class="alb-notes-clean-list" style="margin: 0 0 12px;">
+            <h4>💬 Observações deixadas pelo cliente (${commentEntries.length})</h4>
+            ${commentEntries.map(([pid, note]) => {
+              const ph = (activeAlbum.photos || []).find((p) => p.id === pid);
+              return `
+                <div class="alb-note-row">
+                  <strong>${escapeHtml(ph?.filename || pid)}:</strong> ${escapeHtml(note)}
+                </div>
+              `;
+            }).join('')}
+          </div>
+        ` : ''}
+
         ${(activeAlbum.photos || []).length === 0 ? `
           <div style="padding: 34px 16px; text-align: center; background: #FAF8F3; border-radius: 10px; border: 1px dashed rgba(27,39,51,0.18);">
             <strong style="display:block; color:#1B2733; margin-bottom:4px;">Este álbum ainda está vazio</strong>
@@ -378,6 +392,7 @@
             ${(activeAlbum.photos || []).map((ph) => {
               const isCover = activeAlbum.coverSrc === ph.originalSrc;
               const isSel = selectedSet.has(ph.id);
+              const phNote = String((activeAlbum.photoComments && activeAlbum.photoComments[ph.id]) || '').trim();
               return `
                 <div class="alb-adm-photo-card ${isCover ? 'is-cover-card' : ''}">
                   <div class="alb-adm-thumb-wrap">
@@ -396,6 +411,7 @@
                       title="Remover foto"
                     >✕</button>
                     ${isSel ? `<span class="alb-thumb-sel-badge">♥ Escolhida</span>` : ''}
+                    ${phNote ? `<span class="alb-thumb-note-badge" title="${escapeHtml(phNote)}">💬 Obs.</span>` : ''}
                   </div>
                   <div class="alb-adm-meta">
                     <span class="alb-adm-fname">${escapeHtml(ph.filename)}</span>
@@ -405,20 +421,6 @@
             }).join('')}
           </div>
         `}
-
-        ${commentEntries.length > 0 ? `
-          <div class="alb-notes-clean-list">
-            <h4>Observações deixadas pelo cliente (${commentEntries.length})</h4>
-            ${commentEntries.map(([pid, note]) => {
-              const ph = (activeAlbum.photos || []).find((p) => p.id === pid);
-              return `
-                <div class="alb-note-row">
-                  <strong>${escapeHtml(ph?.filename || pid)}:</strong> ${escapeHtml(note)}
-                </div>
-              `;
-            }).join('')}
-          </div>
-        ` : ''}
       </div>
     `;
   }
@@ -1185,6 +1187,9 @@
     const panel = document.getElementById('panel-albums');
     if (!panel || !albumsState) return;
 
+    const scrollContainer = panel.closest('.cms-editor') || panel.parentElement;
+    const prevScrollTop = scrollContainer ? scrollContainer.scrollTop : 0;
+
     updateSidebarBadge();
     renderSidebarAlbumsSublist();
 
@@ -1231,6 +1236,7 @@
       return;
     }
 
+    const noteCount = Object.values(activeAlbum.photoComments || {}).filter((t) => String(t || '').trim()).length;
     const st = getStatusMeta(activeAlbum);
     const calc = window.AlbumsStore.calculateSelectionPricing(activeAlbum);
 
@@ -1313,6 +1319,7 @@
         <button type="button" class="alb-subtab-btn ${activeAlbumSubTab === 'photos' ? 'active' : ''}" data-alb-subtab="photos">
           <span>Fotos</span>
           <span class="alb-subtab-pill">${(activeAlbum.photos || []).length}</span>
+          ${noteCount > 0 ? `<span class="alb-subtab-pill" title="${noteCount} observação(ões) do cliente">💬 ${noteCount}</span>` : ''}
         </button>
         <button type="button" class="alb-subtab-btn ${activeAlbumSubTab === 'design' ? 'active' : ''}" data-alb-subtab="design">
           <span>Design &amp; Capa</span>
@@ -1334,6 +1341,9 @@
     if (activeAlbumSubTab === 'protection') {
       refreshWatermarkSamplePreview();
       bindAdminPreviewSpotlight();
+    }
+    if (scrollContainer && prevScrollTop > 0) {
+      scrollContainer.scrollTop = prevScrollTop;
     }
   }
 
@@ -1659,7 +1669,9 @@
         const ph = (activeAlbum.photos || []).find((p) => p.id === pid);
         if (ph) {
           activeAlbum.coverSrc = ph.originalSrc;
+          broadcastLiveAlbum();
           await window.AlbumsStore.saveState(albumsState);
+          syncAdminStateDirty();
           renderAlbumsAdminPanel();
           notifyAdminToast('Foto definida como capa do álbum.');
         }
@@ -1710,6 +1722,16 @@
       });
     });
 
+    const saveDesignNow = async (notifyMsg = null) => {
+      clearTimeout(liveSaveTimer);
+      broadcastLiveAlbum();
+      clearTimeout(liveSaveTimer);
+      await window.AlbumsStore.saveState(albumsState);
+      syncAdminStateDirty();
+      renderAlbumsAdminPanel();
+      if (notifyMsg) notifyAdminToast(notifyMsg);
+    };
+
     const focalPicker = document.getElementById('pix-focal-picker');
     focalPicker?.addEventListener('click', async (e) => {
       const rect = focalPicker.getBoundingClientRect();
@@ -1717,19 +1739,14 @@
       const x = Math.round(Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100)));
       const y = Math.round(Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100)));
       activeAlbum.coverFocal = `${x}% ${y}%`;
-      broadcastLiveAlbum();
-      await window.AlbumsStore.saveState(albumsState);
-      renderAlbumsAdminPanel();
-      notifyAdminToast(`Ponto focal da capa ajustado (${x}% · ${y}%).`);
+      await saveDesignNow(`Ponto focal da capa ajustado (${x}% · ${y}%).`);
     });
 
     panel.querySelectorAll('[data-design-cover]').forEach((btn) => {
       btn.addEventListener('click', async () => {
         activeAlbum.design = activeAlbum.design || window.AlbumsStore.getDefaultDesign();
         activeAlbum.design.coverStyle = btn.getAttribute('data-design-cover');
-        broadcastLiveAlbum();
-        await window.AlbumsStore.saveState(albumsState);
-        renderAlbumsAdminPanel();
+        await saveDesignNow();
       });
     });
 
@@ -1738,10 +1755,7 @@
       swCoverLogo.addEventListener('change', async () => {
         activeAlbum.design = activeAlbum.design || window.AlbumsStore.getDefaultDesign();
         activeAlbum.design.coverLogoVisible = swCoverLogo.checked;
-        broadcastLiveAlbum();
-        await window.AlbumsStore.saveState(albumsState);
-        renderAlbumsAdminPanel();
-        notifyAdminToast(swCoverLogo.checked ? 'Logotipo ativado na capa.' : 'Logotipo ocultado na capa.');
+        await saveDesignNow(swCoverLogo.checked ? 'Logotipo ativado na capa.' : 'Logotipo ocultado na capa.');
       });
     }
 
@@ -1750,10 +1764,7 @@
         const color = btn.getAttribute('data-cover-logo-color');
         activeAlbum.design = activeAlbum.design || window.AlbumsStore.getDefaultDesign();
         activeAlbum.design.coverLogoColor = color;
-        broadcastLiveAlbum();
-        await window.AlbumsStore.saveState(albumsState);
-        renderAlbumsAdminPanel();
-        notifyAdminToast(`Cor da logo alterada para: ${color === 'auto' ? 'Automática' : color === 'light' ? 'Branca' : 'Escura'}.`);
+        await saveDesignNow(`Cor da logo alterada para: ${color === 'auto' ? 'Automática' : color === 'light' ? 'Branca' : 'Escura'}.`);
       });
     });
 
@@ -1761,9 +1772,7 @@
       btn.addEventListener('click', async () => {
         activeAlbum.design = activeAlbum.design || window.AlbumsStore.getDefaultDesign();
         activeAlbum.design.typography = btn.getAttribute('data-design-typo');
-        broadcastLiveAlbum();
-        await window.AlbumsStore.saveState(albumsState);
-        renderAlbumsAdminPanel();
+        await saveDesignNow();
       });
     });
 
@@ -1771,9 +1780,7 @@
       btn.addEventListener('click', async () => {
         activeAlbum.design = activeAlbum.design || window.AlbumsStore.getDefaultDesign();
         activeAlbum.design.colorTheme = btn.getAttribute('data-design-color');
-        broadcastLiveAlbum();
-        await window.AlbumsStore.saveState(albumsState);
-        renderAlbumsAdminPanel();
+        await saveDesignNow();
       });
     });
 
@@ -1781,9 +1788,7 @@
       btn.addEventListener('click', async () => {
         activeAlbum.design = activeAlbum.design || window.AlbumsStore.getDefaultDesign();
         activeAlbum.design.gridStyle = btn.getAttribute('data-grid-style');
-        broadcastLiveAlbum();
-        await window.AlbumsStore.saveState(albumsState);
-        renderAlbumsAdminPanel();
+        await saveDesignNow();
       });
     });
 
@@ -1791,9 +1796,7 @@
       btn.addEventListener('click', async () => {
         activeAlbum.design = activeAlbum.design || window.AlbumsStore.getDefaultDesign();
         activeAlbum.design.gridSpacing = btn.getAttribute('data-grid-spacing');
-        broadcastLiveAlbum();
-        await window.AlbumsStore.saveState(albumsState);
-        renderAlbumsAdminPanel();
+        await saveDesignNow();
       });
     });
 
@@ -1801,9 +1804,7 @@
       btn.addEventListener('click', async () => {
         activeAlbum.design = activeAlbum.design || window.AlbumsStore.getDefaultDesign();
         activeAlbum.design.gridSize = btn.getAttribute('data-grid-size');
-        broadcastLiveAlbum();
-        await window.AlbumsStore.saveState(albumsState);
-        renderAlbumsAdminPanel();
+        await saveDesignNow();
       });
     });
 
@@ -1811,13 +1812,11 @@
       btn.addEventListener('click', async () => {
         activeAlbum.design = activeAlbum.design || window.AlbumsStore.getDefaultDesign();
         activeAlbum.design.gridNavStyle = btn.getAttribute('data-grid-nav');
-        broadcastLiveAlbum();
         const iframe = document.getElementById('cms-preview-iframe');
         if (iframe && iframe.contentWindow) {
           iframe.contentWindow.postMessage({ type: 'SCROLL_TO_SECTION', section: 'topbar' }, '*');
         }
-        await window.AlbumsStore.saveState(albumsState);
-        renderAlbumsAdminPanel();
+        await saveDesignNow();
       });
     });
 
@@ -1998,12 +1997,32 @@
      ========================================================================== */
   async function syncCloudPayments() {
     try {
+      const isLocalEnv = new URLSearchParams(window.location.search).get('mockCloud') !== '1'
+        && ['localhost', '127.0.0.1', ''].includes(window.location.hostname);
+      if (isLocalEnv) return;
       if (!albumsState || !Array.isArray(albumsState.albums)) return;
       let changed = false;
 
-      // 1. Sincroniza seleções diretas de clientes (Pix Direto e pacotes inclusos via /api/selection)
+      const mergeCommentsIntoAlbum = (alb, incomingComments) => {
+        if (!incomingComments || typeof incomingComments !== 'object') return false;
+        let updated = false;
+        const cur = { ...(alb.photoComments || {}) };
+        Object.entries(incomingComments).forEach(([pid, txt]) => {
+          const clean = String(txt || '').trim();
+          if (clean && cur[pid] !== clean) {
+            cur[pid] = clean;
+            const photoObj = (alb.photos || []).find((p) => p.id === pid);
+            if (photoObj) photoObj.clientNote = clean;
+            updated = true;
+          }
+        });
+        if (updated) alb.photoComments = cur;
+        return updated;
+      };
+
+      // 1. Sincroniza seleções diretas e observações de clientes (Pix Direto, pacotes inclusos e rascunhos via /api/selection)
       try {
-        const selRes = await fetch('/api/selection');
+        const selRes = await fetch('/api/selection', { cache: 'no-store' });
         if (selRes.ok) {
           const selData = await selRes.json();
           const selections = Array.isArray(selData.selections) ? selData.selections : [];
@@ -2015,7 +2034,11 @@
             );
             if (!alb) return;
 
-            if (Array.isArray(sel.selectedIds) && sel.selectedIds.length > 0) {
+            if (mergeCommentsIntoAlbum(alb, sel.photoComments)) {
+              changed = true;
+            }
+
+            if (Array.isArray(sel.selectedIds) && sel.selectedIds.length > 0 && !sel.draftOnly && sel.status !== 'awaiting_selection') {
               const currentCount = (alb.selectedIds || []).length;
               if (currentCount !== sel.selectedIds.length || alb.status !== sel.status) {
                 alb.selectedIds = sel.selectedIds;
@@ -2034,7 +2057,7 @@
                   alb.activityLog.unshift({
                     at: sel.updatedAt || new Date().toISOString(),
                     type: sel.status === 'awaiting_pix_confirm' ? 'pix_pending' : 'selection',
-                    text: `Seleção recebida do cliente (${sel.selectedIds.length} fotos) via ${sel.method === 'direct_pix' ? 'Pix Direto' : 'Pacote'} (${sel.id}).`
+                    text: `Seleção recebida do cliente (${sel.selectedIds.length} fotos) via ${sel.method === 'direct_pix' ? 'Pix Direto' : sel.method === 'mercadopago' ? 'Mercado Pago' : 'Pacote'} (${sel.id}).`
                   });
                 }
                 changed = true;
@@ -2045,7 +2068,7 @@
       } catch (_) {}
 
       // 2. Higienização automática de falsos positivos antigos do Mercado Pago
-      const res = await fetch('/api/payments');
+      const res = await fetch('/api/payments', { cache: 'no-store' });
       if (res.ok) {
         const data = await res.json();
         const payments = Array.isArray(data.payments) ? data.payments : [];
@@ -2071,12 +2094,19 @@
         payments.forEach((pay) => {
           if (pay.status !== 'approved') return;
           const targetId = String(pay.albumId || '').trim();
-          if (!targetId) return;
+          const targetSlug = String(pay.albumSlug || '').trim();
+          if (!targetId && !targetSlug) return;
 
           let alb = albumsState.albums.find(
-            (a) => a.id === targetId || (a.slug && a.slug.toLowerCase() === targetId.toLowerCase())
+            (a) =>
+              (targetId && (a.id === targetId || (a.slug && a.slug.toLowerCase() === targetId.toLowerCase()))) ||
+              (targetSlug && a.slug && a.slug.toLowerCase() === targetSlug.toLowerCase())
           );
           if (!alb) return;
+
+          if (mergeCommentsIntoAlbum(alb, pay.photoComments)) {
+            changed = true;
+          }
 
           if (alb && alb.status !== 'selection_paid') {
             alb.status = 'selection_paid';
@@ -2106,7 +2136,8 @@
       }
 
       if (changed) {
-        await window.AlbumsStore.saveState(albumsState);
+        await window.AlbumsStore.saveState(albumsState, { fromCloudSync: true });
+        syncAdminStateDirty();
         renderAlbumsAdminPanel();
       }
     } catch (_) {}

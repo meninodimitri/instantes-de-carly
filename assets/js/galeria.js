@@ -8,9 +8,9 @@
 (function () {
   'use strict';
 
-  const isLocalEnv = ['localhost', '127.0.0.1', ''].includes(window.location.hostname);
-  const galeriaRoute = window.location.protocol === 'file:' ? 'galeria.html' : 'galeria';
   const params = new URLSearchParams(window.location.search);
+  const isLocalEnv = params.get('mockCloud') !== '1' && ['localhost', '127.0.0.1', ''].includes(window.location.hostname);
+  const galeriaRoute = window.location.protocol === 'file:' ? 'galeria.html' : 'galeria';
   const hashSlug = window.location.hash.replace(/^#/, '').trim().toLowerCase();
   const initialSlug = (params.get('id') || params.get('album') || hashSlug || '').trim().toLowerCase();
   const isAdminPreview = params.get('preview') === '1';
@@ -165,14 +165,14 @@
   }
 
   let toastTimer = null;
-  function showToast(msg) {
+  function showToast(msg, durationMs = 2800) {
     if (!els.toast) return;
     els.toast.textContent = msg;
     els.toast.hidden = false;
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => {
       els.toast.hidden = true;
-    }, 2800);
+    }, durationMs);
   }
 
   function hydrateBrandStrings() {
@@ -502,30 +502,129 @@
     renderMasonryWall(album);
   }
 
-  async function syncLivePaymentForAlbum(album) {
-    if (!album || isLocalEnv || album.status === 'selection_paid') return;
+  let currentMpPaymentId = null;
+  let mpPollTimer = null;
+
+  function stopMpPaymentPolling() {
+    if (mpPollTimer) {
+      clearInterval(mpPollTimer);
+      mpPollTimer = null;
+    }
+    const pollEl = document.getElementById('mp-poll-status');
+    if (pollEl) pollEl.hidden = true;
+  }
+
+  function startMpPaymentPolling() {
+    stopMpPaymentPolling();
+    if (isLocalEnv || !currentAlbum || currentAlbum.status === 'selection_paid') return;
+    const pollEl = document.getElementById('mp-poll-status');
+    if (pollEl) pollEl.hidden = false;
+    mpPollTimer = setInterval(() => {
+      if (!els.chkDialog?.open || !currentAlbum || currentAlbum.status === 'selection_paid') {
+        stopMpPaymentPolling();
+        return;
+      }
+      syncLivePaymentForAlbum(currentAlbum, currentMpPaymentId);
+    }, 3000);
+  }
+
+  async function syncSelectionDraftToCloud() {
+    if (!currentAlbum) return;
     try {
-      const res = await fetch(`/api/payments?albumId=${encodeURIComponent(album.id)}`);
+      await fetch('/api/selection', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          albumId: currentAlbum.id,
+          slug: currentAlbum.slug,
+          clientName: currentAlbum.clientName,
+          selectedIds: currentAlbum.selectedIds || [],
+          photoComments: currentAlbum.photoComments || {},
+          draftOnly: !currentAlbum.selectionLocked
+        })
+      });
+    } catch (_) {}
+  }
+
+  async function applyApprovedMercadoPagoPayment(album, approved) {
+    if (!album || !approved) return;
+    const wasAlreadyPaid = album.status === 'selection_paid';
+    const calc = window.AlbumsStore.calculateSelectionPricing(album);
+
+    album.status = 'selection_paid';
+    album.selectionLocked = true;
+    if (Array.isArray(approved.selectedIds) && approved.selectedIds.length > 0 && (!album.selectedIds || album.selectedIds.length === 0)) {
+      album.selectedIds = approved.selectedIds;
+    }
+    album.paymentOrder = {
+      id: approved.id,
+      method: approved.paymentMethod || 'mercadopago',
+      status: 'approved',
+      extraCount: approved.extraCount || calc.extraCount || 0,
+      totalAmount: approved.amount != null ? approved.amount : calc.extraTotal,
+      paidAt: approved.paidAt || new Date().toISOString()
+    };
+    album.activityLog = album.activityLog || [];
+    if (!album.activityLog.some((l) => l.text && l.text.includes(String(approved.id)))) {
+      album.activityLog.unshift({
+        at: album.paymentOrder.paidAt,
+        type: 'payment',
+        text: `Pagamento aprovado via Mercado Pago (${approved.id}): ${formatBRL(album.paymentOrder.totalAmount)}.`
+      });
+    }
+
+    await window.AlbumsStore.saveState(rootState, { isClientAction: true });
+
+    // Fecha a janela de pagamento imediatamente para o cliente sair da tela de cobrança
+    stopMpPaymentPolling();
+    const hadCheckoutOpen = Boolean(els.chkDialog?.open);
+    if (hadCheckoutOpen) {
+      els.chkDialog.close();
+    }
+
+    updateProofingChrome(album);
+    renderMasonryWall(album);
+
+    // Garante que seleções + comentários cheguem completos ao painel Admin
+    try {
+      fetch('/api/selection', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          albumId: album.id,
+          slug: album.slug,
+          clientName: album.clientName,
+          selectedIds: album.selectedIds || [],
+          photoComments: album.photoComments || {},
+          status: 'selection_paid',
+          method: album.paymentOrder.method || 'mercadopago',
+          orderCode: String(approved.id || ''),
+          totalAmount: album.paymentOrder.totalAmount,
+          extraCount: album.paymentOrder.extraCount
+        })
+      }).catch(() => {});
+    } catch (_) {}
+
+    if (hadCheckoutOpen || !wasAlreadyPaid || params.get('payment') === 'success') {
+      showToast(`Pagamento de ${formatBRL(album.paymentOrder.totalAmount)} confirmado! Seleção enviada para edição.`, 6500);
+      setTimeout(() => {
+        els.lockedWrap?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 120);
+    }
+  }
+
+  async function syncLivePaymentForAlbum(album, explicitPaymentId = null) {
+    if (!album || isLocalEnv) return;
+    if (album.status === 'selection_paid' && !els.chkDialog?.open && params.get('payment') !== 'success') return;
+    try {
+      const qId = explicitPaymentId || currentMpPaymentId;
+      const url = `/api/payments?albumId=${encodeURIComponent(album.id)}${qId ? `&paymentId=${encodeURIComponent(qId)}` : ''}`;
+      const res = await fetch(url, { cache: 'no-store' });
       if (!res.ok) return;
       const data = await res.json();
       const approved = (data.payments || []).find((p) => p.status === 'approved');
-      if (approved && album.status !== 'selection_paid') {
-        album.status = 'selection_paid';
-        album.selectionLocked = true;
-        if (Array.isArray(approved.selectedIds) && approved.selectedIds.length > 0) {
-          album.selectedIds = approved.selectedIds;
-        }
-        album.paymentOrder = {
-          id: approved.id,
-          method: approved.paymentMethod || 'mercadopago',
-          status: 'approved',
-          extraCount: approved.extraCount || 0,
-          totalAmount: approved.amount,
-          paidAt: approved.paidAt || new Date().toISOString()
-        };
-        await window.AlbumsStore.saveState(rootState);
-        updateProofingChrome(album);
-        renderMasonryWall(album);
+      if (approved) {
+        await applyApprovedMercadoPagoPayment(album, approved);
       }
     } catch (_) {}
   }
@@ -930,7 +1029,7 @@
       }
     }
 
-    await window.AlbumsStore.saveState(rootState);
+    await window.AlbumsStore.saveState(rootState, { isClientAction: true });
     updateProofingChrome(currentAlbum);
     renderFilterTabs(currentAlbum);
     renderMasonryWall(currentAlbum);
@@ -944,7 +1043,7 @@
     if (idx >= 0) currentAlbum.deliveryFavorites.splice(idx, 1);
     else currentAlbum.deliveryFavorites.push(photoId);
 
-    await window.AlbumsStore.saveState(rootState);
+    await window.AlbumsStore.saveState(rootState, { isClientAction: true });
     renderFilterTabs(currentAlbum);
     renderMasonryWall(currentAlbum);
     if (els.lbDialog?.open) refreshLightboxUI();
@@ -1172,12 +1271,14 @@
     if (!calc.hasExtras) {
       if (els.chkNoExtrasBox) els.chkNoExtrasBox.hidden = false;
       if (els.chkPaymentBox) els.chkPaymentBox.hidden = true;
+      stopMpPaymentPolling();
     } else {
       if (els.chkNoExtrasBox) els.chkNoExtrasBox.hidden = true;
       if (els.chkPaymentBox) els.chkPaymentBox.hidden = false;
       preparePaymentPayloads(calc);
     }
 
+    syncSelectionDraftToCloud();
     els.chkDialog.showModal();
   }
 
@@ -1218,32 +1319,40 @@
             extraPrice: calc.extraPhotoPrice,
             extraCount: calc.extraCount,
             totalAmount: calc.extraTotal,
-            selectedPhotoIds: calc.selectedIds
+            selectedPhotoIds: calc.selectedIds,
+            photoComments: currentAlbum.photoComments || {}
           })
         });
         const data = await res.json();
-        if (res.ok && data.pixCopyPaste) {
-          if (els.mpPixCode) els.mpPixCode.value = data.pixCopyPaste;
-          if (data.pixQrBase64) {
-            const qrImg = new Image();
-            qrImg.onload = () => {
-              const ctx = els.mpQrCanvas?.getContext('2d');
-              if (ctx && els.mpQrCanvas) {
-                ctx.clearRect(0, 0, els.mpQrCanvas.width, els.mpQrCanvas.height);
-                ctx.drawImage(qrImg, 0, 0, els.mpQrCanvas.width, els.mpQrCanvas.height);
-              }
-            };
-            qrImg.src = `data:image/png;base64,${data.pixQrBase64}`;
-          } else {
-            renderQrMatrix(els.mpQrCanvas, data.pixCopyPaste);
+        if (res.ok && (data.pixCopyPaste || data.checkoutUrl)) {
+          currentMpPaymentId = data.paymentId || null;
+          if (data.pixCopyPaste) {
+            if (els.mpPixCode) els.mpPixCode.value = data.pixCopyPaste;
+            if (data.pixQrBase64) {
+              const qrImg = new Image();
+              qrImg.onload = () => {
+                const ctx = els.mpQrCanvas?.getContext('2d');
+                if (ctx && els.mpQrCanvas) {
+                  ctx.clearRect(0, 0, els.mpQrCanvas.width, els.mpQrCanvas.height);
+                  ctx.drawImage(qrImg, 0, 0, els.mpQrCanvas.width, els.mpQrCanvas.height);
+                }
+              };
+              qrImg.src = `data:image/png;base64,${data.pixQrBase64}`;
+            } else {
+              renderQrMatrix(els.mpQrCanvas, data.pixCopyPaste);
+            }
           }
           if (els.btnMpCardLink && data.checkoutUrl) {
             els.btnMpCardLink.onclick = () => window.open(data.checkoutUrl, '_blank', 'noopener');
           }
+          startMpPaymentPolling();
           return;
         }
       } catch (_) {}
     }
+
+    currentMpPaymentId = null;
+    stopMpPaymentPolling();
 
     const mpSimulated = window.AlbumsStore.generatePixPayload({
       pixKey: 'mercadopago@instantesdecarly.com.br',
@@ -1280,11 +1389,11 @@
       text: `Seleção concluída dentro do pacote (${calc.selectedCount} fotografias).`
     });
 
-    await window.AlbumsStore.saveState(rootState);
+    await window.AlbumsStore.saveState(rootState, { isClientAction: true });
     els.chkDialog?.close();
     updateProofingChrome(currentAlbum);
     renderMasonryWall(currentAlbum);
-    showToast('Seleção confirmada com sucesso!');
+    showToast('Seleção confirmada com sucesso!', 5000);
 
     // Sincroniza em nuvem para o painel admin do fotógrafo em tempo real
     try {
@@ -1335,11 +1444,15 @@
       text: `Pagamento confirmado (${label}): ${formatBRL(calc.extraTotal)} por ${calc.extraCount} extras. Total: ${calc.selectedCount} fotos.`
     });
 
-    await window.AlbumsStore.saveState(rootState);
+    await window.AlbumsStore.saveState(rootState, { isClientAction: true });
+    stopMpPaymentPolling();
     els.chkDialog?.close();
     updateProofingChrome(currentAlbum);
     renderMasonryWall(currentAlbum);
-    showToast('Pagamento aprovado. Seleção liberada para edição.');
+    showToast('Pagamento aprovado. Seleção liberada para edição.', 6500);
+    setTimeout(() => {
+      els.lockedWrap?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 120);
 
     // Sincroniza em nuvem
     try {
@@ -1385,10 +1498,12 @@
       text: `Seleção concluída (${calc.selectedCount} fotos) via Pix Direto (${formatBRL(calc.extraTotal)}) — aguardando comprovante (${orderCode}).`
     });
 
-    await window.AlbumsStore.saveState(rootState);
+    await window.AlbumsStore.saveState(rootState, { isClientAction: true });
+    stopMpPaymentPolling();
     els.chkDialog?.close();
     updateProofingChrome(currentAlbum);
     renderMasonryWall(currentAlbum);
+    showToast('Seleção enviada! Aguardando confirmação do Pix pelo estúdio.', 5000);
 
     // Sincroniza em nuvem para o painel admin do fotógrafo em tempo real
     try {
@@ -1594,8 +1709,16 @@
       const p = lightboxList[lightboxIdx];
       if (!p || !currentAlbum || currentAlbum.selectionLocked) return;
       if (!currentAlbum.photoComments) currentAlbum.photoComments = {};
-      currentAlbum.photoComments[p.id] = (els.lbCommentIn?.value || '').trim();
-      await window.AlbumsStore.saveState(rootState);
+      const cleanNote = (els.lbCommentIn?.value || '').trim();
+      if (cleanNote) {
+        currentAlbum.photoComments[p.id] = cleanNote;
+        p.clientNote = cleanNote;
+      } else {
+        delete currentAlbum.photoComments[p.id];
+        delete p.clientNote;
+      }
+      await window.AlbumsStore.saveState(rootState, { isClientAction: true });
+      syncSelectionDraftToCloud();
       renderFilterTabs(currentAlbum);
       renderMasonryWall(currentAlbum);
       showToast('Observação salva.');
@@ -1625,6 +1748,7 @@
 
     // Checkout Modal
     els.chkClose?.addEventListener('click', () => els.chkDialog?.close());
+    els.chkDialog?.addEventListener('close', stopMpPaymentPolling);
     document.querySelectorAll('.pay-tab').forEach((tabBtn) => {
       tabBtn.addEventListener('click', () => {
         document.querySelectorAll('.pay-tab').forEach((b) => b.classList.remove('active'));
@@ -1664,6 +1788,7 @@
 
   let lastGalleryRevalidateAt = 0;
   async function revalidateGalleryDataFromServer() {
+    if (isAdminPreview && window.self !== window.top) return;
     const now = Date.now();
     if (now - lastGalleryRevalidateAt < 8000) return;
     lastGalleryRevalidateAt = now;
@@ -1739,9 +1864,19 @@
     } catch (_) {}
 
     document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') revalidateGalleryDataFromServer();
+      if (document.visibilityState === 'visible') {
+        revalidateGalleryDataFromServer();
+        if (currentAlbum && currentAlbum.phase === 'proofing') {
+          syncLivePaymentForAlbum(currentAlbum, currentMpPaymentId);
+        }
+      }
     });
-    window.addEventListener('focus', revalidateGalleryDataFromServer);
+    window.addEventListener('focus', () => {
+      revalidateGalleryDataFromServer();
+      if (currentAlbum && currentAlbum.phase === 'proofing') {
+        syncLivePaymentForAlbum(currentAlbum, currentMpPaymentId);
+      }
+    });
     setInterval(revalidateGalleryDataFromServer, 12000);
 
     window.AlbumsStore.subscribe(async () => {

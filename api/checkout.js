@@ -14,9 +14,23 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { albumId, selectedPhotoIds } = req.body || {};
+    const { albumId, selectedPhotoIds, photoComments } = req.body || {};
     if (!albumId || !Array.isArray(selectedPhotoIds) || selectedPhotoIds.length === 0) {
       return res.status(400).json({ error: 'Dados de seleção inválidos.' });
+    }
+
+    let safeCommentsJson = '';
+    if (photoComments && typeof photoComments === 'object') {
+      try {
+        const cleanComments = {};
+        Object.entries(photoComments).forEach(([k, v]) => {
+          const txt = String(v || '').trim();
+          if (txt) cleanComments[k] = txt.slice(0, 140);
+        });
+        if (Object.keys(cleanComments).length > 0) {
+          safeCommentsJson = JSON.stringify(cleanComments).slice(0, 480);
+        }
+      } catch (_) {}
     }
 
     const rawToken = (process.env.MP_ACCESS_TOKEN || '').trim();
@@ -85,8 +99,10 @@ export default async function handler(req, res) {
         external_reference: externalRef,
         metadata: {
           album_id: albumId,
+          album_slug: slug,
           selected_ids: uniqueSelected,
-          extra_count: extraCount
+          extra_count: extraCount,
+          ...(safeCommentsJson ? { photo_comments_json: safeCommentsJson } : {})
         },
         payer: {
           email: clientEmail
@@ -123,8 +139,10 @@ export default async function handler(req, res) {
           external_reference: externalRef,
           metadata: {
             album_id: albumId,
+            album_slug: slug,
             selected_ids: uniqueSelected,
-            extra_count: extraCount
+            extra_count: extraCount,
+            ...(safeCommentsJson ? { photo_comments_json: safeCommentsJson } : {})
           },
           back_urls: {
             success: `${origin}/galeria?album=${encodeURIComponent(slug)}&payment=success`,

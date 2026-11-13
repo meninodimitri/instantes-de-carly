@@ -48,25 +48,42 @@ export default async function handler(req, res) {
         orderCode = `PIX-${Date.now().toString().slice(-5)}`,
         totalAmount = 0,
         extraCount = 0,
-        clientName = 'Cliente'
+        clientName = 'Cliente',
+        draftOnly = false
       } = req.body || {};
 
       if (!albumId && !slug) {
         return res.status(400).json({ error: 'Identificador do álbum ausente.' });
       }
 
-      const targetKey = albumId || slug;
+      const existingRec = memorySelections.get(albumId || slug) || (slug && memorySelections.get(slug)) || null;
+      const mergedComments = { ...(existingRec?.photoComments || {}) };
+      if (photoComments && typeof photoComments === 'object') {
+        Object.entries(photoComments).forEach(([pid, txt]) => {
+          const clean = String(txt || '').trim();
+          if (clean) mergedComments[pid] = clean;
+          else delete mergedComments[pid];
+        });
+      }
+
+      const effectiveStatus = draftOnly && existingRec && existingRec.status !== 'awaiting_selection'
+        ? existingRec.status
+        : (draftOnly ? 'awaiting_selection' : status);
+
       const record = {
-        id: orderCode,
+        id: draftOnly && existingRec ? existingRec.id : orderCode,
         albumId: albumId || slug,
         slug: slug || albumId,
         clientName,
-        selectedIds: Array.isArray(selectedIds) ? [...new Set(selectedIds)] : [],
-        photoComments: photoComments || {},
-        status, // 'awaiting_pix_confirm' | 'selection_completed' | 'selection_paid'
-        method, // 'direct_pix' | 'free_package' | 'mercadopago'
-        totalAmount: Number(totalAmount) || 0,
-        extraCount: Number(extraCount) || 0,
+        selectedIds: Array.isArray(selectedIds) && selectedIds.length > 0
+          ? [...new Set(selectedIds)]
+          : (existingRec?.selectedIds || []),
+        photoComments: mergedComments,
+        status: effectiveStatus, // 'awaiting_selection' | 'awaiting_pix_confirm' | 'selection_completed' | 'selection_paid'
+        method: draftOnly && existingRec ? existingRec.method : method,
+        totalAmount: draftOnly && existingRec ? existingRec.totalAmount : (Number(totalAmount) || 0),
+        extraCount: draftOnly && existingRec ? existingRec.extraCount : (Number(extraCount) || 0),
+        draftOnly: Boolean(draftOnly && !existingRec),
         updatedAt: new Date().toISOString()
       };
 
@@ -74,8 +91,8 @@ export default async function handler(req, res) {
       memorySelections.set(record.albumId, record);
       if (record.slug) memorySelections.set(record.slug, record);
 
-      // Persiste no GitHub se houver token disponível
-      if (GITHUB_TOKEN && GITHUB_REPO) {
+      // Persiste no GitHub se houver token disponível (para seleção finalizada ou pagamento)
+      if (GITHUB_TOKEN && GITHUB_REPO && !draftOnly) {
         try {
           const ghHeaders = {
             Accept: 'application/vnd.github+json',
@@ -99,8 +116,8 @@ export default async function handler(req, res) {
               );
 
               if (alb) {
-                alb.selectedIds = record.selectedIds;
-                alb.photoComments = record.photoComments;
+                if (record.selectedIds.length > 0) alb.selectedIds = record.selectedIds;
+                alb.photoComments = { ...(alb.photoComments || {}), ...record.photoComments };
                 alb.selectionLocked = true;
                 alb.status = record.status;
                 alb.paymentOrder = {
@@ -115,11 +132,11 @@ export default async function handler(req, res) {
                 alb.activityLog.unshift({
                   at: record.updatedAt,
                   type: record.status === 'awaiting_pix_confirm' ? 'pix_pending' : 'selection',
-                  text: `Seleção registrada (${record.selectedIds.length} fotos) via ${record.method === 'direct_pix' ? 'Pix Direto' : 'Pacote'} (${record.id}).`
+                  text: `Seleção registrada (${record.selectedIds.length} fotos) via ${record.method === 'direct_pix' ? 'Pix Direto' : record.method === 'mercadopago' ? 'Mercado Pago' : 'Pacote'} (${record.id}).`
                 });
 
-                siteData.cmsVersion = Date.now();
-                const newCode = 'window.SITE_DATA = ' + JSON.stringify(siteData, null, 2) + ';\n';
+                siteData.cmsVersion = new Date().toISOString();
+                const newCode = `const SITE_DATA = ${JSON.stringify(siteData, null, 2)};\n\nif (typeof window !== 'undefined') {\n  window.SITE_DATA = SITE_DATA;\n}\n\nif (typeof module !== 'undefined' && module.exports) {\n  module.exports = SITE_DATA;\n}\n`;
 
                 await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/assets/js/data.js`, {
                   method: 'PUT',
