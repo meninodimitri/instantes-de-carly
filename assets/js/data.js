@@ -5,7 +5,7 @@
  */
 
 const SITE_DATA = {
-  "cmsVersion": "2026-11-12T02:38:25.421Z",
+  "cmsVersion": "2026-11-15T21:33:48.427Z",
   "brand": {
     "name": "Instantes de Carly",
     "founder": "Carliane Carvalho (Carly)",
@@ -595,13 +595,13 @@ const SITE_DATA = {
   },
   "clientAlbums": [
     {
-      "id": "alb_1794449405990",
-      "slug": "teste-definitivo",
-      "clientName": "Teste Definitivo",
-      "title": "Ensaio — Teste Definitivo",
+      "id": "alb_1794778206229",
+      "slug": "yanzinho-bbzinho",
+      "clientName": "Yanzinho bbzinho",
+      "title": "O Sedutor - Yanzinho Bbzinho",
       "subtitle": "FORTALEZA, CEARÁ & REGIÃO METROPOLITANA",
-      "phase": "delivery",
-      "status": "selection_paid",
+      "phase": "proofing",
+      "status": "awaiting_selection",
       "protectionLevel": "watermark_lowres",
       "watermarkEnabled": true,
       "passwordEnabled": true,
@@ -614,96 +614,104 @@ const SITE_DATA = {
       "extraPhotoPrice": 1,
       "allowHighResDownload": true,
       "allowWebDownload": true,
-      "welcomeMessage": "Olá, Teste Definitivo! Escolham com carinho suas fotografias favoritas.",
-      "coverSrc": "assets/images/uploads/foto-20261112021441-01.jpg",
-      "coverFocal": "50% 35%",
+      "welcomeMessage": "O Maioral das danças sem quebrar o resguardo",
+      "coverSrc": "assets/images/uploads/foto-20261115213348-01.jpg",
+      "coverFocal": "71% 37%",
       "design": {
-        "coverStyle": "alegria",
-        "typography": "sans",
+        "coverStyle": "moldura",
+        "typography": "bold",
         "colorTheme": "maresia",
-        "gridStyle": "square",
+        "gridStyle": "vertical",
         "gridSpacing": "regular",
         "gridSize": "large",
-        "gridNavStyle": "icons_only",
+        "gridNavStyle": "icons_text",
         "coverLogoVisible": true,
         "coverLogoColor": "auto"
       },
       "photos": [
         {
-          "id": "ph_1794449607242_0",
-          "filename": "IMG-20260904-WA0065.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261112021441-02.jpg",
-          "selected": true
+          "id": "ph_1794778281563_0",
+          "filename": "Captura de tela 2026-11-14 194051.png",
+          "originalSrc": "assets/images/uploads/foto-20261115213348-02.jpg"
         },
         {
-          "id": "ph_1794449607343_2",
-          "filename": "IMG-20250530-WA0102.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261112021441-04.jpg",
-          "selected": true
+          "id": "ph_1794778281582_1",
+          "filename": "Captura de tela 2026-11-14 192922.png",
+          "originalSrc": "assets/images/uploads/foto-20261115213348-03.jpg"
         },
         {
-          "id": "ph_1794449607380_3",
-          "filename": "IMG-20250613-WA0074.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261112021441-05.jpg",
-          "selected": true
+          "id": "ph_1794778281667_2",
+          "filename": "Captura de tela 2026-11-14 191734.png",
+          "originalSrc": "assets/images/uploads/foto-20261115213348-04.jpg"
         },
         {
-          "id": "ph_1794449607491_4",
-          "filename": "IMG-20250613-WA0063.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261112021441-06.jpg",
-          "selected": true
+          "id": "ph_1794778281695_3",
+          "filename": "Captura de tela 2026-11-14 190021.png",
+          "originalSrc": "assets/images/uploads/foto-20261115213348-05.jpg"
         },
         {
-          "id": "ph_1794449607693_8",
-          "filename": "Gemini_Generated_Image_cn2estcn2estcn2e.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261112021441-10.jpg",
-          "selected": true
+          "id": "ph_1794778281725_4",
+          "filename": "Captura de tela 2026-11-14 190015.png",
+          "originalSrc": "assets/images/uploads/foto-20261115213348-06.jpg"
         },
         {
-          "id": "ph_1794450348027_0",
-          "filename": "IMG-20250519-WA0035.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261112022824-01.jpg"
+          "id": "ph_1794778281748_5",
+          "filename": "Captura de tela 2026-11-14 185943.png",
+          "originalSrc": "assets/images/uploads/foto-20261115213348-07.jpg"
+        },
+        {
+          "id": "ph_1794778281754_6",
+          "filename": "Captura de tela 2026-11-14 185546.png",
+          "originalSrc": "assets/images/uploads/foto-20261115213348-08.jpg"
+        },
+        {
+          "id": "ph_1794778281846_7",
+          "filename": "Captura de tela 2026-11-14 160209.png",
+          "originalSrc": "assets/images/uploads/foto-20261115213348-09.jpg"
+        },
+        {
+          "id": "ph_1794778281856_8",
+          "filename": "Captura de tela 2026-11-14 155641.png",
+          "originalSrc": "assets/images/uploads/foto-20261115213348-10.jpg"
+        },
+        {
+          "id": "ph_1794778281871_9",
+          "filename": "Captura de tela 2026-11-14 143312.png",
+          "originalSrc": "assets/images/uploads/foto-20261115213348-11.jpg"
+        },
+        {
+          "id": "ph_1794778281879_10",
+          "filename": "Captura de tela 2026-11-13 202235.png",
+          "originalSrc": "assets/images/uploads/foto-20261115213348-12.jpg"
         }
       ],
-      "selectedIds": [
-        "ph_1794449607242_0",
-        "ph_1794449607343_2",
-        "ph_1794449607380_3",
-        "ph_1794449607491_4",
-        "ph_1794449607693_8"
-      ],
+      "selectedIds": [],
       "photoComments": {},
       "deliveryFavorites": [],
-      "selectionLocked": true,
-      "paymentOrder": {
-        "id": "188089054601",
-        "method": "pix",
-        "status": "approved",
-        "extraCount": 1,
-        "totalAmount": 1,
-        "paidAt": "2026-11-11T22:19:02.000-04:00"
-      },
+      "selectionLocked": false,
+      "paymentOrder": null,
       "activityLog": [
         {
-          "at": "2026-11-12T02:10:05.990Z",
+          "at": "2026-11-15T21:30:06.229Z",
           "type": "created",
           "text": "Álbum criado no painel."
         }
       ],
       "antiPrintEnabled": true,
       "coverKicker": "",
-      "coverAuthor": "Carliane Carvalho"
+      "coverAuthor": "Carliane Carvalho",
+      "updatedAt": 1794778417764
     }
   ],
   "clientWatermarkConfig": {
     "enabled": true,
-    "mode": "text",
+    "mode": "image",
     "imageSrc": "assets/images/logo-light.png",
     "text": "INSTANTES DE CARLY",
     "pattern": "tiled",
     "opacity": 0.85,
     "scale": 0.15,
-    "updatedAt": 1794449651133
+    "updatedAt": 1794777473917
   },
   "clientPaymentConfig": {
     "enableMercadoPago": true,
