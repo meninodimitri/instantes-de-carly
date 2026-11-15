@@ -391,6 +391,9 @@
     if (typeof alb.pinEnabled !== 'boolean') {
       alb.pinEnabled = Boolean(alb.downloadPin && String(alb.downloadPin).trim());
     }
+    if (typeof alb.showOnlySelected !== 'boolean') {
+      alb.showOnlySelected = false;
+    }
 
     const defDesign = getDefaultDesign();
     const d = alb.design && typeof alb.design === 'object' ? alb.design : {};
@@ -429,7 +432,8 @@
       shortName: b.shortName || b.founder || 'Carly',
       whatsappNumber: b.whatsappNumber || '5585920015290',
       city: 'FORTALEZA',
-      defaultWatermarkImg: 'assets/images/logo-light.png'
+      defaultWatermarkImg: 'assets/images/logo-light.png',
+      googleReviewsUrl: b.googleReviewsUrl || 'https://www.google.com/search?q=instantes+de+carly+fotografia+fortaleza'
     };
   }
 

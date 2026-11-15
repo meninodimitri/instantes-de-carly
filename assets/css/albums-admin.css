@@ -1621,3 +1621,198 @@
   background: #1B2733;
   color: #FFFFFF;
 }
+
+/* ==========================================================================
+   8. MINIATURAS DE SELECIONADAS NO BANNER + FILTRO + DIALOG DE EXCLUSÃO
+   ========================================================================== */
+.alb-pix-alert-stack {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.alb-pix-alert-toprow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.alb-paid-alert-banner {
+  background: rgba(39, 174, 96, 0.12);
+  border-color: rgba(39, 174, 96, 0.35);
+  color: #1e8449;
+}
+
+.alb-paid-selected-wrap {
+  padding-top: 10px;
+  border-top: 1px solid rgba(27, 39, 51, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.alb-paid-selected-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.78rem;
+}
+
+.alb-paid-selected-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.alb-paid-selected-chip {
+  flex: 0 0 auto;
+  width: 68px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(27, 39, 51, 0.12);
+  border-radius: 7px;
+  padding: 4px;
+}
+
+.alb-paid-selected-chip img {
+  width: 100%;
+  height: 52px;
+  object-fit: cover;
+  border-radius: 4px;
+  display: block;
+}
+
+.alb-paid-selected-chip span {
+  font-size: 0.65rem;
+  line-height: 1.2;
+  color: #1B2733;
+  word-break: break-word;
+}
+
+.alb-only-sel-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 12px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  background: #EEF6FA;
+  border: 1px solid rgba(36, 87, 117, 0.25);
+  color: #1B2733;
+  font-size: 0.79rem;
+}
+
+.alb-confirm-del-dialog {
+  margin: auto;
+  width: min(440px, 92vw);
+  border: 1px solid rgba(27, 39, 51, 0.14);
+  border-radius: 14px;
+  padding: 0;
+  background: #FFFFFF;
+  color: #1B2733;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+}
+
+.alb-confirm-del-dialog::backdrop {
+  background: rgba(15, 23, 30, 0.58);
+  backdrop-filter: blur(4px);
+}
+
+.alb-del-dlg-body {
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.alb-del-dlg-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.alb-del-dlg-icon {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #FDECEA;
+  color: #B42318;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.alb-del-dlg-head h3 {
+  margin: 0 0 4px;
+  font-size: 1rem;
+  line-height: 1.3;
+  color: #1B2733;
+}
+
+.alb-del-dlg-desc {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: #5E6D7C;
+}
+
+.alb-del-dlg-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 10px;
+  background: #FAF8F3;
+  border: 1px solid rgba(27, 39, 51, 0.1);
+}
+
+.alb-del-dlg-preview img {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.alb-del-dlg-preview span {
+  font-size: 0.84rem;
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.alb-del-dlg-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.alb-btn-danger {
+  appearance: none;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 15px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: #C62828;
+  color: #FFFFFF;
+  transition: background-color 0.15s ease;
+}
+
+.alb-btn-danger:hover {
+  background: #A91E1E;
+}

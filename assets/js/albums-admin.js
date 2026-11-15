@@ -324,6 +324,9 @@
      ========================================================================== */
   function renderPhotosSubTab(activeAlbum, calc) {
     const selectedSet = new Set(activeAlbum.selectedIds || []);
+    const allPhotos = activeAlbum.photos || [];
+    const onlySelActive = Boolean(activeAlbum.showOnlySelected) && selectedSet.size > 0;
+    const visiblePhotos = onlySelActive ? allPhotos.filter((p) => selectedSet.has(p.id)) : allPhotos;
     const lrInfo = window.AlbumsStore.formatLightroomCodes(activeAlbum);
     const lrList = typeof lrInfo === 'string' ? lrInfo : (lrInfo?.lightroomComma || '');
     const commentEntries = Object.entries(activeAlbum.photoComments || {}).filter(([, txt]) => String(txt || '').trim());
@@ -332,7 +335,7 @@
       <div class="alb-card-clean">
         <div class="alb-photos-topbar">
           <div class="alb-photos-summary">
-            <strong>${(activeAlbum.photos || []).length} fotografias no álbum</strong>
+            <strong>${allPhotos.length} fotografias no álbum</strong>
             <span>·</span>
             <span>${calc.selectedCount} escolhidas de ${calc.packageIncluded} inclusas</span>
             ${calc.hasExtras ? `<span class="alb-status-tag st-paid">+${calc.extraCount} extras (${formatBRL(calc.extraTotal)})</span>` : ''}
@@ -356,6 +359,15 @@
               <input type="text" id="lr-code-output" class="alb-lr-code-inline" readonly value="${escapeHtml(lrList)}" />
             </div>
             <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <button
+                type="button"
+                id="btn-filter-only-selected"
+                class="cms-btn cms-btn-sm ${onlySelActive ? 'cms-btn-primary' : 'cms-btn-outline'} js-toggle-only-selected"
+                aria-pressed="${onlySelActive ? 'true' : 'false'}"
+                title="Mostra apenas as fotografias escolhidas pelo cliente aqui e na galeria do álbum"
+              >
+                ${onlySelActive ? `✓ Só Escolhidas (${selectedSet.size})` : `Filtrar Só Escolhidas (${selectedSet.size})`}
+              </button>
               <button type="button" id="btn-copy-lr-code" class="cms-btn cms-btn-outline cms-btn-sm">
                 Copiar Códigos
               </button>
@@ -368,11 +380,20 @@
           </div>
         ` : ''}
 
+        ${onlySelActive ? `
+          <div class="alb-only-sel-banner" role="status">
+            <span>♥ Exibindo apenas as <strong>${visiblePhotos.length} fotos selecionadas</strong> pelo cliente (refletindo também no site público).</span>
+            <button type="button" id="btn-reset-only-selected" class="cms-btn cms-btn-outline cms-btn-sm">
+              Ver todas (${allPhotos.length})
+            </button>
+          </div>
+        ` : ''}
+
         ${commentEntries.length > 0 ? `
           <div class="alb-notes-clean-list" style="margin: 0 0 12px;">
             <h4>💬 Observações deixadas pelo cliente (${commentEntries.length})</h4>
             ${commentEntries.map(([pid, note]) => {
-              const ph = (activeAlbum.photos || []).find((p) => p.id === pid);
+              const ph = allPhotos.find((p) => p.id === pid);
               return `
                 <div class="alb-note-row">
                   <strong>${escapeHtml(ph?.filename || pid)}:</strong> ${escapeHtml(note)}
@@ -382,14 +403,14 @@
           </div>
         ` : ''}
 
-        ${(activeAlbum.photos || []).length === 0 ? `
+        ${allPhotos.length === 0 ? `
           <div style="padding: 34px 16px; text-align: center; background: #FAF8F3; border-radius: 10px; border: 1px dashed rgba(27,39,51,0.18);">
             <strong style="display:block; color:#1B2733; margin-bottom:4px;">Este álbum ainda está vazio</strong>
             <span style="font-size:0.8rem; color:#5E6D7C;">Clique em "+ Enviar Fotos do Ensaio" para subir as fotos da sessão.</span>
           </div>
         ` : `
           <div class="alb-photos-admin-grid">
-            ${(activeAlbum.photos || []).map((ph) => {
+            ${visiblePhotos.map((ph) => {
               const isCover = activeAlbum.coverSrc === ph.originalSrc;
               const isSel = selectedSet.has(ph.id);
               const phNote = String((activeAlbum.photoComments && activeAlbum.photoComments[ph.id]) || '').trim();
@@ -1251,6 +1272,30 @@
       subTabContent = renderPhotosSubTab(activeAlbum, calc);
     }
 
+    const bannerSelectedSet = new Set(activeAlbum.selectedIds || []);
+    const bannerSelectedPhotos = (activeAlbum.photos || []).filter((p) => bannerSelectedSet.has(p.id));
+    const onlySelActive = Boolean(activeAlbum.showOnlySelected) && bannerSelectedPhotos.length > 0;
+    const selectedStripMarkup = bannerSelectedPhotos.length > 0 ? `
+      <div class="alb-paid-selected-wrap">
+        <div class="alb-paid-selected-header">
+          <span><strong>${bannerSelectedPhotos.length}</strong> ${bannerSelectedPhotos.length === 1 ? 'foto selecionada' : 'fotos selecionadas'} pelo cliente:</span>
+          <button
+            type="button"
+            class="cms-btn cms-btn-sm ${onlySelActive ? 'cms-btn-primary' : 'cms-btn-outline'} js-toggle-only-selected"
+            aria-pressed="${onlySelActive ? 'true' : 'false'}"
+          >${onlySelActive ? '✓ Só Escolhidas Ativo (Ver Todas)' : 'Mostrar Só Escolhidas (Admin + Site)'}</button>
+        </div>
+        <div class="alb-paid-selected-strip">
+          ${bannerSelectedPhotos.map((ph) => `
+            <div class="alb-paid-selected-chip" title="${escapeHtml(ph.filename)}">
+              <img src="${escapeHtml(ph.originalSrc)}" alt="${escapeHtml(ph.filename)}" loading="lazy" />
+              <span>${escapeHtml(ph.filename)}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    ` : '';
+
     panel.innerHTML = `
       ${quickCreateMarkup}
 
@@ -1289,20 +1334,26 @@
       </div>
 
       ${activeAlbum.status === 'awaiting_pix_confirm' ? `
-        <div class="alb-pix-alert-banner">
-          <span><strong>Pix informado pelo cliente:</strong> confirme o recebimento de <strong>${formatBRL(activeAlbum.paymentOrder?.totalAmount)}</strong> para liberar a seleção.</span>
-          <button type="button" id="btn-approve-direct-pix" class="cms-btn cms-btn-primary cms-btn-sm">
-            Confirmar Pix Recebido
-          </button>
+        <div class="alb-pix-alert-banner alb-pix-alert-stack">
+          <div class="alb-pix-alert-toprow">
+            <span><strong>Pix informado pelo cliente:</strong> confirme o recebimento de <strong>${formatBRL(activeAlbum.paymentOrder?.totalAmount)}</strong> para liberar a seleção.</span>
+            <button type="button" id="btn-approve-direct-pix" class="cms-btn cms-btn-primary cms-btn-sm">
+              Confirmar Pix Recebido
+            </button>
+          </div>
+          ${selectedStripMarkup}
         </div>
       ` : ''}
 
       ${activeAlbum.status === 'selection_paid' ? `
-        <div class="alb-pix-alert-banner" style="background: rgba(39, 174, 96, 0.12); border-color: rgba(39, 174, 96, 0.35); color: #1e8449; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-          <span>✅ <strong>Pagamento Confirmado:</strong> ${formatBRL(activeAlbum.paymentOrder?.totalAmount)} (${activeAlbum.paymentOrder?.extraCount || 0} fotos extras) pagos via ${activeAlbum.paymentOrder?.method || 'Mercado Pago'}. As ${calc.selectedCount} fotografias selecionadas estão prontas para edição!</span>
-          <button type="button" id="btn-reset-album-payment" class="cms-btn cms-btn-outline cms-btn-sm" style="border-color: rgba(39, 174, 96, 0.45); color: #1e8449; background: #fff;" title="Reabre a seleção para o cliente e limpa status de pago">
-            Reabrir Seleção
-          </button>
+        <div class="alb-pix-alert-banner alb-pix-alert-stack alb-paid-alert-banner">
+          <div class="alb-pix-alert-toprow">
+            <span>✅ <strong>Pagamento Confirmado:</strong> ${formatBRL(activeAlbum.paymentOrder?.totalAmount)} (${activeAlbum.paymentOrder?.extraCount || 0} fotos extras) pagos via ${escapeHtml(activeAlbum.paymentOrder?.method || 'Mercado Pago')}. As ${calc.selectedCount} fotografias selecionadas estão prontas para edição!</span>
+            <button type="button" id="btn-reset-album-payment" class="cms-btn cms-btn-outline cms-btn-sm" style="border-color: rgba(39, 174, 96, 0.45); color: #1e8449; background: #fff;" title="Reabre a seleção para o cliente e limpa status de pago">
+              Reabrir Seleção
+            </button>
+          </div>
+          ${selectedStripMarkup}
         </div>
       ` : ''}
 
@@ -1678,17 +1729,84 @@
       });
     });
 
+    const removeAlbumPhotoById = async (pid) => {
+      const removed = (activeAlbum.photos || []).find((p) => p.id === pid);
+      activeAlbum.photos = (activeAlbum.photos || []).filter((p) => p.id !== pid);
+      activeAlbum.selectedIds = (activeAlbum.selectedIds || []).filter((id) => id !== pid);
+      if ((activeAlbum.selectedIds || []).length === 0) {
+        activeAlbum.showOnlySelected = false;
+      }
+      if (removed && activeAlbum.coverSrc === removed.originalSrc) {
+        activeAlbum.coverSrc = activeAlbum.photos[0]?.originalSrc || '';
+      }
+      await window.AlbumsStore.saveState(albumsState);
+      broadcastLiveAlbum();
+      syncAdminStateDirty();
+      renderAlbumsAdminPanel();
+      notifyAdminToast('Fotografia removida do álbum.');
+    };
+
+    const setOnlySelectedFilter = async (nextVal) => {
+      activeAlbum.showOnlySelected = Boolean(nextVal);
+      await window.AlbumsStore.saveState(albumsState);
+      broadcastLiveAlbum();
+      syncAdminStateDirty();
+      renderAlbumsAdminPanel();
+      notifyAdminToast(
+        activeAlbum.showOnlySelected
+          ? 'Filtro ativo: mostrando só as fotos escolhidas (Admin e Site).'
+          : 'Exibindo todas as fotos do álbum (Admin e Site).'
+      );
+    };
+
+    panel.querySelectorAll('.js-toggle-only-selected').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        setOnlySelectedFilter(!activeAlbum.showOnlySelected);
+      });
+    });
+
+    document.getElementById('btn-reset-only-selected')?.addEventListener('click', () => {
+      setOnlySelectedFilter(false);
+    });
+
     panel.querySelectorAll('.js-del-alb-photo').forEach((btn) => {
       btn.addEventListener('click', async () => {
         const pid = btn.getAttribute('data-photo-id');
-        const removed = (activeAlbum.photos || []).find((p) => p.id === pid);
-        activeAlbum.photos = (activeAlbum.photos || []).filter((p) => p.id !== pid);
-        activeAlbum.selectedIds = (activeAlbum.selectedIds || []).filter((id) => id !== pid);
-        if (removed && activeAlbum.coverSrc === removed.originalSrc) {
-          activeAlbum.coverSrc = activeAlbum.photos[0]?.originalSrc || '';
+        if (!pid) return;
+        const isSelected = (activeAlbum.selectedIds || []).includes(pid);
+        if (!isSelected) {
+          await removeAlbumPhotoById(pid);
+          return;
         }
-        await window.AlbumsStore.saveState(albumsState);
-        renderAlbumsAdminPanel();
+        const ph = (activeAlbum.photos || []).find((p) => p.id === pid);
+        const dlg = document.getElementById('alb-confirm-del-dialog');
+        if (!dlg || typeof dlg.showModal !== 'function') {
+          await removeAlbumPhotoById(pid);
+          return;
+        }
+        const descEl = document.getElementById('alb-del-dlg-desc');
+        const thumbEl = document.getElementById('alb-del-dlg-thumb');
+        const fnameEl = document.getElementById('alb-del-dlg-fname');
+        if (descEl) {
+          descEl.textContent = `Esta fotografia foi marcada como escolhida (♥) por ${activeAlbum.clientName}. Se você excluir agora, ela sairá do álbum e da lista final do cliente.`;
+        }
+        if (thumbEl && ph) {
+          thumbEl.src = ph.originalSrc;
+          thumbEl.alt = ph.filename || '';
+        }
+        if (fnameEl) fnameEl.textContent = ph?.filename || pid;
+
+        const cancelBtn = document.getElementById('btn-cancel-del-sel-photo');
+        const confirmBtn = document.getElementById('btn-confirm-del-sel-photo');
+        if (cancelBtn) cancelBtn.onclick = () => dlg.close();
+        if (confirmBtn) {
+          confirmBtn.onclick = async () => {
+            dlg.close();
+            await removeAlbumPhotoById(pid);
+          };
+        }
+        dlg.showModal();
+        cancelBtn?.focus();
       });
     });
 

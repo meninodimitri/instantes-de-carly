@@ -1114,7 +1114,7 @@ body.theme-is-dark .auth-kicker-pill {
   text-transform: uppercase;
   box-shadow: none !important;
   margin: 0;
-  transition: opacity 0.2s ease, border-color 0.2s ease;
+  transition: opacity 0.2s ease;
 }
 
 .pixieset-cover[data-cover="contorno"] .gal-btn-cover:hover,
@@ -2386,6 +2386,99 @@ body.theme-is-dark .auth-kicker-pill {
 }
 
 /* ==========================================================================
+   7B. MINIATURAS NO BANNER TRAVADO + BOTÃO DE AVALIAÇÃO GOOGLE (FASE 2)
+   ========================================================================== */
+.locked-status-msg {
+  margin: 0;
+}
+
+.locked-selected-strip {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  overflow-x: auto;
+  margin-top: 10px;
+  padding-bottom: 4px;
+}
+
+.locked-selected-chip {
+  flex: 0 0 auto;
+  width: 66px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 4px;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.locked-selected-chip img {
+  width: 100%;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 4px;
+  display: block;
+}
+
+.locked-selected-chip span {
+  font-size: 0.65rem;
+  line-height: 1.2;
+  color: #1B2733;
+  word-break: break-word;
+}
+
+.gal-btn-google-review {
+  gap: 6px;
+}
+
+.gal-btn-google-review svg {
+  color: #D4A12A;
+  flex-shrink: 0;
+}
+
+.delivery-review-section {
+  padding-bottom: 56px;
+}
+
+.delivery-review-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 24px 28px;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid rgba(128, 128, 128, 0.18);
+}
+
+.delivery-review-stars {
+  color: #D4A12A;
+  font-size: 1rem;
+  letter-spacing: 0.14em;
+  margin-bottom: 4px;
+}
+
+.delivery-review-copy h3 {
+  margin: 0 0 4px;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  color: var(--ink);
+}
+
+.delivery-review-copy p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--ink-secondary);
+}
+
+.delivery-review-btn {
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+/* ==========================================================================
    RESPONSIVIDADE (DESKTOP -> TABLET -> CELULAR)
    ========================================================================== */
 @media (max-width: 1120px) {
@@ -2540,6 +2633,21 @@ body.theme-is-dark .auth-kicker-pill {
   .pay-method-switch {
     grid-template-columns: 1fr;
     justify-items: center;
+  }
+  .topbar-row {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  #topbar-delivery-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .delivery-review-card {
+    padding: 20px;
+  }
+  .delivery-review-btn {
+    width: 100%;
+    text-align: center;
   }
 }
 

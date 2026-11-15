@@ -72,7 +72,10 @@
     topExtraStat: document.getElementById('top-extra-stat'),
     btnFinishTop: document.getElementById('btn-finish-selection-top'),
     topbarDeliveryActions: document.getElementById('topbar-delivery-actions'),
+    btnDeliveryGoogleReview: document.getElementById('btn-delivery-google-review'),
     btnDeliveryZip: document.getElementById('btn-delivery-download-zip'),
+    deliveryReviewBox: document.getElementById('delivery-google-review-box'),
+    btnDeliveryGoogleReviewCta: document.getElementById('btn-delivery-google-review-cta'),
 
     toolbarFilters: document.getElementById('toolbar-filters'),
     toolbarCount: document.getElementById('toolbar-count-label'),
@@ -182,6 +185,10 @@
     document.querySelectorAll('img[alt="Instantes de Carly"]').forEach((img) => {
       img.alt = brand.studioName;
     });
+    if (brand.googleReviewsUrl) {
+      if (els.btnDeliveryGoogleReview) els.btnDeliveryGoogleReview.href = brand.googleReviewsUrl;
+      if (els.btnDeliveryGoogleReviewCta) els.btnDeliveryGoogleReviewCta.href = brand.googleReviewsUrl;
+    }
   }
 
   /* ==========================================================================
@@ -480,6 +487,7 @@
     if (els.deliveryTopbarTitle) els.deliveryTopbarTitle.hidden = isProof;
     if (els.topbarProofingActions) els.topbarProofingActions.hidden = !isProof;
     if (els.topbarDeliveryActions) els.topbarDeliveryActions.hidden = isProof;
+    if (els.deliveryReviewBox) els.deliveryReviewBox.hidden = isProof;
     if (els.dock) els.dock.hidden = !isProof || Boolean(album.selectionLocked);
 
     if (isProof && activeFilter === 'favorites') activeFilter = 'all';
@@ -492,6 +500,7 @@
     if (isProof) {
       updateProofingChrome(album);
       await ensureProtectedProofsReady(album);
+      if (album.selectionLocked) updateProofingChrome(album);
       syncLivePaymentForAlbum(album);
     } else {
       updateDeliveryChrome(album);
@@ -756,13 +765,27 @@
     if (els.lockedWrap && els.lockedBanner) {
       if (album.selectionLocked) {
         els.lockedWrap.hidden = false;
+        let lockedMessage = '';
         if (album.status === 'selection_paid' && album.paymentOrder) {
-          els.lockedBanner.textContent = `Seleção confirmada e pagamento de ${formatBRL(album.paymentOrder.totalAmount)} aprovado. Total de ${calc.selectedCount} fotografias liberadas para edição final.`;
+          lockedMessage = `Seleção confirmada e pagamento de ${formatBRL(album.paymentOrder.totalAmount)} aprovado. Total de ${calc.selectedCount} fotografias liberadas para edição final.`;
         } else if (album.status === 'awaiting_pix_confirm' && album.paymentOrder) {
-          els.lockedBanner.textContent = `Seleção registrada (${calc.selectedCount} fotografias). Aguardando confirmação do Pix de ${formatBRL(album.paymentOrder.totalAmount)} pelo estúdio.`;
+          lockedMessage = `Seleção registrada (${calc.selectedCount} fotografias). Aguardando confirmação do Pix de ${formatBRL(album.paymentOrder.totalAmount)} pelo estúdio.`;
         } else {
-          els.lockedBanner.textContent = `Seleção finalizada (${calc.selectedCount} fotografias). Sua fotógrafa já recebeu sua lista para edição final.`;
+          lockedMessage = `Seleção finalizada (${calc.selectedCount} fotografias). Sua fotógrafa já recebeu sua lista para edição final.`;
         }
+        const selectedSet = new Set(album.selectedIds || []);
+        const selectedPhotos = (album.photos || []).filter((p) => selectedSet.has(p.id));
+        const stripHtml = selectedPhotos.length > 0 ? `
+          <div class="locked-selected-strip" aria-label="Fotos selecionadas">
+            ${selectedPhotos.map((p) => `
+              <div class="locked-selected-chip" title="${escapeHtml(p.filename)}">
+                <img src="${escapeHtml(getPhotoPrimarySrc(album, p))}" alt="${escapeHtml(p.filename)}" />
+                <span>${escapeHtml(p.filename)}</span>
+              </div>
+            `).join('')}
+          </div>
+        ` : '';
+        els.lockedBanner.innerHTML = `<p class="locked-status-msg">${escapeHtml(lockedMessage)}</p>${stripHtml}`;
       } else {
         els.lockedWrap.hidden = true;
       }
@@ -773,15 +796,27 @@
     hydrateCoverHero(album);
     if (els.deliveryTopbarTitle) els.deliveryTopbarTitle.textContent = album.clientName;
     if (els.proofingPkgMeta) {
-      els.proofingPkgMeta.textContent = `${(album.photos || []).length} fotografias em alta resolução`;
+      const visibleCount = getBaseAlbumPhotos(album).length;
+      els.proofingPkgMeta.textContent = `${visibleCount} fotografias em alta resolução`;
     }
   }
 
   /* ==========================================================================
      5. FILTROS LIMPOS & PAREDE DE FOTOS (COM FOCO NO CURSOR/DEDO EM SPOTLIGHT)
      ========================================================================== */
+  function getBaseAlbumPhotos(album) {
+    const photos = (album && album.photos) || [];
+    if (album && album.showOnlySelected) {
+      const selectedSet = new Set(album.selectedIds || []);
+      if (selectedSet.size > 0) {
+        return photos.filter((p) => selectedSet.has(p.id));
+      }
+    }
+    return photos;
+  }
+
   function getFilteredPhotos(album) {
-    const photos = album.photos || [];
+    const photos = getBaseAlbumPhotos(album);
     const selectedSet = new Set(album.selectedIds || []);
     const favSet = new Set(album.deliveryFavorites || []);
     const comments = album.photoComments || {};
@@ -795,13 +830,16 @@
 
   function renderFilterTabs(album) {
     if (!els.toolbarFilters) return;
-    const photos = album.photos || [];
+    const photos = getBaseAlbumPhotos(album);
+    const visibleIds = new Set(photos.map((p) => p.id));
     let tabs = [];
 
     if (album.phase === 'proofing') {
-      const selCount = (album.selectedIds || []).length;
+      const selCount = (album.selectedIds || []).filter((id) => visibleIds.has(id)).length;
       const unselCount = Math.max(0, photos.length - selCount);
-      const noteCount = Object.values(album.photoComments || {}).filter((v) => String(v || '').trim()).length;
+      const noteCount = Object.entries(album.photoComments || {}).filter(
+        ([pid, v]) => visibleIds.has(pid) && String(v || '').trim()
+      ).length;
 
       tabs = [
         { id: 'all', label: `Todas (${photos.length})` },
@@ -810,7 +848,7 @@
         { id: 'commented', label: `Com observação (${noteCount})` }
       ];
     } else {
-      const favCount = (album.deliveryFavorites || []).length;
+      const favCount = (album.deliveryFavorites || []).filter((id) => visibleIds.has(id)).length;
       tabs = [
         { id: 'all', label: `Todas (${photos.length})` },
         { id: 'favorites', label: `Favoritas (${favCount})` }
@@ -1275,11 +1313,23 @@
     } else {
       if (els.chkNoExtrasBox) els.chkNoExtrasBox.hidden = true;
       if (els.chkPaymentBox) els.chkPaymentBox.hidden = false;
+      setActiveCheckoutPayTab('direct');
       preparePaymentPayloads(calc);
     }
 
     syncSelectionDraftToCloud();
     els.chkDialog.showModal();
+  }
+
+  function setActiveCheckoutPayTab(which) {
+    const target = which === 'mp' ? 'mp' : 'direct';
+    document.querySelectorAll('.pay-tab').forEach((btn) => {
+      const active = btn.getAttribute('data-pay-tab') === target;
+      btn.classList.toggle('active', active);
+      btn.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+    if (els.payPaneDirect) els.payPaneDirect.hidden = target !== 'direct';
+    if (els.payPaneMp) els.payPaneMp.hidden = target !== 'mp';
   }
 
   async function preparePaymentPayloads(calc) {
@@ -1551,9 +1601,10 @@
     pendingDownloadTarget = singlePhoto;
 
     if (els.dlTitle) {
+      const visibleCount = getBaseAlbumPhotos(currentAlbum).length;
       els.dlTitle.textContent = singlePhoto
         ? `Baixar ${singlePhoto.filename}`
-        : `Baixar álbum completo (${(currentAlbum.photos || []).length} fotos)`;
+        : `Baixar álbum completo (${visibleCount} fotos)`;
     }
 
     const needPin = !isPinVerifiedForSession(currentAlbum);
@@ -1596,7 +1647,7 @@
         triggerBlobDownload(new Blob([bytes], { type: 'image/jpeg' }), pendingDownloadTarget.filename);
         await registerDownloadLog(`Download individual: ${pendingDownloadTarget.filename} (${resLabel}).`);
       } else {
-        const photos = currentAlbum.photos || [];
+        const photos = getBaseAlbumPhotos(currentAlbum);
         const zipEntries = [];
         for (let i = 0; i < photos.length; i++) {
           const p = photos[i];
@@ -1751,11 +1802,8 @@
     els.chkDialog?.addEventListener('close', stopMpPaymentPolling);
     document.querySelectorAll('.pay-tab').forEach((tabBtn) => {
       tabBtn.addEventListener('click', () => {
-        document.querySelectorAll('.pay-tab').forEach((b) => b.classList.remove('active'));
-        tabBtn.classList.add('active');
         const which = tabBtn.getAttribute('data-pay-tab');
-        if (els.payPaneMp) els.payPaneMp.hidden = which !== 'mp';
-        if (els.payPaneDirect) els.payPaneDirect.hidden = which !== 'direct';
+        setActiveCheckoutPayTab(which);
       });
     });
 
@@ -1907,7 +1955,7 @@
         }
         runtimeProofMap.clear();
         if (currentAlbum) {
-          renderMasonryGrid(currentAlbum);
+          renderMasonryWall(currentAlbum);
           if (els.lbDialog?.open) refreshLightboxUI();
         }
         return;
@@ -1925,6 +1973,9 @@
         els.deliveryHero.hidden = !shouldShowCover;
         els.deliveryHero.setAttribute('data-cover', coverStyle);
       }
+      if (els.topbarProofingActions) els.topbarProofingActions.hidden = !isProof;
+      if (els.topbarDeliveryActions) els.topbarDeliveryActions.hidden = isProof;
+      if (els.deliveryReviewBox) els.deliveryReviewBox.hidden = isProof;
       applyAlbumDesign(currentAlbum);
       hydrateCoverHero(currentAlbum);
       if (currentAlbum.phase === 'delivery') {
@@ -1932,6 +1983,8 @@
       } else {
         updateProofingChrome(currentAlbum);
       }
+      renderFilterTabs(currentAlbum);
+      renderMasonryWall(currentAlbum);
     });
 
     if (!initialSlug) {

@@ -227,6 +227,17 @@
 
         <!-- Controles exclusivos de ENTREGA FINAL (Pixieset — NUNCA aparece em proofing) -->
         <div id="topbar-delivery-actions" class="topbar-actions" hidden>
+          <a
+            id="btn-delivery-google-review"
+            class="gal-btn gal-btn-outline gal-btn-sm gal-btn-google-review"
+            href="https://www.google.com/search?q=instantes+de+carly+fotografia+fortaleza"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Deixar uma avaliação no Google"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.93 5.94 6.56.95-4.74 4.62 1.12 6.53L12 17.46l-5.87 3.08 1.12-6.53L2.51 9.39l6.56-.95L12 2.5z"/></svg>
+            <span class="btn-label">Avaliar no Google</span>
+          </a>
           <button type="button" id="btn-delivery-download-zip" class="gal-btn gal-btn-primary gal-btn-sm" title="Baixar álbum completo em ZIP">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="topbar-btn-icon" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             <span class="btn-label">Baixar álbum</span>
@@ -259,6 +270,26 @@
 
       <div id="gallery-empty" class="empty-state" hidden>
         <p id="gallery-empty-text">Nenhuma fotografia neste filtro no momento.</p>
+      </div>
+    </section>
+
+    <!-- CONVITE DE AVALIAÇÃO NO GOOGLE (EXCLUSIVO DA FASE 2: ENTREGA FINAL EM ALTA) -->
+    <section id="delivery-google-review-box" class="gal-container delivery-review-section" aria-label="Avaliar no Google" hidden>
+      <div class="delivery-review-card">
+        <div class="delivery-review-copy">
+          <div class="delivery-review-stars" aria-hidden="true">★★★★★</div>
+          <h3>Gostou das suas fotografias?</h3>
+          <p>Sua avaliação no Google ajuda nosso estúdio a alcançar novas famílias e leva menos de 1 minuto.</p>
+        </div>
+        <a
+          id="btn-delivery-google-review-cta"
+          class="gal-btn gal-btn-primary delivery-review-btn"
+          href="https://www.google.com/search?q=instantes+de+carly+fotografia+fortaleza"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Avaliar no Google
+        </a>
       </div>
     </section>
 
@@ -404,15 +435,36 @@
         <!-- Pagamento Seguro quando há fotos extras -->
         <div id="chk-payment-box" hidden>
           <div class="pay-method-switch" role="tablist" aria-label="Forma de pagamento">
-            <button type="button" class="pay-tab active" data-pay-tab="mp">
-              Pix automático ou Cartão (Mercado Pago)
-            </button>
-            <button type="button" class="pay-tab" data-pay-tab="direct">
+            <button type="button" class="pay-tab active" data-pay-tab="direct" role="tab" aria-selected="true">
               Pix direto ao estúdio (0% taxa)
+            </button>
+            <button type="button" class="pay-tab" data-pay-tab="mp" role="tab" aria-selected="false">
+              Pix automático ou Cartão (Mercado Pago)
             </button>
           </div>
 
-          <div id="pay-pane-mp" class="pay-pane">
+          <div id="pay-pane-direct" class="pay-pane">
+            <div class="pix-grid">
+              <div class="qr-frame">
+                <canvas id="direct-qr-canvas" width="168" height="168"></canvas>
+              </div>
+              <div class="pix-details">
+                <p class="modal-note" style="margin-top: 0;">
+                  Chave Pix do estúdio: <strong id="direct-pix-key-label"></strong>
+                </p>
+                <label for="direct-pix-code" class="field-label">Código Pix Copia e Cola (valor exato)</label>
+                <div class="copy-row">
+                  <input type="text" id="direct-pix-code" class="gal-input" readonly />
+                  <button type="button" id="btn-copy-direct-pix" class="gal-btn gal-btn-primary gal-btn-sm">Copiar</button>
+                </div>
+                <button type="button" id="btn-confirm-direct-pix" class="gal-btn gal-btn-primary gal-btn-full" style="margin-top: 12px;">
+                  Já realizei o Pix — enviar comprovante no WhatsApp
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div id="pay-pane-mp" class="pay-pane" hidden>
             <p class="modal-note">
               Valor calculado automaticamente pela quantidade de fotos extras selecionadas. A liberação ocorre em segundos após o pagamento.
             </p>
@@ -438,27 +490,6 @@
                     Simular confirmação do Webhook Mercado Pago
                   </button>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          <div id="pay-pane-direct" class="pay-pane" hidden>
-            <div class="pix-grid">
-              <div class="qr-frame">
-                <canvas id="direct-qr-canvas" width="168" height="168"></canvas>
-              </div>
-              <div class="pix-details">
-                <p class="modal-note" style="margin-top: 0;">
-                  Chave Pix do estúdio: <strong id="direct-pix-key-label"></strong>
-                </p>
-                <label for="direct-pix-code" class="field-label">Código Pix Copia e Cola (valor exato)</label>
-                <div class="copy-row">
-                  <input type="text" id="direct-pix-code" class="gal-input" readonly />
-                  <button type="button" id="btn-copy-direct-pix" class="gal-btn gal-btn-primary gal-btn-sm">Copiar</button>
-                </div>
-                <button type="button" id="btn-confirm-direct-pix" class="gal-btn gal-btn-primary gal-btn-full" style="margin-top: 12px;">
-                  Já realizei o Pix — enviar comprovante no WhatsApp
-                </button>
               </div>
             </div>
           </div>

@@ -450,6 +450,27 @@
     </div>
   </dialog>
 
+  <!-- Dialog de confirmação ao excluir foto já selecionada pelo cliente -->
+  <dialog id="alb-confirm-del-dialog" class="alb-confirm-del-dialog" closedby="any" aria-labelledby="alb-del-dlg-title">
+    <div class="alb-del-dlg-body">
+      <div class="alb-del-dlg-head">
+        <span class="alb-del-dlg-icon" aria-hidden="true">⚠</span>
+        <div>
+          <h3 id="alb-del-dlg-title">Excluir fotografia selecionada pelo cliente?</h3>
+          <p id="alb-del-dlg-desc" class="alb-del-dlg-desc"></p>
+        </div>
+      </div>
+      <div id="alb-del-dlg-preview" class="alb-del-dlg-preview">
+        <img id="alb-del-dlg-thumb" src="" alt="" />
+        <span id="alb-del-dlg-fname"></span>
+      </div>
+      <div class="alb-del-dlg-actions">
+        <button type="button" id="btn-cancel-del-sel-photo" class="cms-btn cms-btn-outline">Cancelar — manter foto</button>
+        <button type="button" id="btn-confirm-del-sel-photo" class="alb-btn-danger">Excluir foto mesmo assim</button>
+      </div>
+    </div>
+  </dialog>
+
   <!-- Container de Notificações Toast -->
   <div id="cms-toast-container" class="cms-toast-container" aria-live="polite"></div>
 

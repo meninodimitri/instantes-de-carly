@@ -202,10 +202,12 @@ test.describe('Validação Rigorosa das Correções do Usuário', () => {
       if (!active) await hearts.nth(i).click();
     }
 
-    // Abre Checkout
+    // Abre Checkout -> seleciona aba Mercado Pago -> verifica polling
     await page.locator('#btn-finish-selection-top').click();
     const chkDialog = page.locator('#checkout-dialog');
     await expect(chkDialog).toBeVisible();
+    await expect(page.locator('.pay-tab[data-pay-tab="direct"]')).toHaveClass(/active/);
+    await page.locator('.pay-tab[data-pay-tab="mp"]').click();
     await expect(page.locator('#mp-poll-status')).toBeVisible();
 
     // Polling a cada 3s detecta approved -> fecha modal automaticamente e exibe banner verde
@@ -287,6 +289,171 @@ test.describe('Validação Rigorosa das Correções do Usuário', () => {
     await expect(page.locator('#panel-albums')).toContainText(photoNote);
     await expect(page.locator('.alb-notes-clean-list')).toContainText(photoNote);
     await expect(page.locator('.alb-thumb-note-badge').first()).toBeVisible();
+  });
+
+  test('7. Fotos selecionadas no banner pago + filtro "Só Escolhidas" sincronizado (Admin + Site)', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 860 });
+
+    await page.route('**/api/selection**', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: true, selections: [] })
+      });
+    });
+    await page.route('**/api/payments**', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: true, payments: [] })
+      });
+    });
+
+    await page.route('**/assets/js/data.js*', async route => {
+      const resp = await route.fetch();
+      let body = await resp.text();
+      body += `\n;(function(){
+        if (window.SITE_DATA && Array.isArray(window.SITE_DATA.clientAlbums)) {
+          const alb = window.SITE_DATA.clientAlbums.find(a => a.slug === 'teste-definitivo') || window.SITE_DATA.clientAlbums[0];
+          if (alb && Array.isArray(alb.photos) && alb.photos.length >= 3) {
+            alb.phase = 'proofing';
+            alb.selectionLocked = true;
+            alb.status = 'selection_paid';
+            alb.selectedIds = [alb.photos[0].id, alb.photos[1].id];
+            alb.showOnlySelected = false;
+            alb.paymentOrder = { id: 'PAY-TEST-7', method: 'Pix Direto', status: 'approved', extraCount: 1, totalAmount: 1 };
+          }
+        }
+      })();\n`;
+      await route.fulfill({ response: resp, body });
+    });
+
+    await page.goto(`${BASE_URL}/admin?local=1&mockCloud=1`);
+    await page.waitForTimeout(500);
+    const btnLocal = page.locator('#btn-enter-local');
+    if (await btnLocal.isVisible()) await btnLocal.click();
+
+    await page.locator('#tab-btn-albums').click();
+    await page.waitForTimeout(300);
+
+    // Banner pago mostra miniaturas das 2 fotos selecionadas
+    const paidBanner = page.locator('.alb-paid-alert-banner');
+    await expect(paidBanner).toBeVisible();
+    await expect(paidBanner.locator('.alb-paid-selected-chip')).toHaveCount(2);
+
+    const allCardsCount = await page.locator('.alb-adm-photo-card').count();
+    expect(allCardsCount).toBeGreaterThan(2);
+
+    // Ativa filtro "Só Escolhidas" no banner ou barra Lightroom
+    await paidBanner.locator('.js-toggle-only-selected').click();
+    await page.waitForTimeout(300);
+
+    await expect(page.locator('.alb-adm-photo-card')).toHaveCount(2);
+    await expect(page.locator('.alb-only-sel-banner')).toBeVisible();
+
+    // Abre a galeria no mesmo navegador e verifica filtro refletido + miniaturas no banner travado
+    await page.goto(`${BASE_URL}/galeria?album=teste-definitivo&preview=1`);
+    await page.waitForTimeout(600);
+
+    await expect(page.locator('#proofing-locked-banner .locked-selected-chip')).toHaveCount(2);
+    await expect(page.locator('.masonry-tile')).toHaveCount(2);
+  });
+
+  test('8. Pop-up de confirmação ao excluir foto selecionada pelo cliente', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 860 });
+
+    await page.route('**/api/selection**', async route => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, selections: [] }) });
+    });
+    await page.route('**/api/payments**', async route => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, payments: [] }) });
+    });
+
+    await page.route('**/assets/js/data.js*', async route => {
+      const resp = await route.fetch();
+      let body = await resp.text();
+      body += `\n;(function(){
+        if (window.SITE_DATA && Array.isArray(window.SITE_DATA.clientAlbums)) {
+          const alb = window.SITE_DATA.clientAlbums.find(a => a.slug === 'teste-definitivo') || window.SITE_DATA.clientAlbums[0];
+          if (alb && Array.isArray(alb.photos) && alb.photos.length >= 3) {
+            alb.phase = 'proofing';
+            alb.selectionLocked = false;
+            alb.status = 'awaiting_selection';
+            alb.selectedIds = [alb.photos[0].id];
+            alb.showOnlySelected = false;
+          }
+        }
+      })();\n`;
+      await route.fulfill({ response: resp, body });
+    });
+
+    await page.goto(`${BASE_URL}/admin?local=1&mockCloud=1`);
+    await page.waitForTimeout(500);
+    const btnLocal = page.locator('#btn-enter-local');
+    if (await btnLocal.isVisible()) await btnLocal.click();
+
+    await page.locator('#tab-btn-albums').click();
+    await page.waitForTimeout(300);
+
+    const initialCount = await page.locator('.alb-adm-photo-card').count();
+    expect(initialCount).toBeGreaterThanOrEqual(3);
+
+    // Tenta excluir a 1ª foto (selecionada pelo cliente) -> abre popup
+    await page.locator('.alb-adm-photo-card').first().locator('.js-del-alb-photo').click();
+    const confirmDlg = page.locator('#alb-confirm-del-dialog');
+    await expect(confirmDlg).toBeVisible();
+
+    // Cancela -> foto permanece intacta
+    await page.locator('#btn-cancel-del-sel-photo').click();
+    await expect(confirmDlg).not.toBeVisible();
+    await expect(page.locator('.alb-adm-photo-card')).toHaveCount(initialCount);
+
+    // Tenta excluir novamente e confirma -> foto é removida
+    await page.locator('.alb-adm-photo-card').first().locator('.js-del-alb-photo').click();
+    await expect(confirmDlg).toBeVisible();
+    await page.locator('#btn-confirm-del-sel-photo').click();
+    await expect(confirmDlg).not.toBeVisible();
+    await expect(page.locator('.alb-adm-photo-card')).toHaveCount(initialCount - 1);
+
+    // Excluir foto NÃO selecionada (última) -> remove direto sem abrir popup
+    await page.locator('.alb-adm-photo-card').last().locator('.js-del-alb-photo').click();
+    await expect(confirmDlg).not.toBeVisible();
+    await expect(page.locator('.alb-adm-photo-card')).toHaveCount(initialCount - 2);
+  });
+
+  test('9. Botão "Avaliar no Google" visível apenas na Fase 2 (Entrega Final em Alta)', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+
+    // Fase 1: proofing -> CTAs do Google ocultos
+    await forcePhase1SelectionDataJs(page);
+    await page.goto(`${BASE_URL}/galeria?album=teste-definitivo&preview=1`);
+    await page.waitForTimeout(500);
+    await expect(page.locator('#btn-delivery-google-review')).toBeHidden();
+    await expect(page.locator('#delivery-google-review-box')).toBeHidden();
+
+    // Fase 2: delivery -> CTAs do Google visíveis com URL oficial
+    await page.unroute('**/assets/js/data.js*');
+    await page.route('**/assets/js/data.js*', async route => {
+      const resp = await route.fetch();
+      let body = await resp.text();
+      body += `\n;(function(){
+        if (window.SITE_DATA && Array.isArray(window.SITE_DATA.clientAlbums)) {
+          window.SITE_DATA.clientAlbums.forEach(a => { a.phase = 'delivery'; });
+        }
+      })();\n`;
+      await route.fulfill({ response: resp, body });
+    });
+
+    await page.goto(`${BASE_URL}/galeria?album=teste-definitivo&preview=1`);
+    await page.waitForTimeout(500);
+
+    const topBtn = page.locator('#btn-delivery-google-review');
+    const cardBtn = page.locator('#btn-delivery-google-review-cta');
+    await expect(topBtn).toBeVisible();
+    await expect(cardBtn).toBeVisible();
+    await expect(topBtn).toHaveAttribute('target', '_blank');
+    await expect(topBtn).toHaveAttribute('href', /google\.com\/search/);
+    await expect(cardBtn).toHaveAttribute('href', /google\.com\/search/);
   });
 
 });

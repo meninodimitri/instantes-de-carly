@@ -223,31 +223,36 @@ test.describe('3. Área Privada do Cliente (galeria.html)', () => {
     const payBox = page.locator('#chk-payment-box');
     await expect(payBox).toBeVisible();
 
-    // Abas de pagamento: Mercado Pago e Pix Direto
-    const tabMp = page.locator('.pay-tab[data-pay-tab="mp"]');
+    // Abas de pagamento: Pix Direto primeiro (0% taxa) e Mercado Pago em segundo
+    const tabs = page.locator('.pay-tab');
+    await expect(tabs).toHaveCount(2);
+    await expect(tabs.nth(0)).toHaveAttribute('data-pay-tab', 'direct');
+    await expect(tabs.nth(1)).toHaveAttribute('data-pay-tab', 'mp');
+
     const tabDirect = page.locator('.pay-tab[data-pay-tab="direct"]');
-    await expect(tabMp).toBeVisible();
+    const tabMp = page.locator('.pay-tab[data-pay-tab="mp"]');
     await expect(tabDirect).toBeVisible();
-    await expect(tabMp).toHaveClass(/active/);
-
-    // Painel Mercado Pago ativo por padrão com QR code e botão de cartão
-    const paneMp = page.locator('#pay-pane-mp');
-    await expect(paneMp).toBeVisible();
-    const btnCard = page.locator('#btn-mp-card-link');
-    await expect(btnCard).toBeVisible();
-    await expect(btnCard).toContainText('Pagar com cartão de crédito');
-
-    // Alterna para aba Pix Direto ao estúdio (0% taxa)
-    await tabDirect.click();
-    await page.waitForTimeout(200);
+    await expect(tabMp).toBeVisible();
     await expect(tabDirect).toHaveClass(/active/);
 
-    // Painel Pix Direto visível com chave e botão de envio no WhatsApp
+    // Painel Pix Direto ativo por padrão com chave e botão de envio no WhatsApp
     const paneDirect = page.locator('#pay-pane-direct');
     await expect(paneDirect).toBeVisible();
     const btnDirectConfirm = page.locator('#btn-confirm-direct-pix');
     await expect(btnDirectConfirm).toBeVisible();
     await expect(btnDirectConfirm).toContainText('Já realizei o Pix');
+
+    // Alterna para aba Mercado Pago
+    await tabMp.click();
+    await page.waitForTimeout(200);
+    await expect(tabMp).toHaveClass(/active/);
+
+    // Painel Mercado Pago visível com QR code e botão de cartão
+    const paneMp = page.locator('#pay-pane-mp');
+    await expect(paneMp).toBeVisible();
+    const btnCard = page.locator('#btn-mp-card-link');
+    await expect(btnCard).toBeVisible();
+    await expect(btnCard).toContainText('Pagar com cartão de crédito');
 
     // Fecha modal
     await page.locator('#chk-close').click();
