@@ -5,7 +5,7 @@
  */
 
 const SITE_DATA = {
-  "cmsVersion": "2026-11-15T23:18:31.484Z",
+  "cmsVersion": "2026-11-15T23:22:54.253Z",
   "brand": {
     "name": "Instantes de Carly",
     "founder": "Carliane Carvalho (Carly)",
@@ -593,7 +593,117 @@ const SITE_DATA = {
     "googleReviewFormUrl": "https://search.google.com/local/writereview?placeid=ChIJjZQfEEERvikRuXdgNX7jr3s",
     "reviews": []
   },
-  "clientAlbums": [],
+  "clientAlbums": [
+    {
+      "id": "alb_1794784967762",
+      "slug": "pqpqpqpqpqpqpq",
+      "clientName": "pqpqpqpqpqpqpq",
+      "title": "Ensaio — pqpqpqpqpqpqpq",
+      "subtitle": "FORTALEZA, CEARÁ & REGIÃO METROPOLITANA",
+      "phase": "proofing",
+      "status": "awaiting_selection",
+      "protectionLevel": "watermark",
+      "watermarkEnabled": true,
+      "passwordEnabled": true,
+      "password": "6710",
+      "pinEnabled": false,
+      "downloadPin": "",
+      "packageName": "Ensaio Autoral",
+      "packageIncluded": 5,
+      "extrasEnabled": true,
+      "extraPhotoPrice": 25,
+      "allowHighResDownload": true,
+      "allowWebDownload": true,
+      "welcomeMessage": "Olá, pqpqpqpqpqpqpq! Escolham com carinho suas fotografias favoritas.",
+      "coverSrc": "assets/images/uploads/foto-20261115232254-01.jpg",
+      "coverFocal": "50% 35%",
+      "design": {
+        "coverStyle": "centro",
+        "typography": "carly",
+        "colorTheme": "amarelinho",
+        "gridStyle": "vertical",
+        "gridSpacing": "regular",
+        "gridSize": "regular",
+        "gridNavStyle": "icons_text",
+        "coverLogoVisible": true,
+        "coverLogoColor": "auto"
+      },
+      "photos": [
+        {
+          "id": "ph_1794784972955_0",
+          "filename": "Captura de tela 2026-11-13 202235.png",
+          "originalSrc": "assets/images/uploads/foto-20261115232254-02.jpg"
+        },
+        {
+          "id": "ph_1794784972964_1",
+          "filename": "Captura de tela 2026-11-14 143312.png",
+          "originalSrc": "assets/images/uploads/foto-20261115232254-03.jpg"
+        },
+        {
+          "id": "ph_1794784972984_2",
+          "filename": "Captura de tela 2026-11-14 155641.png",
+          "originalSrc": "assets/images/uploads/foto-20261115232254-04.jpg"
+        },
+        {
+          "id": "ph_1794784973058_3",
+          "filename": "Captura de tela 2026-11-14 160209.png",
+          "originalSrc": "assets/images/uploads/foto-20261115232254-05.jpg"
+        },
+        {
+          "id": "ph_1794784973066_4",
+          "filename": "Captura de tela 2026-11-14 185546.png",
+          "originalSrc": "assets/images/uploads/foto-20261115232254-06.jpg"
+        },
+        {
+          "id": "ph_1794784973090_5",
+          "filename": "Captura de tela 2026-11-14 185943.png",
+          "originalSrc": "assets/images/uploads/foto-20261115232254-07.jpg"
+        },
+        {
+          "id": "ph_1794784973114_6",
+          "filename": "Captura de tela 2026-11-14 190015.png",
+          "originalSrc": "assets/images/uploads/foto-20261115232254-08.jpg"
+        },
+        {
+          "id": "ph_1794784973136_7",
+          "filename": "Captura de tela 2026-11-14 190021.png",
+          "originalSrc": "assets/images/uploads/foto-20261115232254-09.jpg"
+        },
+        {
+          "id": "ph_1794784973205_8",
+          "filename": "Captura de tela 2026-11-14 191734.png",
+          "originalSrc": "assets/images/uploads/foto-20261115232254-10.jpg"
+        },
+        {
+          "id": "ph_1794784973225_9",
+          "filename": "Captura de tela 2026-11-14 192922.png",
+          "originalSrc": "assets/images/uploads/foto-20261115232254-11.jpg"
+        },
+        {
+          "id": "ph_1794784973267_10",
+          "filename": "Captura de tela 2026-11-14 194051.png",
+          "originalSrc": "assets/images/uploads/foto-20261115232254-12.jpg"
+        }
+      ],
+      "selectedIds": [],
+      "photoComments": {},
+      "deliveryFavorites": [],
+      "selectionLocked": false,
+      "paymentOrder": null,
+      "activityLog": [
+        {
+          "at": "2026-11-15T23:22:47.762Z",
+          "type": "created",
+          "text": "Álbum criado no painel."
+        }
+      ],
+      "antiPrintEnabled": true,
+      "showOnlySelected": false,
+      "coverKicker": "GALERIA OFICIAL EM ALTA RESOLUÇÃO",
+      "coverAuthor": "Carliane Carvalho",
+      "updatedAt": 1794784973267
+    }
+  ],
   "clientWatermarkConfig": {
     "enabled": true,
     "mode": "image",
@@ -602,7 +712,7 @@ const SITE_DATA = {
     "pattern": "tiled",
     "opacity": 0.85,
     "scale": 0.15,
-    "updatedAt": 1794784711484
+    "updatedAt": 1794784702339
   },
   "clientPaymentConfig": {
     "enableMercadoPago": true,
