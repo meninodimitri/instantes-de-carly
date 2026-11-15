@@ -5,7 +5,7 @@
  */
 
 const SITE_DATA = {
-  "cmsVersion": "2026-11-15T21:59:05.811Z",
+  "cmsVersion": "2026-11-15T23:18:31.484Z",
   "brand": {
     "name": "Instantes de Carly",
     "founder": "Carliane Carvalho (Carly)",
@@ -593,125 +593,16 @@ const SITE_DATA = {
     "googleReviewFormUrl": "https://search.google.com/local/writereview?placeid=ChIJjZQfEEERvikRuXdgNX7jr3s",
     "reviews": []
   },
-  "clientAlbums": [
-    {
-      "id": "alb_1794779335367",
-      "slug": "carliane-autista",
-      "clientName": "Carliane Autista",
-      "title": "Ensaio — Carliane Autista Austista",
-      "subtitle": "FORTALEZA, CEARÁ & REGIÃO METROPOLITANA",
-      "phase": "proofing",
-      "status": "awaiting_selection",
-      "protectionLevel": "watermark_lowres",
-      "watermarkEnabled": true,
-      "passwordEnabled": true,
-      "password": "4242",
-      "pinEnabled": false,
-      "downloadPin": "",
-      "packageName": "Ensaio Autoral",
-      "packageIncluded": 5,
-      "extrasEnabled": true,
-      "extraPhotoPrice": 1,
-      "allowHighResDownload": true,
-      "allowWebDownload": true,
-      "welcomeMessage": "Olá, Carliane Autista! Escolham com carinho suas fotografias favoritas. Sua Austista!!!",
-      "coverSrc": "assets/images/uploads/foto-20261115215905-01.jpg",
-      "coverFocal": "50% 35%",
-      "design": {
-        "coverStyle": "centro",
-        "typography": "carly",
-        "colorTheme": "amarelinho",
-        "gridStyle": "horizontal",
-        "gridSpacing": "regular",
-        "gridSize": "regular",
-        "gridNavStyle": "icons_only",
-        "coverLogoVisible": true,
-        "coverLogoColor": "auto"
-      },
-      "photos": [
-        {
-          "id": "ph_1794779338636_0",
-          "filename": "Captura de tela 2026-11-13 202235.png",
-          "originalSrc": "assets/images/uploads/foto-20261115215905-02.jpg"
-        },
-        {
-          "id": "ph_1794779338649_1",
-          "filename": "Captura de tela 2026-11-14 143312.png",
-          "originalSrc": "assets/images/uploads/foto-20261115215905-03.jpg"
-        },
-        {
-          "id": "ph_1794779338656_2",
-          "filename": "Captura de tela 2026-11-14 155641.png",
-          "originalSrc": "assets/images/uploads/foto-20261115215905-04.jpg"
-        },
-        {
-          "id": "ph_1794779338737_3",
-          "filename": "Captura de tela 2026-11-14 160209.png",
-          "originalSrc": "assets/images/uploads/foto-20261115215905-05.jpg"
-        },
-        {
-          "id": "ph_1794779338744_4",
-          "filename": "Captura de tela 2026-11-14 185546.png",
-          "originalSrc": "assets/images/uploads/foto-20261115215905-06.jpg"
-        },
-        {
-          "id": "ph_1794779338767_5",
-          "filename": "Captura de tela 2026-11-14 185943.png",
-          "originalSrc": "assets/images/uploads/foto-20261115215905-07.jpg"
-        },
-        {
-          "id": "ph_1794779338796_6",
-          "filename": "Captura de tela 2026-11-14 190015.png",
-          "originalSrc": "assets/images/uploads/foto-20261115215905-08.jpg"
-        },
-        {
-          "id": "ph_1794779338820_7",
-          "filename": "Captura de tela 2026-11-14 190021.png",
-          "originalSrc": "assets/images/uploads/foto-20261115215905-09.jpg"
-        },
-        {
-          "id": "ph_1794779338888_8",
-          "filename": "Captura de tela 2026-11-14 191734.png",
-          "originalSrc": "assets/images/uploads/foto-20261115215905-10.jpg"
-        },
-        {
-          "id": "ph_1794779338907_9",
-          "filename": "Captura de tela 2026-11-14 192922.png",
-          "originalSrc": "assets/images/uploads/foto-20261115215905-11.jpg"
-        },
-        {
-          "id": "ph_1794779338951_10",
-          "filename": "Captura de tela 2026-11-14 194051.png",
-          "originalSrc": "assets/images/uploads/foto-20261115215905-12.jpg"
-        }
-      ],
-      "selectedIds": [],
-      "photoComments": {},
-      "deliveryFavorites": [],
-      "selectionLocked": false,
-      "paymentOrder": null,
-      "activityLog": [
-        {
-          "at": "2026-11-15T21:48:55.367Z",
-          "type": "created",
-          "text": "Álbum criado no painel."
-        }
-      ],
-      "antiPrintEnabled": true,
-      "coverKicker": "Austista Austista Austista Austista",
-      "coverAuthor": "Carliane Carvalho",
-      "updatedAt": 1794779496159
-    }
-  ],
+  "clientAlbums": [],
   "clientWatermarkConfig": {
     "enabled": true,
-    "mode": "text",
+    "mode": "image",
     "imageSrc": "assets/images/logo-light.png",
     "text": "INSTANTES DE CARLY",
     "pattern": "tiled",
     "opacity": 0.85,
     "scale": 0.15,
-    "updatedAt": 1794779451770
+    "updatedAt": 1794784711484
   },
   "clientPaymentConfig": {
     "enableMercadoPago": true,
