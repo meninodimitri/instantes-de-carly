@@ -1446,6 +1446,8 @@
         deliveryFavorites: [],
         selectionLocked: false,
         paymentOrder: null,
+        createdAt: new Date().toISOString(),
+        updatedAt: Date.now(),
         activityLog: [{ at: new Date().toISOString(), type: 'created', text: 'Álbum criado no painel.' }]
       });
 
@@ -1454,8 +1456,17 @@
       showQuickCreateAlbum = false;
       activeAlbumSubTab = 'photos';
       await window.AlbumsStore.saveState(albumsState);
+      syncAdminStateDirty();
       renderAlbumsAdminPanel();
       notifyAdminToast(`Álbum "${clientName}" criado!`);
+
+      try {
+        fetch('/api/selection', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'purge', albumId: newAlb.id, slug: newAlb.slug })
+        }).catch(() => {});
+      } catch (_) {}
     };
 
     document.getElementById('btn-confirm-quick-create')?.addEventListener('click', createNow);
@@ -2102,11 +2113,26 @@
 
     document.getElementById('btn-delete-album')?.addEventListener('click', async () => {
       if (!window.confirm(`Excluir permanentemente o álbum de "${activeAlbum.clientName}"?`)) return;
-      albumsState.albums = albumsState.albums.filter((a) => a.id !== activeAlbum.id);
+      const deletedId = activeAlbum.id;
+      const deletedSlug = activeAlbum.slug;
+      albumsState.deletedAlbumIds = [...new Set([...(albumsState.deletedAlbumIds || []), deletedId])];
+      albumsState.albums = albumsState.albums.filter((a) => a.id !== deletedId);
+      if (window.SITE_DATA && Array.isArray(window.SITE_DATA.clientAlbums)) {
+        window.SITE_DATA.clientAlbums = window.SITE_DATA.clientAlbums.filter((a) => a.id !== deletedId);
+      }
       selectedAlbumId = albumsState.albums[0]?.id || null;
       await window.AlbumsStore.saveState(albumsState);
+      syncAdminStateDirty();
       renderAlbumsAdminPanel();
       notifyAdminToast('Álbum excluído.');
+
+      try {
+        fetch('/api/selection', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'purge', albumId: deletedId, slug: deletedSlug })
+        }).catch(() => {});
+      } catch (_) {}
     });
   }
 
@@ -2121,11 +2147,54 @@
       if (!albumsState || !Array.isArray(albumsState.albums)) return;
       let changed = false;
 
+      const getAlbumCreatedAtMs = (alb) => {
+        if (!alb) return 0;
+        if (alb.createdAt) {
+          const t = typeof alb.createdAt === 'number' ? alb.createdAt : Date.parse(String(alb.createdAt));
+          if (!Number.isNaN(t) && t > 0) return t;
+        }
+        const m = String(alb.id || '').match(/^alb_(\d{10,})$/);
+        return m ? (Number(m[1]) || 0) : 0;
+      };
+
+      const doesCloudRecordBelongToAlbum = (alb, recAlbumId, recSlug, recTimeIso) => {
+        if (!alb) return false;
+        const rId = String(recAlbumId || '').trim();
+        const rSlug = String(recSlug || '').trim().toLowerCase();
+        const albId = String(alb.id || '').trim();
+        const albSlug = String(alb.slug || '').trim().toLowerCase();
+
+        // Quando ambos possuem ID alb_*, exige igualdade exata (impede vazar dados entre álbuns recriados com mesmo nome/slug)
+        if (rId.startsWith('alb_') && albId.startsWith('alb_')) {
+          if (rId !== albId) return false;
+        } else if (rId && albId && rId === albId) {
+          // match exato de ID
+        } else if (rSlug && albSlug && rSlug === albSlug) {
+          // match por slug apenas quando não há conflito de IDs alb_*
+        } else if (rId && albSlug && rId.toLowerCase() === albSlug && !rId.startsWith('alb_')) {
+          // fallback legado por slug
+        } else {
+          return false;
+        }
+
+        if (recTimeIso) {
+          const recMs = typeof recTimeIso === 'number' ? recTimeIso : Date.parse(String(recTimeIso));
+          const albCreatedMs = getAlbumCreatedAtMs(alb);
+          if (albCreatedMs > 0 && !Number.isNaN(recMs) && recMs > 0 && recMs < albCreatedMs - 5000) {
+            return false;
+          }
+        }
+        return true;
+      };
+
       const mergeCommentsIntoAlbum = (alb, incomingComments) => {
         if (!incomingComments || typeof incomingComments !== 'object') return false;
+        const validPhotoIds = new Set((alb.photos || []).map((p) => p && p.id).filter(Boolean));
+        if (validPhotoIds.size === 0) return false;
         let updated = false;
         const cur = { ...(alb.photoComments || {}) };
         Object.entries(incomingComments).forEach(([pid, txt]) => {
+          if (!validPhotoIds.has(pid)) return;
           const clean = String(txt || '').trim();
           if (clean && cur[pid] !== clean) {
             cur[pid] = clean;
@@ -2145,10 +2214,11 @@
           const selData = await selRes.json();
           const selections = Array.isArray(selData.selections) ? selData.selections : [];
           selections.forEach((sel) => {
-            const targetId = String(sel.albumId || sel.slug || '').trim();
-            if (!targetId) return;
-            const alb = albumsState.albums.find(
-              (a) => a.id === targetId || (a.slug && a.slug.toLowerCase() === targetId.toLowerCase())
+            const targetId = String(sel.albumId || '').trim();
+            const targetSlug = String(sel.slug || sel.albumId || '').trim();
+            if (!targetId && !targetSlug) return;
+            const alb = albumsState.albums.find((a) =>
+              doesCloudRecordBelongToAlbum(a, targetId, targetSlug, sel.updatedAt || sel.createdAt)
             );
             if (!alb) return;
 
@@ -2157,9 +2227,15 @@
             }
 
             if (Array.isArray(sel.selectedIds) && sel.selectedIds.length > 0 && !sel.draftOnly && sel.status !== 'awaiting_selection') {
+              const validPhotoIds = new Set((alb.photos || []).map((p) => p && p.id).filter(Boolean));
+              const matchedIds = validPhotoIds.size > 0
+                ? sel.selectedIds.filter((id) => validPhotoIds.has(id))
+                : (alb.id === targetId ? sel.selectedIds : []);
+              if (matchedIds.length === 0) return;
+
               const currentCount = (alb.selectedIds || []).length;
-              if (currentCount !== sel.selectedIds.length || alb.status !== sel.status) {
-                alb.selectedIds = sel.selectedIds;
+              if (currentCount !== matchedIds.length || alb.status !== sel.status) {
+                alb.selectedIds = matchedIds;
                 alb.selectionLocked = true;
                 alb.status = sel.status || 'awaiting_pix_confirm';
                 alb.paymentOrder = {
@@ -2175,7 +2251,7 @@
                   alb.activityLog.unshift({
                     at: sel.updatedAt || new Date().toISOString(),
                     type: sel.status === 'awaiting_pix_confirm' ? 'pix_pending' : 'selection',
-                    text: `Seleção recebida do cliente (${sel.selectedIds.length} fotos) via ${sel.method === 'direct_pix' ? 'Pix Direto' : sel.method === 'mercadopago' ? 'Mercado Pago' : 'Pacote'} (${sel.id}).`
+                    text: `Seleção recebida do cliente (${matchedIds.length} fotos) via ${sel.method === 'direct_pix' ? 'Pix Direto' : sel.method === 'mercadopago' ? 'Mercado Pago' : 'Pacote'} (${sel.id}).`
                   });
                 }
                 changed = true;
@@ -2194,7 +2270,7 @@
         albumsState.albums.forEach((a) => {
           if (a.paymentOrder && (a.paymentOrder.totalAmount === 117.8 || (a.paymentOrder.extraCount === 0 && a.status === 'selection_paid' && (!a.selectedIds || a.selectedIds.length === 0)))) {
             const hasLegit = payments.some(
-              (p) => p.status === 'approved' && p.albumId && (p.albumId === a.id || (a.slug && p.albumId.toLowerCase() === a.slug.toLowerCase()))
+              (p) => p.status === 'approved' && doesCloudRecordBelongToAlbum(a, p.albumId, p.albumSlug, p.paidAt || p.createdAt)
             );
             if (!hasLegit) {
               a.status = 'awaiting_selection';
@@ -2215,10 +2291,8 @@
           const targetSlug = String(pay.albumSlug || '').trim();
           if (!targetId && !targetSlug) return;
 
-          let alb = albumsState.albums.find(
-            (a) =>
-              (targetId && (a.id === targetId || (a.slug && a.slug.toLowerCase() === targetId.toLowerCase()))) ||
-              (targetSlug && a.slug && a.slug.toLowerCase() === targetSlug.toLowerCase())
+          const alb = albumsState.albums.find((a) =>
+            doesCloudRecordBelongToAlbum(a, targetId, targetSlug, pay.paidAt || pay.createdAt)
           );
           if (!alb) return;
 
@@ -2230,7 +2304,11 @@
             alb.status = 'selection_paid';
             alb.selectionLocked = true;
             if (Array.isArray(pay.selectedIds) && pay.selectedIds.length > 0) {
-              alb.selectedIds = pay.selectedIds;
+              const validPhotoIds = new Set((alb.photos || []).map((p) => p && p.id).filter(Boolean));
+              const filteredIds = validPhotoIds.size > 0
+                ? pay.selectedIds.filter((id) => validPhotoIds.has(id))
+                : pay.selectedIds;
+              if (filteredIds.length > 0) alb.selectedIds = filteredIds;
             }
             alb.paymentOrder = {
               id: pay.id,

@@ -631,7 +631,18 @@
       const res = await fetch(url, { cache: 'no-store' });
       if (!res.ok) return;
       const data = await res.json();
-      const approved = (data.payments || []).find((p) => p.status === 'approved');
+      const albCreatedMs = album.createdAt
+        ? Date.parse(String(album.createdAt))
+        : ((String(album.id || '').match(/^alb_(\d{10,})$/)?.[1] && Number(String(album.id).match(/^alb_(\d{10,})$/)[1])) || 0);
+      const approved = (data.payments || []).find((p) => {
+        if (p.status !== 'approved') return false;
+        if (p.albumId && String(p.albumId).startsWith('alb_') && p.albumId !== album.id) return false;
+        if (p.paidAt && albCreatedMs > 0) {
+          const paidMs = Date.parse(String(p.paidAt));
+          if (!Number.isNaN(paidMs) && paidMs > 0 && paidMs < albCreatedMs - 5000) return false;
+        }
+        return true;
+      });
       if (approved) {
         await applyApprovedMercadoPagoPayment(album, approved);
       }

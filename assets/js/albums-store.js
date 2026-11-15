@@ -365,8 +365,24 @@
     };
   }
 
+  function getAlbumCreatedAtMs(alb) {
+    if (!alb) return 0;
+    if (alb.createdAt) {
+      const t = typeof alb.createdAt === 'number' ? alb.createdAt : Date.parse(String(alb.createdAt));
+      if (!Number.isNaN(t) && t > 0) return t;
+    }
+    const m = String(alb.id || '').match(/^alb_(\d{10,})$/);
+    if (m) return Number(m[1]) || 0;
+    return 0;
+  }
+
   function normalizeAlbum(alb) {
     if (!alb || typeof alb !== 'object') return alb;
+
+    if (!alb.createdAt) {
+      const ms = getAlbumCreatedAtMs(alb);
+      alb.createdAt = ms > 0 ? new Date(ms).toISOString() : new Date().toISOString();
+    }
 
     // Migra 'watermark_blur' legado para o novo 'watermark_lowres'
     if (alb.protectionLevel === 'watermark_blur') {
@@ -422,18 +438,34 @@
     if (!alb.photoComments || typeof alb.photoComments !== 'object') alb.photoComments = {};
     if (!Array.isArray(alb.activityLog)) alb.activityLog = [];
 
+    const validPhotoIds = new Set(alb.photos.map((p) => p && p.id).filter(Boolean));
+    if (validPhotoIds.size === 0) {
+      alb.selectedIds = [];
+      alb.photoComments = {};
+    } else {
+      alb.selectedIds = alb.selectedIds.filter((id) => validPhotoIds.has(id));
+      const cleanComments = {};
+      Object.entries(alb.photoComments).forEach(([pid, txt]) => {
+        if (validPhotoIds.has(pid) && String(txt || '').trim()) {
+          cleanComments[pid] = String(txt).trim();
+        }
+      });
+      alb.photoComments = cleanComments;
+    }
+
     return alb;
   }
 
   function getBrandDefaults() {
     const b = (window.SITE_DATA && window.SITE_DATA.brand) || {};
+    const gr = (window.SITE_DATA && window.SITE_DATA.googleReviews) || {};
     return {
       studioName: b.name || 'Instantes de Carly',
       shortName: b.shortName || b.founder || 'Carly',
       whatsappNumber: b.whatsappNumber || '5585920015290',
       city: 'FORTALEZA',
       defaultWatermarkImg: 'assets/images/logo-light.png',
-      googleReviewsUrl: b.googleReviewsUrl || 'https://www.google.com/search?q=instantes+de+carly+fotografia+fortaleza'
+      googleReviewsUrl: gr.googleReviewFormUrl || b.googleReviewsUrl || 'https://search.google.com/local/writereview?placeid=ChIJjZQfEEERvikRuXdgNX7jr3s'
     };
   }
 
@@ -515,11 +547,16 @@
       ? activeSiteData.clientAlbums
       : [];
 
+    const deletedIds = new Set(Array.isArray(saved?.deletedAlbumIds) ? saved.deletedAlbumIds : []);
     let root = saved;
     if (!root || !Array.isArray(root.albums) || root.albums.length === 0) {
+      const prevDeleted = Array.isArray(root?.deletedAlbumIds) ? root.deletedAlbumIds : [];
       root = createInitialDemoState();
+      if (prevDeleted.length > 0) root.deletedAlbumIds = prevDeleted;
       if (cloudAlbums.length > 0) {
-        root.albums = JSON.parse(JSON.stringify(cloudAlbums)).filter((a) => a && a.id && !a.id.startsWith('alb_demo_'));
+        root.albums = JSON.parse(JSON.stringify(cloudAlbums)).filter(
+          (a) => a && a.id && !a.id.startsWith('alb_demo_') && !deletedIds.has(a.id)
+        );
       }
     } else {
       // Purga imediatamente qualquer álbum demo residual do cache local / IndexedDB
@@ -533,11 +570,21 @@
         // Mescla álbuns centrais do SITE_DATA preservando edições locais mais recentes do Admin
         cloudAlbums.forEach((cAlb) => {
           if (cAlb.id && cAlb.id.startsWith('alb_demo_')) return;
+          if (cAlb.id && deletedIds.has(cAlb.id)) return;
           const existingIdx = root.albums.findIndex((a) => a.id === cAlb.id || (cAlb.slug && a.slug === cAlb.slug));
           if (existingIdx === -1) {
             root.albums.push(JSON.parse(JSON.stringify(cAlb)));
           } else {
             const localAlb = root.albums[existingIdx];
+
+            // Se o álbum tem mesmo slug mas ID diferente (excluído e recriado), NUNCA mescla pagamento/comentários antigos!
+            if (localAlb.id && cAlb.id && localAlb.id !== cAlb.id) {
+              const localTime = Math.max(Number(localAlb.updatedAt) || 0, getAlbumCreatedAtMs(localAlb));
+              const cloudTime = Math.max(Number(cAlb.updatedAt) || 0, getAlbumCreatedAtMs(cAlb), cmsVersionMs);
+              root.albums[existingIdx] = JSON.parse(JSON.stringify(localTime >= cloudTime ? localAlb : cAlb));
+              return;
+            }
+
             const localAdminUpdated = Number(localAlb.updatedAt) || 0;
             const cloudAdminUpdated = Math.max(Number(cAlb.updatedAt) || 0, cmsVersionMs);
             const localHasNewerConfig = localAdminUpdated > cloudAdminUpdated;

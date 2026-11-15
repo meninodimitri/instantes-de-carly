@@ -5,6 +5,25 @@ const BASE_URL = 'http://localhost:4173';
 
 test.describe('3. Área Privada do Cliente (galeria.html)', () => {
 
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/assets/js/data.js*', async route => {
+      const resp = await route.fetch();
+      let body = await resp.text();
+      body += `\n;(function(){
+        if (window.SITE_DATA && Array.isArray(window.SITE_DATA.clientAlbums) && window.SITE_DATA.clientAlbums[0]) {
+          const a = window.SITE_DATA.clientAlbums[0];
+          a.slug = 'teste-definitivo';
+          a.password = '1212';
+          a.passwordEnabled = true;
+          a.showOnlySelected = false;
+          a.packageIncluded = 5;
+          a.extraPhotoPrice = 1;
+        }
+      })();\n`;
+      await route.fulfill({ response: resp, body });
+    });
+  });
+
   test('Tela de Acesso: Glassmorphism translúcido neutro, logo centralizada e sem sombras', async ({ page }) => {
     // Limpa localStorage e sessionStorage para garantir tela de senha bloqueada
     await page.goto(`${BASE_URL}/galeria`);
@@ -160,10 +179,11 @@ test.describe('3. Área Privada do Cliente (galeria.html)', () => {
     await page.addInitScript(() => {
       try { localStorage.clear(); } catch (e) {}
     });
+    await page.unroute('**/assets/js/data.js*');
     await page.route('**/assets/js/data.js*', async route => {
       const resp = await route.fetch();
       let body = await resp.text();
-      body += `\n;(function(){ if (window.SITE_DATA && Array.isArray(window.SITE_DATA.clientAlbums)) { window.SITE_DATA.clientAlbums.forEach(a => { a.phase = 'proofing'; a.selectionLocked = false; a.selectedIds = []; a.photoComments = {}; a.status = 'awaiting_selection'; a.paymentOrder = null; }); } })();\n`;
+      body += `\n;(function(){ if (window.SITE_DATA && Array.isArray(window.SITE_DATA.clientAlbums)) { window.SITE_DATA.clientAlbums.forEach((a, i) => { if (i === 0) a.slug = 'teste-definitivo'; a.phase = 'proofing'; a.selectionLocked = false; a.selectedIds = []; a.photoComments = {}; a.status = 'awaiting_selection'; a.paymentOrder = null; a.showOnlySelected = false; a.packageIncluded = 5; a.extraPhotoPrice = 1; }); } })();\n`;
       await route.fulfill({ response: resp, body });
     });
 
@@ -188,10 +208,11 @@ test.describe('3. Área Privada do Cliente (galeria.html)', () => {
     await page.addInitScript(() => {
       try { localStorage.clear(); } catch (e) {}
     });
+    await page.unroute('**/assets/js/data.js*');
     await page.route('**/assets/js/data.js*', async route => {
       const resp = await route.fetch();
       let body = await resp.text();
-      body += `\n;(function(){ if (window.SITE_DATA && Array.isArray(window.SITE_DATA.clientAlbums)) { window.SITE_DATA.clientAlbums.forEach(a => { a.phase = 'proofing'; a.selectionLocked = false; a.selectedIds = []; a.photoComments = {}; a.status = 'awaiting_selection'; a.paymentOrder = null; }); } })();\n`;
+      body += `\n;(function(){ if (window.SITE_DATA && Array.isArray(window.SITE_DATA.clientAlbums)) { window.SITE_DATA.clientAlbums.forEach((a, i) => { if (i === 0) a.slug = 'teste-definitivo'; a.phase = 'proofing'; a.selectionLocked = false; a.selectedIds = []; a.photoComments = {}; a.status = 'awaiting_selection'; a.paymentOrder = null; a.showOnlySelected = false; a.packageIncluded = 5; a.extraPhotoPrice = 1; }); } })();\n`;
       await route.fulfill({ response: resp, body });
     });
 

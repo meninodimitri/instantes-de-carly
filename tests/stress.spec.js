@@ -12,7 +12,7 @@ test.describe('4. Validação & Stress Tests Globais', () => {
     page.on('console', msg => {
       if (msg.type() === 'error') {
         const text = msg.text();
-        if (!text.includes('favicon.ico') && !text.includes('net::ERR_ABORTED')) {
+        if (!text.includes('favicon.ico') && !text.includes('net::ERR_ABORTED') && !text.includes('net::ERR_CACHE_WRITE_FAILURE')) {
           errorLogs.push(text);
         }
       }

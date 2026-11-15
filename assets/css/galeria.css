@@ -1666,6 +1666,8 @@ body.theme-is-dark .auth-kicker-pill {
   display: block;
   width: 100%;
   height: auto;
+  min-height: 92px;
+  object-fit: cover;
   transition: transform 0.28s ease-out;
 }
 
@@ -1738,6 +1740,7 @@ body.theme-is-dark .auth-kicker-pill {
   position: absolute;
   top: 6px;
   right: 6px;
+  z-index: 3;
   width: 38px;
   height: 38px;
   padding: 0;

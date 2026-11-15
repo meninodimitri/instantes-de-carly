@@ -9,16 +9,37 @@ const memorySelections = new Map();
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
+  const purgeKeys = (albumId, slug) => {
+    const idTarget = String(albumId || '').trim().toLowerCase();
+    const slugTarget = String(slug || '').trim().toLowerCase();
+    for (const [k, rec] of memorySelections.entries()) {
+      const recId = String(rec?.albumId || '').trim().toLowerCase();
+      const recSlug = String(rec?.slug || '').trim().toLowerCase();
+      const keyLower = String(k || '').trim().toLowerCase();
+      if ((idTarget && (keyLower === idTarget || recId === idTarget)) ||
+          (slugTarget && (keyLower === slugTarget || recSlug === slugTarget))) {
+        memorySelections.delete(k);
+      }
+    }
+  };
+
   const GITHUB_TOKEN = (process.env.GITHUB_TOKEN || process.env.GH_TOKEN || process.env.GH_PAT || req.headers['x-github-token'] || '').trim();
   const GITHUB_REPO = (process.env.GITHUB_REPO || process.env.GH_REPO || 'meninodimitri/instantes-de-carly').trim();
   const GITHUB_BRANCH = (process.env.GITHUB_BRANCH || process.env.GH_BRANCH || 'main').trim();
+
+  // DELETE: Purga registros de álbum excluído / recriado
+  if (req.method === 'DELETE') {
+    const { albumId, slug } = req.query || {};
+    purgeKeys(albumId, slug);
+    return res.status(200).json({ ok: true, purged: true });
+  }
 
   // GET: Retorna seleções ativas
   if (req.method === 'GET') {
@@ -26,18 +47,26 @@ export default async function handler(req, res) {
     const list = Array.from(memorySelections.values());
     if (albumId) {
       const q = String(albumId).trim().toLowerCase();
-      const filtered = list.filter((s) =>
-        (s.albumId && s.albumId.toLowerCase() === q) ||
-        (s.slug && s.slug.toLowerCase() === q)
-      );
+      const filtered = list.filter((s) => {
+        if (q.startsWith('alb_')) {
+          return s.albumId && s.albumId.toLowerCase() === q;
+        }
+        return (s.albumId && s.albumId.toLowerCase() === q) ||
+          (s.slug && s.slug.toLowerCase() === q);
+      });
       return res.status(200).json({ selections: filtered });
     }
     return res.status(200).json({ selections: list });
   }
 
-  // POST: Registra ou atualiza seleção do cliente
+  // POST: Registra, atualiza ou purga seleção do cliente
   if (req.method === 'POST') {
     try {
+      if (req.body && req.body.action === 'purge') {
+        purgeKeys(req.body.albumId, req.body.slug);
+        return res.status(200).json({ ok: true, purged: true });
+      }
+
       const {
         albumId,
         slug,
@@ -56,7 +85,11 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Identificador do álbum ausente.' });
       }
 
-      const existingRec = memorySelections.get(albumId || slug) || (slug && memorySelections.get(slug)) || null;
+      let existingRec = memorySelections.get(albumId || slug) || (slug && memorySelections.get(slug)) || null;
+      if (existingRec && albumId && existingRec.albumId && existingRec.albumId !== albumId) {
+        purgeKeys(existingRec.albumId, slug);
+        existingRec = null;
+      }
       const mergedComments = { ...(existingRec?.photoComments || {}) };
       if (photoComments && typeof photoComments === 'object') {
         Object.entries(photoComments).forEach(([pid, txt]) => {
@@ -111,9 +144,11 @@ export default async function handler(req, res) {
             const siteData = fn();
 
             if (siteData && Array.isArray(siteData.clientAlbums)) {
-              const alb = siteData.clientAlbums.find(
-                (a) => a.id === record.albumId || (a.slug && a.slug.toLowerCase() === (record.slug || '').toLowerCase())
-              );
+              const alb = siteData.clientAlbums.find((a) => {
+                if (a.id === record.albumId) return true;
+                if (String(record.albumId || '').startsWith('alb_') && String(a.id || '').startsWith('alb_')) return false;
+                return Boolean(a.slug && record.slug && a.slug.toLowerCase() === record.slug.toLowerCase());
+              });
 
               if (alb) {
                 if (record.selectedIds.length > 0) alb.selectedIds = record.selectedIds;

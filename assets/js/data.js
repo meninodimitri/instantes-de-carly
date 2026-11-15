@@ -23,7 +23,7 @@ const SITE_DATA = {
     "logoDark": "assets/images/logo-dark.png",
     "logoLight": "assets/images/logo-light.png",
     "headerCtaText": "Agendar conversa",
-    "googleReviewsUrl": "https://www.google.com/search?q=instantes+de+carly+fotografia+fortaleza"
+    "googleReviewsUrl": "https://search.google.com/local/writereview?placeid=ChIJjZQfEEERvikRuXdgNX7jr3s"
   },
   "sections": {
     "hero": {

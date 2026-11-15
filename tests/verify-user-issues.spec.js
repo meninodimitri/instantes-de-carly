@@ -7,7 +7,7 @@ async function forcePhase1SelectionDataJs(page) {
   await page.route('**/assets/js/data.js*', async route => {
     const resp = await route.fetch();
     let body = await resp.text();
-    body += `\n;(function(){ if (window.SITE_DATA && Array.isArray(window.SITE_DATA.clientAlbums)) { window.SITE_DATA.clientAlbums.forEach(a => { a.phase = 'proofing'; a.selectionLocked = false; a.selectedIds = []; a.photoComments = {}; a.status = 'awaiting_selection'; a.paymentOrder = null; }); } })();\n`;
+    body += `\n;(function(){ if (window.SITE_DATA && Array.isArray(window.SITE_DATA.clientAlbums)) { window.SITE_DATA.clientAlbums.forEach((a, i) => { if (i === 0) a.slug = 'teste-definitivo'; a.phase = 'proofing'; a.selectionLocked = false; a.selectedIds = []; a.photoComments = {}; a.status = 'awaiting_selection'; a.paymentOrder = null; a.showOnlySelected = false; a.packageIncluded = 5; a.extraPhotoPrice = 1; }); } })();\n`;
     await route.fulfill({ response: resp, body });
   });
 }
@@ -119,6 +119,12 @@ test.describe('Validação Rigorosa das Correções do Usuário', () => {
   });
 
   test('5. Pagamento Mercado Pago fecha o modal automaticamente ao aprovar e sincroniza observações', async ({ page }) => {
+    const fs = require('fs');
+    const path = require('path');
+    const dataTxt = fs.readFileSync(path.join(process.cwd(), 'assets/js/data.js'), 'utf8');
+    const albumMatch = dataTxt.match(/"clientAlbums":\s*\[\s*\{[\s\S]*?"id":\s*"(alb_[^"]+)"/);
+    const targetAlbumId = albumMatch ? albumMatch[1] : 'alb_1794784967762';
+
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.addInitScript(() => {
       try { localStorage.clear(); } catch (e) {}
@@ -154,8 +160,9 @@ test.describe('Validação Rigorosa das Correções do Usuário', () => {
             id: '99887766',
             status: isApproved ? 'approved' : 'pending',
             amount: 1,
+            paidAt: new Date().toISOString(),
             paymentMethod: 'pix',
-            albumId: 'alb_1794449405990',
+            albumId: targetAlbumId,
             albumSlug: 'teste-definitivo',
             extraCount: 1,
             selectedIds: [],
@@ -316,6 +323,7 @@ test.describe('Validação Rigorosa das Correções do Usuário', () => {
         if (window.SITE_DATA && Array.isArray(window.SITE_DATA.clientAlbums)) {
           const alb = window.SITE_DATA.clientAlbums.find(a => a.slug === 'teste-definitivo') || window.SITE_DATA.clientAlbums[0];
           if (alb && Array.isArray(alb.photos) && alb.photos.length >= 3) {
+            alb.slug = 'teste-definitivo';
             alb.phase = 'proofing';
             alb.selectionLocked = true;
             alb.status = 'selection_paid';
@@ -376,6 +384,7 @@ test.describe('Validação Rigorosa das Correções do Usuário', () => {
         if (window.SITE_DATA && Array.isArray(window.SITE_DATA.clientAlbums)) {
           const alb = window.SITE_DATA.clientAlbums.find(a => a.slug === 'teste-definitivo') || window.SITE_DATA.clientAlbums[0];
           if (alb && Array.isArray(alb.photos) && alb.photos.length >= 3) {
+            alb.slug = 'teste-definitivo';
             alb.phase = 'proofing';
             alb.selectionLocked = false;
             alb.status = 'awaiting_selection';
@@ -431,14 +440,17 @@ test.describe('Validação Rigorosa das Correções do Usuário', () => {
     await expect(page.locator('#btn-delivery-google-review')).toBeHidden();
     await expect(page.locator('#delivery-google-review-box')).toBeHidden();
 
-    // Fase 2: delivery -> CTAs do Google visíveis com URL oficial
+    // Fase 2: delivery -> CTAs do Google visíveis com URL oficial de avaliação
     await page.unroute('**/assets/js/data.js*');
     await page.route('**/assets/js/data.js*', async route => {
       const resp = await route.fetch();
       let body = await resp.text();
       body += `\n;(function(){
         if (window.SITE_DATA && Array.isArray(window.SITE_DATA.clientAlbums)) {
-          window.SITE_DATA.clientAlbums.forEach(a => { a.phase = 'delivery'; });
+          window.SITE_DATA.clientAlbums.forEach((a, i) => {
+            if (i === 0) a.slug = 'teste-definitivo';
+            a.phase = 'delivery';
+          });
         }
       })();\n`;
       await route.fulfill({ response: resp, body });
@@ -449,11 +461,96 @@ test.describe('Validação Rigorosa das Correções do Usuário', () => {
 
     const topBtn = page.locator('#btn-delivery-google-review');
     const cardBtn = page.locator('#btn-delivery-google-review-cta');
+    const expectedReviewUrl = 'https://search.google.com/local/writereview?placeid=ChIJjZQfEEERvikRuXdgNX7jr3s';
     await expect(topBtn).toBeVisible();
     await expect(cardBtn).toBeVisible();
     await expect(topBtn).toHaveAttribute('target', '_blank');
-    await expect(topBtn).toHaveAttribute('href', /google\.com\/search/);
-    await expect(cardBtn).toHaveAttribute('href', /google\.com\/search/);
+    await expect(topBtn).toHaveAttribute('href', expectedReviewUrl);
+    await expect(cardBtn).toHaveAttribute('href', expectedReviewUrl);
+  });
+
+  test('10. Excluir álbum e recriar com o mesmo nome não puxa pagamento nem comentários do álbum excluído', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 860 });
+
+    const oldDeletedComment = 'Comentário antigo do álbum que já foi excluído!';
+    await page.route('**/api/selection**', async route => {
+      if (route.request().method() === 'POST') {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ ok: true, purged: true })
+        });
+        return;
+      }
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          ok: true,
+          selections: [{
+            id: 'PIX-OLD-999',
+            albumId: 'alb_1700000000000',
+            slug: 'ensaio-recriado',
+            status: 'selection_paid',
+            method: 'direct_pix',
+            totalAmount: 50,
+            extraCount: 2,
+            selectedIds: ['ph_old_1', 'ph_old_2'],
+            photoComments: { ph_old_1: oldDeletedComment },
+            draftOnly: false,
+            updatedAt: '2025-01-01T10:00:00.000Z'
+          }]
+        })
+      });
+    });
+
+    await page.route('**/api/payments**', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          ok: true,
+          payments: [{
+            id: '999000111',
+            status: 'approved',
+            amount: 50,
+            paidAt: '2025-01-01T10:00:00.000Z',
+            paymentMethod: 'pix',
+            albumId: 'alb_1700000000000',
+            albumSlug: 'ensaio-recriado',
+            extraCount: 2,
+            selectedIds: ['ph_old_1', 'ph_old_2'],
+            photoComments: { ph_old_1: oldDeletedComment }
+          }]
+        })
+      });
+    });
+
+    await page.goto(`${BASE_URL}/admin?local=1&mockCloud=1`);
+    await page.waitForTimeout(500);
+    const btnLocal = page.locator('#btn-enter-local');
+    if (await btnLocal.isVisible()) await btnLocal.click();
+
+    await page.locator('#tab-btn-albums').click();
+    await page.waitForTimeout(300);
+
+    // Cria novo álbum com o MESMO nome/slug do álbum antigo excluído
+    await page.locator('#btn-sidebar-new-album').click();
+    await page.locator('#quick-alb-client-input').fill('Ensaio Recriado');
+    await page.locator('#quick-alb-pkg-input').fill('15');
+    await page.locator('#btn-confirm-quick-create').click();
+    await page.waitForTimeout(400);
+
+    // Força sincronização na nuvem (que retorna registros antigos do slug 'ensaio-recriado')
+    await page.evaluate(() => window.dispatchEvent(new Event('focus')));
+    await page.waitForTimeout(600);
+
+    // Garante que status segue limpo e nenhum pagamento/comentário antigo vazou
+    await expect(page.locator('.alb-studio-title')).toHaveText('Ensaio Recriado');
+    await expect(page.locator('.alb-studio-header .alb-status-tag')).toHaveText('Em Seleção');
+    await expect(page.locator('.alb-paid-alert-banner')).toHaveCount(0);
+    await expect(page.locator('.alb-pix-alert-banner:not([hidden])')).toHaveCount(0);
+    await expect(page.locator('#panel-albums')).not.toContainText(oldDeletedComment);
   });
 
 });
