@@ -5,7 +5,7 @@
  */
 
 const SITE_DATA = {
-  "cmsVersion": "2026-11-15T21:33:48.427Z",
+  "cmsVersion": "2026-11-15T21:45:52.381Z",
   "brand": {
     "name": "Instantes de Carly",
     "founder": "Carliane Carvalho (Carly)",
@@ -600,8 +600,8 @@ const SITE_DATA = {
       "clientName": "Yanzinho bbzinho",
       "title": "O Sedutor - Yanzinho Bbzinho",
       "subtitle": "FORTALEZA, CEARÁ & REGIÃO METROPOLITANA",
-      "phase": "proofing",
-      "status": "awaiting_selection",
+      "phase": "delivery",
+      "status": "delivered",
       "protectionLevel": "watermark_lowres",
       "watermarkEnabled": true,
       "passwordEnabled": true,
@@ -615,7 +615,7 @@ const SITE_DATA = {
       "allowHighResDownload": true,
       "allowWebDownload": true,
       "welcomeMessage": "O Maioral das danças sem quebrar o resguardo",
-      "coverSrc": "assets/images/uploads/foto-20261115213348-01.jpg",
+      "coverSrc": "assets/images/uploads/foto-20261115214552-01.jpg",
       "coverFocal": "71% 37%",
       "design": {
         "coverStyle": "moldura",
@@ -630,67 +630,65 @@ const SITE_DATA = {
       },
       "photos": [
         {
-          "id": "ph_1794778281563_0",
-          "filename": "Captura de tela 2026-11-14 194051.png",
-          "originalSrc": "assets/images/uploads/foto-20261115213348-02.jpg"
-        },
-        {
-          "id": "ph_1794778281582_1",
-          "filename": "Captura de tela 2026-11-14 192922.png",
-          "originalSrc": "assets/images/uploads/foto-20261115213348-03.jpg"
-        },
-        {
-          "id": "ph_1794778281667_2",
-          "filename": "Captura de tela 2026-11-14 191734.png",
-          "originalSrc": "assets/images/uploads/foto-20261115213348-04.jpg"
-        },
-        {
-          "id": "ph_1794778281695_3",
-          "filename": "Captura de tela 2026-11-14 190021.png",
-          "originalSrc": "assets/images/uploads/foto-20261115213348-05.jpg"
-        },
-        {
-          "id": "ph_1794778281725_4",
-          "filename": "Captura de tela 2026-11-14 190015.png",
-          "originalSrc": "assets/images/uploads/foto-20261115213348-06.jpg"
-        },
-        {
-          "id": "ph_1794778281748_5",
-          "filename": "Captura de tela 2026-11-14 185943.png",
-          "originalSrc": "assets/images/uploads/foto-20261115213348-07.jpg"
-        },
-        {
           "id": "ph_1794778281754_6",
           "filename": "Captura de tela 2026-11-14 185546.png",
-          "originalSrc": "assets/images/uploads/foto-20261115213348-08.jpg"
+          "originalSrc": "assets/images/uploads/foto-20261115214552-02.jpg",
+          "clientNote": "Sai do fake lula",
+          "selected": true
         },
         {
           "id": "ph_1794778281846_7",
           "filename": "Captura de tela 2026-11-14 160209.png",
-          "originalSrc": "assets/images/uploads/foto-20261115213348-09.jpg"
+          "originalSrc": "assets/images/uploads/foto-20261115214552-03.jpg",
+          "clientNote": "Pipipipopopo",
+          "selected": true
         },
         {
           "id": "ph_1794778281856_8",
           "filename": "Captura de tela 2026-11-14 155641.png",
-          "originalSrc": "assets/images/uploads/foto-20261115213348-10.jpg"
+          "originalSrc": "assets/images/uploads/foto-20261115214552-04.jpg",
+          "selected": true
         },
         {
           "id": "ph_1794778281871_9",
           "filename": "Captura de tela 2026-11-14 143312.png",
-          "originalSrc": "assets/images/uploads/foto-20261115213348-11.jpg"
+          "originalSrc": "assets/images/uploads/foto-20261115214552-05.jpg",
+          "selected": true
         },
         {
           "id": "ph_1794778281879_10",
           "filename": "Captura de tela 2026-11-13 202235.png",
-          "originalSrc": "assets/images/uploads/foto-20261115213348-12.jpg"
+          "originalSrc": "assets/images/uploads/foto-20261115214552-06.jpg",
+          "selected": true
         }
       ],
-      "selectedIds": [],
-      "photoComments": {},
+      "selectedIds": [
+        "ph_1794778281754_6",
+        "ph_1794778281879_10",
+        "ph_1794778281856_8",
+        "ph_1794778281846_7",
+        "ph_1794778281871_9"
+      ],
+      "photoComments": {
+        "ph_1794778281846_7": "Pipipipopopo",
+        "ph_1794778281754_6": "Sai do fake lula"
+      },
       "deliveryFavorites": [],
-      "selectionLocked": false,
-      "paymentOrder": null,
+      "selectionLocked": true,
+      "paymentOrder": {
+        "id": "PIX-47359",
+        "method": "direct_pix",
+        "status": "pending_receipt",
+        "extraCount": 1,
+        "totalAmount": 1,
+        "createdAt": "2026-11-15T21:44:07.498Z"
+      },
       "activityLog": [
+        {
+          "at": "2026-11-15T21:44:07.498Z",
+          "type": "pix_pending",
+          "text": "Seleção recebida do cliente (6 fotos) via Pix Direto (PIX-47359)."
+        },
         {
           "at": "2026-11-15T21:30:06.229Z",
           "type": "created",
@@ -700,7 +698,7 @@ const SITE_DATA = {
       "antiPrintEnabled": true,
       "coverKicker": "",
       "coverAuthor": "Carliane Carvalho",
-      "updatedAt": 1794778417764
+      "updatedAt": 1794779141784
     }
   ],
   "clientWatermarkConfig": {
