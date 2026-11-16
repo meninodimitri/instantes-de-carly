@@ -5,7 +5,7 @@
  */
 
 const SITE_DATA = {
-  "cmsVersion": "2026-11-16T16:44:39.186Z",
+  "cmsVersion": "2026-11-16T16:46:57.443Z",
   "brand": {
     "name": "Instantes de Carly",
     "founder": "Carliane Carvalho (Carly)",
@@ -501,7 +501,7 @@ const SITE_DATA = {
       "image": "assets/images/uploads/foto-20261116162801-12.jpg",
       "objectPosition": "center 25%",
       "location": "Fortaleza, Ceará",
-      "caption": "",
+      "caption": "O amor, o carinho e a presença dos pais são fundamentais na construção de quem uma criança se tornará. \nPela psicologia, sabemos que esses vínculos ajudam a desenvolver a identidade, a segurança emocional e a autoestima.\nSão pequenos gestos que deixam marcas para a vida inteira.",
       "isAcervoCover": true
     },
     {
@@ -1213,7 +1213,7 @@ const SITE_DATA = {
       "showOnlySelected": true,
       "coverKicker": "GALERIA OFICIAL EM ALTA RESOLUÇÃO",
       "coverAuthor": "Carliane Carvalho",
-      "updatedAt": 1794847390648,
+      "updatedAt": 1794847479186,
       "createdAt": "2026-11-15T23:22:47.762Z"
     }
   ],
