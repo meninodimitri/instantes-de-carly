@@ -2342,12 +2342,18 @@ function renderSectionsAdmin() {
       if (pid) {
         gr.googleProfileUrl = `https://www.google.com/maps/place/?q=place_id:${pid}`;
         gr.googleReviewFormUrl = `https://search.google.com/local/writereview?placeid=${pid}`;
+        b.googleReviewsUrl = gr.googleReviewFormUrl;
         const writeIn = container.querySelector('#f-gr-write');
         if (writeIn) writeIn.value = gr.googleReviewFormUrl;
       }
       markDirtyAndSync();
     });
-    container.querySelector('#f-gr-write')?.addEventListener('input', (e) => { gr.googleReviewFormUrl = e.target.value.trim(); markDirtyAndSync(); });
+    container.querySelector('#f-gr-write')?.addEventListener('input', (e) => {
+      const url = e.target.value.trim();
+      gr.googleReviewFormUrl = url;
+      b.googleReviewsUrl = url;
+      markDirtyAndSync();
+    });
     return;
   }
 

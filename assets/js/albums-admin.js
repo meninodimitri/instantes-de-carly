@@ -259,7 +259,8 @@
 
     const seq = ++previewRenderSeq;
     const activeAlbum = getActiveAlbum();
-    const sampleSrc = activeAlbum?.photos?.[0]?.originalSrc || activeAlbum?.coverSrc || 'assets/images/carly-perfil.jpg';
+    const fallbackSrc = window.AlbumsStore.getBrandDefaults().profilePhoto;
+    const sampleSrc = activeAlbum?.photos?.[0]?.originalSrc || activeAlbum?.coverSrc || fallbackSrc;
     const wmEnabled = activeAlbum ? activeAlbum.watermarkEnabled !== false : true;
     const level = activeAlbum?.protectionLevel || 'watermark';
 
@@ -666,7 +667,8 @@
   function renderDesignSubTab(activeAlbum) {
     const presets = window.AlbumsStore.DESIGN_PRESETS;
     const design = activeAlbum.design || window.AlbumsStore.getDefaultDesign();
-    const coverSrc = activeAlbum.coverSrc || activeAlbum.photos?.[0]?.originalSrc || 'assets/images/carly-perfil.jpg';
+    const fallbackSrc = window.AlbumsStore.getBrandDefaults().profilePhoto;
+    const coverSrc = activeAlbum.coverSrc || activeAlbum.photos?.[0]?.originalSrc || fallbackSrc;
     const focal = parseFocalCoords(activeAlbum.coverFocal);
     const shortTitle = (activeAlbum.title || activeAlbum.clientName || 'Álbum').slice(0, 24);
 
@@ -1026,8 +1028,8 @@
 
           <div>
             <div class="alb-wm-live-card" id="adm-wm-live-card">
-              <img id="adm-wm-live-preview" class="adm-wm-base" src="assets/images/carly-perfil.jpg" alt="Prévia viva da proteção" />
-              <img id="adm-wm-live-reveal" class="adm-wm-reveal" src="assets/images/carly-perfil.jpg" alt="" hidden />
+              <img id="adm-wm-live-preview" class="adm-wm-base" src="${escapeHtml(window.AlbumsStore.getBrandDefaults().profilePhoto)}" alt="Prévia viva da proteção" />
+              <img id="adm-wm-live-reveal" class="adm-wm-reveal" src="${escapeHtml(window.AlbumsStore.getBrandDefaults().profilePhoto)}" alt="" hidden />
               <div class="alb-wm-live-badge">
                 <span>${activeProt === 'watermark_spotlight' ? 'Passe o mouse p/ testar' : 'Prévia real'}</span>
                 <strong id="adm-wm-live-caption">${escapeHtml(getProtectionLabel(activeProt, wmEnabled))}</strong>
@@ -1076,7 +1078,7 @@
           </div>
           <div class="field-group">
             <label class="field-label">Assinatura da Fotógrafa na Capa</label>
-            <input type="text" id="alb-in-author" class="cms-input" value="${escapeHtml(activeAlbum.coverAuthor !== undefined ? activeAlbum.coverAuthor : 'Carliane Carvalho')}" placeholder="Deixe em branco para ocultar da capa" />
+            <input type="text" id="alb-in-author" class="cms-input" value="${escapeHtml(activeAlbum.coverAuthor !== undefined ? activeAlbum.coverAuthor : window.AlbumsStore.getBrandDefaults().founderName)}" placeholder="Deixe em branco para ocultar da capa" />
           </div>
         </div>
 

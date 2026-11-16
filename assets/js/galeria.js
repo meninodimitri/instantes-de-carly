@@ -367,7 +367,16 @@
     applyAlbumDesign(null);
     showOnlySection(els.portalView);
     document.body.classList.remove('is-proofing-protected');
-    document.title = `Área do Cliente — ${window.AlbumsStore.getBrandDefaults().studioName}`;
+    const brand = window.AlbumsStore.getBrandDefaults();
+    const portalBgImg = els.portalView?.querySelector('.auth-bg-img');
+    if (portalBgImg && brand.profilePhoto) {
+      portalBgImg.src = brand.profilePhoto;
+      portalBgImg.alt = `Galeria Privada — ${brand.studioName}`;
+    }
+    document.querySelectorAll('.auth-brand-link img').forEach((img) => {
+      if (brand.studioName) img.alt = brand.studioName;
+    });
+    document.title = `Área do Cliente — ${brand.studioName}`;
   }
 
   function isAlbumUnlocked(album) {
@@ -389,9 +398,11 @@
     applyAlbumDesign(album);
     showOnlySection(els.pwView);
     document.body.classList.remove('is-proofing-protected');
-    const cover = album.coverSrc || album.photos?.[0]?.originalSrc || 'assets/images/carly-perfil.jpg';
+    const brand = window.AlbumsStore.getBrandDefaults();
+    const cover = album.coverSrc || album.photos?.[0]?.originalSrc || brand.profilePhoto;
     if (els.pwCoverImg) {
       els.pwCoverImg.src = cover;
+      els.pwCoverImg.alt = `${brand.studioName} — ${brand.founderName}`;
       els.pwCoverImg.style.objectPosition = album.coverFocal || '50% 34%';
     }
     if (els.pwTitle) els.pwTitle.textContent = album.title || album.clientName;
@@ -650,7 +661,8 @@
   }
 
   function hydrateCoverHero(album) {
-    const cover = album.coverSrc || album.photos?.[0]?.originalSrc || 'assets/images/carly-perfil.jpg';
+    const brand = window.AlbumsStore.getBrandDefaults();
+    const cover = album.coverSrc || album.photos?.[0]?.originalSrc || brand.profilePhoto;
     if (els.deliveryHeroImg) {
       els.deliveryHeroImg.src = cover;
       els.deliveryHeroImg.alt = album.title || album.clientName || 'Capa do ensaio';
@@ -666,7 +678,7 @@
       els.deliveryHeroKicker.hidden = !kText;
       els.deliveryHeroKicker.style.display = kText ? '' : 'none';
     }
-    const authorText = (album.coverAuthor !== undefined ? album.coverAuthor : 'CARLIANE CARVALHO').trim();
+    const authorText = (album.coverAuthor !== undefined ? album.coverAuthor : brand.founderName.toUpperCase()).trim();
     if (els.deliveryHeroAuthor) {
       els.deliveryHeroAuthor.textContent = authorText.toUpperCase();
       els.deliveryHeroAuthor.hidden = !authorText;
@@ -1349,14 +1361,14 @@
     const txid = `ALB${currentAlbum.slug.replace(/[^a-z0-9]/gi, '').slice(0, 10)}${Date.now().toString().slice(-4)}`;
 
     const directPayload = window.AlbumsStore.generatePixPayload({
-      pixKey: payCfg.pixKey || 'contato@instantesdecarly.com.br',
+      pixKey: payCfg.pixKey || brand.email || 'contato@instantesdecarly.com.br',
       merchantName: payCfg.merchantName || brand.studioName,
       merchantCity: payCfg.merchantCity || brand.city,
       amount: calc.extraTotal,
       txid
     });
 
-    const rawDirectKey = payCfg.pixKey || 'contato@instantesdecarly.com.br';
+    const rawDirectKey = payCfg.pixKey || brand.email || 'contato@instantesdecarly.com.br';
     const digitsKey = rawDirectKey.replace(/\D/g, '');
     let displayDirectKey = rawDirectKey;
     if (digitsKey.length === 11 && !rawDirectKey.includes('@')) {

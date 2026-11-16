@@ -31,7 +31,10 @@ export default async function handler(req, res) {
   };
 
   const GITHUB_TOKEN = (process.env.GITHUB_TOKEN || process.env.GH_TOKEN || process.env.GH_PAT || req.headers['x-github-token'] || '').trim();
-  const GITHUB_REPO = (process.env.GITHUB_REPO || process.env.GH_REPO || 'meninodimitri/instantes-de-carly').trim();
+  const vercelRepo = (process.env.VERCEL_GIT_REPO_OWNER && process.env.VERCEL_GIT_REPO_SLUG)
+    ? `${process.env.VERCEL_GIT_REPO_OWNER}/${process.env.VERCEL_GIT_REPO_SLUG}`
+    : '';
+  const GITHUB_REPO = (process.env.GITHUB_REPO || process.env.GH_REPO || vercelRepo || 'meninodimitri/instantes-de-carly').trim();
   const GITHUB_BRANCH = (process.env.GITHUB_BRANCH || process.env.GH_BRANCH || 'main').trim();
 
   // DELETE: Purga registros de álbum excluído / recriado

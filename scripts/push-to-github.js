@@ -40,6 +40,8 @@ const IGNORE_LIST = [
   '.claude',
   '.playwright-cli',
   '.taste-skill',
+  'playwright-report',
+  'test-results',
   'skills-lock.json',
   'package-lock.json',
   'REDESIGN_V2_SUMMARY.md',

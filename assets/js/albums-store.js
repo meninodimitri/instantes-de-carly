@@ -430,7 +430,7 @@
     };
 
     if (alb.coverKicker === undefined) alb.coverKicker = 'GALERIA OFICIAL EM ALTA RESOLUÇÃO';
-    if (alb.coverAuthor === undefined) alb.coverAuthor = 'Carliane Carvalho';
+    if (alb.coverAuthor === undefined) alb.coverAuthor = getBrandDefaults().founderName;
     if (!alb.coverFocal) alb.coverFocal = '50% 35%';
     if (!Array.isArray(alb.photos)) alb.photos = [];
     if (!Array.isArray(alb.selectedIds)) alb.selectedIds = [];
@@ -459,11 +459,17 @@
   function getBrandDefaults() {
     const b = (window.SITE_DATA && window.SITE_DATA.brand) || {};
     const gr = (window.SITE_DATA && window.SITE_DATA.googleReviews) || {};
+    const sobre = (window.SITE_DATA && window.SITE_DATA.sections && window.SITE_DATA.sections.sobre) || {};
+    const rawCity = ((b.location || 'Fortaleza').split(/[,\-–•]/)[0].trim().toUpperCase()) || 'FORTALEZA';
+    const founderClean = (b.founderHighlight || b.founder || 'Carliane Carvalho').replace(/\s*\([^)]*\)\s*/g, '').trim();
     return {
       studioName: b.name || 'Instantes de Carly',
-      shortName: b.shortName || b.founder || 'Carly',
+      shortName: b.shortName || founderClean || 'Carly',
+      founderName: founderClean || 'Carliane Carvalho',
+      email: b.email || 'contato@instantesdecarly.com.br',
       whatsappNumber: b.whatsappNumber || '5585920015290',
-      city: 'FORTALEZA',
+      city: rawCity,
+      profilePhoto: sobre.profilePhoto || sobre.image || 'assets/images/carly-perfil.jpg',
       defaultWatermarkImg: 'assets/images/logo-light.png',
       googleReviewsUrl: gr.googleReviewFormUrl || b.googleReviewsUrl || 'https://search.google.com/local/writereview?placeid=ChIJjZQfEEERvikRuXdgNX7jr3s'
     };
@@ -481,7 +487,7 @@
         enabled: true,
         mode: 'image',          // 'image' | 'text'
         imageSrc: brand.defaultWatermarkImg || 'assets/images/logo-light.png',
-        text: 'INSTANTES DE CARLY',
+        text: (brand.studioName || 'INSTANTES DE CARLY').toUpperCase(),
         pattern: 'tiled',       // 'tiled' (grade diagonal) | 'center' (centralizada)
         opacity: 0.85,          // 0.15 a 0.85
         scale: 0.15,            // proporção em relação à foto
@@ -491,8 +497,8 @@
         enableMercadoPago: true,
         enableDirectPix: true,
         pixKey: '+5585985247276',
-        merchantName: 'Carliane Carvalho',
-        merchantCity: 'FORTALEZA'
+        merchantName: brand.founderName || 'Carliane Carvalho',
+        merchantCity: brand.city || 'FORTALEZA'
       },
       albums: []
     };

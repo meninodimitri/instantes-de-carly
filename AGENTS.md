@@ -39,11 +39,21 @@ Produto completo de **Portfólio Editorial + Sistema de Gestão de Conteúdo (CM
 
 4. **Área Privada do Cliente (`galeria.html`)**:
    - Plataforma exclusiva de Provas e Entrega Final para clientes (fluxo integrado Sineto Studio + Pixieset).
-   - Tela de acesso protegida por senha com estética editorial em *Glassmorphism* (fundo translúcido com `backdrop-filter: blur`, borda luminosa e foto do ensaio em tela cheia ao fundo).
-   - **Fase 1 (Seleção de Provas — Estilo Sineto)**: Filtros limpos (*Todas, Selecionadas, Não Selecionadas, Com Observação*), proteção de imagem com 3 níveis (Marca d'água autoral, Marca d'água + Baixa resolução, ou Marca d'água + Foco interativo ao passar o mouse/dedo), contador de franquia contratada e compra de fotos extras com cálculo automático e pagamento via Pix.
-   - **Fase 2 (Entrega Final em Alta — Estilo Pixieset)**: 16 capas autênticas do Pixieset (*Centro, Alegria com máscara JOY na foto, Esquerda, Romance split 50/50, Vintage polaroid, Moldura interna, Listra, Divisor central, Diário, Carimbo, Contorno, Clássico, Dividido, Rótulo, Borda passe-partout e Álbum*), personalização de tipografia, cores e grade, e download em alta resolução protegido por PIN opcional de 4 dígitos.
+   - Tela de acesso protegida por senha com estética editorial em *Glassmorphism* (fundo translúcido com `backdrop-filter: blur`, borda luminosa) utilizando a foto de capa do álbum ou a foto de perfil da fotógrafa (`SITE_DATA.sections.sobre.profilePhoto`) — nunca fotos aleatórias de outros clientes.
+   - **Fase 1 (Seleção de Provas — Estilo Sineto)**:
+     - Filtros limpos (*Todas, Selecionadas, Não Selecionadas, Com Observação*), 3 níveis de proteção de imagem (Marca d'água autoral, Marca d'água + Baixa resolução, ou Marca d'água + Foco no cursor) e anti-print.
+     - **Checkout Híbrido de Fotos Extras**: **Pix Direto ao Estúdio (0% de taxa)** exibido como **1ª opção padrão** e **Mercado Pago Automatizado (Pix + Cartão em até 12x)** como **2ª opção**, com fechamento automático do modal ao confirmar pagamento (`applyApprovedMercadoPagoPayment`) e exibição da grade de miniaturas das fotos selecionadas dentro do banner de confirmação.
+     - **Filtro "Só Escolhidas" & Trava Anti-Exclusão**: botão `★ Só Escolhidas (X)` no `/admin` que filtra as fotos do painel e sincroniza `showOnlySelected` com a galeria pública do cliente (`/galeria`), além de modal de confirmação obrigatório antes de excluir qualquer foto já selecionada pelo cliente.
+   - **Fase 2 (Entrega Final em Alta — Estilo Pixieset)**:
+     - 16 capas editoriais autênticas estilo Pixieset (incluindo *Retângulo Vertical / Moldura Fina* `moldura` e *Contorno*) com preview ao vivo reativo no `/admin`, personalização de tipografia, cores e grade, e download em alta resolução protegido por PIN opcional de 4 dígitos.
+     - **CTA de Avaliação no Google Meu Negócio**: botões no topo e no rodapé da Fase 2 apontando diretamente para o formulário de avaliação do estúdio (`https://search.google.com/local/writereview?placeid=...`).
 
-5. **Visualizador Mobile (`mobile-preview.html`)**, **Brandbook (`brand/index.html`)** e **Deploy Automatizado (`scripts/push-to-github.js`)**.
+5. **APIs Serverless & Sincronização Bidirecional em Tempo Real (`api/*`)**:
+   - Endpoints Vercel Serverless em `api/`: `selection.js`, `checkout.js`, `payments.js` e `webhooks/mercadopago.js`.
+   - Sincronização instantânea e bidirecional de seleções, comentários por foto (`photoComments`) e aprovações de pagamento sem exigir `Alt+F5` no painel `/admin` ou no site do cliente.
+   - **Isolamento Estrito por ID de Álbum**: utiliza `albumId` (`alb_*`) + timestamp `createdAt` + `deletedAlbumIds` (e limpeza via `DELETE` / `POST { action: 'purge' }` em `/api/selection`) para que um álbum excluído e recriado com o mesmo nome (`slug`) jamais herde pagamentos, seleções ou observações antigas.
+
+6. **Visualizador Mobile (`mobile-preview.html`)**, **Brandbook (`brand/index.html`)**, **Deploy Automatizado (`scripts/push-to-github.js`)** e **Suíte E2E (`tests/`, 31 testes Playwright)**.
 
 ---
 
@@ -55,9 +65,17 @@ Produto completo de **Portfólio Editorial + Sistema de Gestão de Conteúdo (CM
 ├── galeria.html                 # Área privada do cliente (Seleção Sineto + Entrega Pixieset)
 ├── mobile-preview.html          # Simulador responsivo em molduras reais
 ├── vercel.json                  # Clean URLs + Headers Zero-Cache para data.js
+├── playwright.config.js         # Configuração da suíte E2E Playwright (31 testes)
 ├── README.md                    # Documentação pública do repositório
 ├── AGENTS.md                    # Manual de arquitetura, White-Label e Regras de Tokens (auto-carregado)
 ├── CONTEXT_ECONOMY_GUIDE.md     # Guia complementar de engenharia de contexto
+│
+├── api/
+│   ├── checkout.js              # Criação de cobrança Pix/Cartão no Mercado Pago
+│   ├── payments.js              # Consulta ao vivo de status de pagamento no Mercado Pago
+│   ├── selection.js             # Sincronização/purge de seleções, comentários e Pix Direto
+│   └── webhooks/
+│       └── mercadopago.js       # Webhook HMAC-SHA256 de confirmação de pagamento
 │
 ├── assets/
 │   ├── css/
@@ -66,23 +84,29 @@ Produto completo de **Portfólio Editorial + Sistema de Gestão de Conteúdo (CM
 │   │   ├── galeria.css          # Design editorial da galeria privada, glassmorphism e 16 capas
 │   │   └── albums-admin.css     # Estilos da gestão de álbuns, proteções e mini-previews
 │   ├── js/
-│   │   ├── data.js              # BANCO DE DADOS LOCAL do Portfólio (Fonte Única da Verdade)
+│   │   ├── data.js              # BANCO DE DADOS LOCAL do Portfólio & Álbuns (Fonte Única da Verdade)
 │   │   ├── main.js              # Hidratação, vitrine de capas, filtros, lightbox e live-sync
 │   │   ├── admin.js             # Engine do CMS, otimizador DSLR, seletor de capas e GitHub API
-│   │   ├── albums-store.js      # Store local/IndexedDB de álbuns, cálculo de extras e marcas d'água
-│   │   ├── albums-admin.js      # Subpainel do CMS para gerenciar álbuns, capas Pixieset e convites
-│   │   └── galeria.js           # Engine da galeria do cliente: seleção, carrinho de extras e downloads
+│   │   ├── albums-store.js      # Store local/IndexedDB de álbuns, extras, marcas d'água e White-Label
+│   │   ├── albums-admin.js      # Subpainel do CMS para álbuns, capas Pixieset, filtros e convites
+│   │   └── galeria.js           # Engine da galeria do cliente: seleção, checkout duplo e downloads
 │   └── images/
 │       ├── real/                # Fotos iniciais curadas do portfólio
 │       ├── uploads/             # Fotos enviadas pelo cliente via Painel Admin
-│       ├── carly-perfil.jpg     # Foto de perfil do(a) fotógrafo(a)
+│       ├── carly-perfil.jpg     # Foto de perfil do(a) fotógrafo(a) (fallback neutro da galeria)
 │       ├── logo-dark.png        # Logo escura (header após scroll e fundos claros)
 │       └── logo-light.png       # Logo clara (hero, admin e capas escuras)
 │
 ├── brand/
 │   └── index.html               # Brandbook interativo da marca
-└── scripts/
-    └── push-to-github.js        # Motor de deploy via GitHub REST API (sem depender de Git CLI)
+├── scripts/
+│   └── push-to-github.js        # Motor de deploy via GitHub REST API (sem depender de Git CLI)
+└── tests/
+    ├── index.spec.js            # Testes E2E do portfólio público
+    ├── admin.spec.js            # Testes E2E do painel CMS e preview PC/Celular
+    ├── galeria.spec.js          # Testes E2E da área do cliente, capas e checkout
+    ├── verify-user-issues.spec.js # Regressões de pagamentos, comentários, filtro e isolamento
+    └── stress.spec.js           # Auditoria de console e stress responsivo
 ```
 
 ---
@@ -91,16 +115,19 @@ Produto completo de **Portfólio Editorial + Sistema de Gestão de Conteúdo (CM
 
 Toda informação editável vive em `window.SITE_DATA` dentro de `assets/js/data.js`.  
 **Nunca declare textos fixos ou dados de clientes direto no HTML/JS sem refletir no `data.js`**.
+Os módulos `AlbumsStore.getBrandDefaults()` (`assets/js/albums-store.js`), `admin.js` e `galeria.js` hidratam automaticamente nome do estúdio, fotógrafa, cidade, e-mail, foto de perfil (`sections.sobre.profilePhoto`) e link de avaliação Google a partir do `SITE_DATA`.
 
 Chaves oficiais de `SITE_DATA`:
 * `cmsVersion`: Timestamp numérico atualizado a cada publicação no `/admin` (controla o live-sync sem cache).
-* `brand`: `name`, `shortName`, `founder`, `role`, `tagline`, `whatsappNumber`, `whatsappFormatted`, `instagram`, `instagramUrl`, `location`, `googleReviewsUrl`, `googleRating`, `googleReviewsCount`.
-* `sections`: Textos e imagens das seções `hero`, `proposta`, `portfolio`, `metodologia`, `experiencias` (Formatos & Valores), `sobre`, `reviews` e `contato`.
+* `brand`: `name`, `shortName`, `founder`, `founderHighlight`, `role`, `tagline`, `whatsappNumber`, `whatsappFormatted`, `instagram`, `instagramUrl`, `email`, `location`, `googleReviewsUrl`, `googleRating`, `googleReviewsCount`.
+* `sections`: Textos e imagens das seções `hero`, `proposta`, `portfolio`, `metodologia`, `experiencias` (Formatos & Valores), `sobre` (`profilePhoto`), `reviews` e `contato`.
 * `heroSlides`: Fotos da capa principal (Hero) com `src`, `alt`, `focalPoint` e legenda.
 * `categories`: Categorias do portfólio (`id`, `label`, `subtitle`, `description`).
 * `portfolio`: Galeria de fotos (`id`, `title`, `category`, `categoryLabel`, `location`, `aspect`, `src`, `focalPoint`, `story`, `isAcervoCover`).
 * `packages`: Pacotes de investimento (`id`, `name`, `badge`, `featured`, `price`, `priceNote`, `duration`, `photosCount`, `deliveryTime`, `details`, `whatsappMsg`).
-* `googleReviews`: Depoimentos reais de clientes.
+* `googleReviews`: `googlePlaceId`, `googleProfileUrl`, `googleReviewFormUrl`, `featurableWidgetId` e lista `reviews`.
+* `clientAlbums`: Álbuns privados de clientes (`id`, `slug`, `clientName`, `title`, `phase`, `status`, `selectedIds`, `photoComments`, `paymentOrder`, `showOnlySelected`, `createdAt`, `updatedAt`, `photos`, `design`, etc.).
+* `clientWatermarkConfig` & `clientPaymentConfig`: Configurações globais de marca d'água (`mode`, `text`, `imageSrc`, `pattern`, `opacity`, `scale`) e pagamento (`enableMercadoPago`, `enableDirectPix`, `pixKey`, `merchantName`, `merchantCity`). (No armazenamento local `AlbumsStore`, `deletedAlbumIds` garante que IDs excluídos não sejam restaurados.)
 
 ---
 
@@ -193,26 +220,32 @@ Tokens de saída (output) custam de 3x a 5x mais caro que tokens de entrada e el
 
 Quando Yan pedir: *"Esse projeto agora é para o(a) fotógrafo(a) [Nome]"*, siga este checklist completo:
 
-### Passo 1: Dados da Marca & SEO (`assets/js/data.js` + `index.html`)
-1. Em `assets/js/data.js`, atualize `brand`, `sections`, `packages` e `googleReviews` do novo cliente (o painel `/admin` já assume automaticamente o nome e a logo definidos em `SITE_DATA.brand`).
-2. Em `index.html` (linhas 8–25), atualize `<title>`, `<meta name="description">`, `<meta name="keywords">`, `<meta name="author">`, `<meta property="og:*">` e o `<link rel="preload" as="image">` da primeira foto do Hero.
+### Passo 1: Dados da Marca, Google Reviews, Pagamentos & SEO (`assets/js/data.js` + `index.html`)
+1. Em `assets/js/data.js`, atualize `brand`, `sections`, `packages`, `googleReviews` (`googlePlaceId`, `googleProfileUrl`, `googleReviewFormUrl`: `https://search.google.com/local/writereview?placeid=SEU_PLACE_ID` e `brand.googleReviewsUrl`), `clientPaymentConfig` (`pixKey`, `merchantName`, `merchantCity`) e `clientWatermarkConfig` (`text`, `imageSrc`).
+   - Os módulos `AlbumsStore.getBrandDefaults()`, `/admin` e `/galeria` hidratam automaticamente nome do estúdio, fotógrafa, cidade, e-mail, foto de perfil (`sections.sobre.profilePhoto`), marca d'água e link de avaliação Google a partir de `SITE_DATA`.
+2. Em `index.html` (linhas 8–25) e `galeria.html` (`<title>` e texto `alt` das imagens iniciais), atualize `<title>`, `<meta name="description">`, `<meta name="keywords">`, `<meta name="author">`, `<meta property="og:*">` e o `<link rel="preload" as="image">` da primeira foto do Hero.
 3. Se o cliente contratar Brandbook personalizado, atualize `brand/index.html`.
 
 ### Passo 2: Paleta de Cores & Logos (`assets/css/style.css` + `assets/images/`)
 1. Em `assets/css/style.css` (`:root`), ajuste `--bg-primary`, `--bg-surface`, `--color-gold`, `--color-gold-dark`, `--color-blue`, `--color-blue-dark` e `--text-primary`.
-2. Substitua `assets/images/logo-light.png`, `assets/images/logo-dark.png` e a foto de perfil da seção Sobre (atualizando o caminho em `SITE_DATA.sections.sobre.image`).
+2. Substitua `assets/images/logo-light.png`, `assets/images/logo-dark.png` e a foto de perfil da seção Sobre (atualizando o caminho em `SITE_DATA.sections.sobre.profilePhoto`, usada também como fundo neutro da tela de acesso do `/galeria`).
 
-### Passo 3: Acervo Inicial de Fotos
+### Passo 3: Acervo Inicial de Fotos & Galeria Privada Limpa
 1. Limpe as fotos do cliente anterior em `assets/images/real/` e `assets/images/uploads/`, adicionando as fotos iniciais do novo cliente (ou deixe 1 foto por categoria para ele subir o resto pelo `/admin`).
 2. Em `SITE_DATA.categories` e `SITE_DATA.portfolio`, defina as categorias iniciais e marque `isAcervoCover: true` na foto-capa de cada categoria.
+3. Em `SITE_DATA.clientAlbums`, defina `[]` (e limpe eventual estado local com `deletedAlbumIds: []`) para entregar a área de álbuns do cliente completamente zerada.
 
-### Passo 4: Criar Repositório no GitHub & Deploy na Vercel
+### Passo 4: Criar Repositório no GitHub, Deploy na Vercel & Variáveis Serverless
 1. Crie um repositório vazio no GitHub (ex: `meninodimitri/nome-do-cliente`).
-2. Envie o projeto (garantindo que `vercel.json` vá junto para ativar o Zero-Cache):
+2. Envie o projeto (garantindo que `vercel.json` vá junto para ativar o Zero-Cache; `playwright-report` e `test-results` já são ignorados pelo script):
    ```powershell
    node scripts/push-to-github.js --repo="meninodimitri/nome-do-cliente" --token="SEU_GITHUB_TOKEN" --branch="main"
    ```
-3. Na Vercel: **Add New... > Project** → importe o repositório → **Deploy**.
+3. Na Vercel: **Add New... > Project** → importe o repositório → configure as variáveis de ambiente opcionais conforme os recursos ativos:
+   - `GITHUB_TOKEN`: PAT com permissão de escrita para sincronização automática de `/api/selection` (o repositório é detectado automaticamente via `VERCEL_GIT_REPO_OWNER`/`VERCEL_GIT_REPO_SLUG`, com fallback configurável via `GITHUB_REPO`).
+   - `MP_ACCESS_TOKEN` e `MP_WEBHOOK_SECRET`: para checkout automatizado via Mercado Pago em `/api/checkout`, `/api/payments` e `/api/webhooks/mercadopago` (opcional caso use apenas Pix Direto).
+   - `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY`: opcionais caso habilite persistência em banco Supabase.
+4. Clique em **Deploy**.
 
 ### Passo 5: Conectar o Painel Admin (`/admin`)
 Acesse `https://dominio-do-cliente.com.br/admin`, informe o repositório (`meninodimitri/nome-do-cliente`) e o GitHub Personal Access Token (PAT com permissão `repo` / `Contents: Read and write`), marcando **Lembrar neste aparelho**.
