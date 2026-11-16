@@ -5,7 +5,7 @@
  */
 
 const SITE_DATA = {
-  "cmsVersion": "2026-11-15T23:27:05.985Z",
+  "cmsVersion": "2026-11-16T15:14:07.055Z",
   "brand": {
     "name": "Instantes de Carly",
     "founder": "Carliane Carvalho (Carly)",
@@ -66,7 +66,7 @@ const SITE_DATA = {
         {
           "num": "III.",
           "title": "Luz Natural de Fortaleza",
-          "description": "Sessões na Ponte dos Ingleses, praias, parques ou no aconchego do seu lar, banhadas pela luz dourada cearense."
+          "description": "Sessões na Ponte dos Ingleses, praias, parques ou no aconchego do seu lar."
         },
         {
           "num": "IV.",
@@ -104,7 +104,7 @@ const SITE_DATA = {
         {
           "num": "03",
           "title": "Atenção aos Gestos Silenciosos",
-          "description": "O riso que escapa entre uma frase e outra, o vento no cabelo, as mãos entrelaçadas e os detalhes preparados com amor — é ali que a memória verdadeira mora."
+          "description": "O riso que escapa entre uma frase e outra, o vento no cabelo, as mãos entrelaçadas e os detalhes preparados com amor, é ali que a memória verdadeira mora."
         }
       ],
       "mainPhoto": "assets/images/real/IMG_2305.jpg",
@@ -136,9 +136,9 @@ const SITE_DATA = {
       "profilePhoto": "assets/images/carly-perfil.jpg",
       "profilePhotoFocal": "center 20%",
       "badgeName": "Carliane Carvalho (Carly)",
-      "badgeRole": "Fotógrafa & Estudante de Psicologia em Fortaleza, Ceará.",
+      "badgeRole": "Fotógrafa & Bacharelando em Psicologia — Fortaleza, Ceará.",
       "paragraphs": [
-        "Prazer, eu sou a Carly. Sou fotógrafa e estudante de Psicologia — duas vocações que se encontram na minha curiosidade genuína pelas pessoas, pelas suas histórias e pelos detalhes sutis que tornam cada fase única.",
+        "Prazer, eu sou a Carly. Sou fotógrafa e estudante de Psicologia, duas vocações que se encontram na minha curiosidade genuína pelas pessoas, pelas suas histórias e pelos detalhes sutis que tornam cada fase única.",
         "A vida acontece enquanto estamos ocupados vivendo. Entre compromissos e dias que parecem iguais, muitos momentos preciosos passam sem que a gente perceba o quanto significam: uma gestação que chega ao fim, um abraço que muda de forma, uma nova fase que começa. Não podemos parar o tempo, mas podemos escolher olhar com mais carinho para aquilo que estamos vivendo hoje.",
         "A escuta da Psicologia me ensinou a acolher suas inseguranças, respeitar seu ritmo e orientar cada detalhe com calma. Começamos conversando e, no nosso tempo, o afeto real ganha espaço para virar fotografia."
       ],
@@ -726,7 +726,8 @@ const SITE_DATA = {
       "showOnlySelected": true,
       "coverKicker": "GALERIA OFICIAL EM ALTA RESOLUÇÃO",
       "coverAuthor": "Carliane Carvalho",
-      "updatedAt": 1794785179336
+      "updatedAt": 1794785179336,
+      "createdAt": "2026-11-15T23:22:47.762Z"
     }
   ],
   "clientWatermarkConfig": {
@@ -737,7 +738,7 @@ const SITE_DATA = {
     "pattern": "tiled",
     "opacity": 0.85,
     "scale": 0.15,
-    "updatedAt": 1794784702339
+    "updatedAt": 1794842047054
   },
   "clientPaymentConfig": {
     "enableMercadoPago": true,
