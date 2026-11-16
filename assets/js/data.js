@@ -5,7 +5,7 @@
  */
 
 const SITE_DATA = {
-  "cmsVersion": "2026-11-16T16:20:21.840Z",
+  "cmsVersion": "2026-11-16T16:28:01.682Z",
   "brand": {
     "name": "Instantes de Carly",
     "founder": "Carliane Carvalho (Carly)",
@@ -350,6 +350,294 @@ const SITE_DATA = {
     }
   ],
   "portfolio": [
+    {
+      "id": 1794846349366,
+      "title": "Ensaio de Natal — Noel Camping",
+      "category": "natal",
+      "categoryName": "Natal",
+      "aspect": "landscape",
+      "image": "assets/images/uploads/foto-20261116162801-01.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza.",
+      "isAcervoCover": false
+    },
+    {
+      "id": 1794846346832,
+      "title": "2",
+      "category": "natal",
+      "categoryName": "Natal",
+      "aspect": "landscape",
+      "image": "assets/images/uploads/foto-20261116162801-02.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza.",
+      "isAcervoCover": false
+    },
+    {
+      "id": 1794846347764,
+      "title": "3",
+      "category": "natal",
+      "categoryName": "Natal",
+      "aspect": "portrait",
+      "image": "assets/images/uploads/foto-20261116162801-03.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza.",
+      "isAcervoCover": false
+    },
+    {
+      "id": 1794846346455,
+      "title": "4",
+      "category": "natal",
+      "categoryName": "Natal",
+      "aspect": "portrait",
+      "image": "assets/images/uploads/foto-20261116162801-04.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza.",
+      "isAcervoCover": false
+    },
+    {
+      "id": 1794846350463,
+      "title": "5",
+      "category": "natal",
+      "categoryName": "Natal",
+      "aspect": "portrait",
+      "image": "assets/images/uploads/foto-20261116162801-05.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza.",
+      "isAcervoCover": false
+    },
+    {
+      "id": 1794846346807,
+      "title": "6",
+      "category": "natal",
+      "categoryName": "Natal",
+      "aspect": "landscape",
+      "image": "assets/images/uploads/foto-20261116162801-06.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza.",
+      "isAcervoCover": false
+    },
+    {
+      "id": 1794846344564,
+      "title": "7",
+      "category": "natal",
+      "categoryName": "Natal",
+      "aspect": "landscape",
+      "image": "assets/images/uploads/foto-20261116162801-07.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza.",
+      "isAcervoCover": false
+    },
+    {
+      "id": 1794846350506,
+      "title": "8",
+      "category": "natal",
+      "categoryName": "Natal",
+      "aspect": "portrait",
+      "image": "assets/images/uploads/foto-20261116162801-08.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza.",
+      "isAcervoCover": false
+    },
+    {
+      "id": 1794846341828,
+      "title": "9",
+      "category": "natal",
+      "categoryName": "Natal",
+      "aspect": "portrait",
+      "image": "assets/images/uploads/foto-20261116162801-09.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza.",
+      "isAcervoCover": false
+    },
+    {
+      "id": 1794846349440,
+      "title": "10",
+      "category": "natal",
+      "categoryName": "Natal",
+      "aspect": "portrait",
+      "image": "assets/images/uploads/foto-20261116162801-10.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza.",
+      "isAcervoCover": false
+    },
+    {
+      "id": 1794846349874,
+      "title": "11",
+      "category": "natal",
+      "categoryName": "Natal",
+      "aspect": "landscape",
+      "image": "assets/images/uploads/foto-20261116162801-11.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza.",
+      "isAcervoCover": false
+    },
+    {
+      "id": 1794846342275,
+      "title": "12",
+      "category": "natal",
+      "categoryName": "Natal",
+      "aspect": "landscape",
+      "image": "assets/images/uploads/foto-20261116162801-12.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza.",
+      "isAcervoCover": false
+    },
+    {
+      "id": 1794846342276,
+      "title": "13",
+      "category": "natal",
+      "categoryName": "Natal",
+      "aspect": "landscape",
+      "image": "assets/images/uploads/foto-20261116162801-13.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza.",
+      "isAcervoCover": false
+    },
+    {
+      "id": 1794846345653,
+      "title": "14",
+      "category": "natal",
+      "categoryName": "Natal",
+      "aspect": "portrait",
+      "image": "assets/images/uploads/foto-20261116162801-14.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza.",
+      "isAcervoCover": false
+    },
+    {
+      "id": 1794846348056,
+      "title": "15",
+      "category": "natal",
+      "categoryName": "Natal",
+      "aspect": "portrait",
+      "image": "assets/images/uploads/foto-20261116162801-15.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza.",
+      "isAcervoCover": false
+    },
+    {
+      "id": 1794846347782,
+      "title": "16",
+      "category": "natal",
+      "categoryName": "Natal",
+      "aspect": "landscape",
+      "image": "assets/images/uploads/foto-20261116162801-16.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza.",
+      "isAcervoCover": false
+    },
+    {
+      "id": 1794846342786,
+      "title": "17",
+      "category": "natal",
+      "categoryName": "Natal",
+      "aspect": "landscape",
+      "image": "assets/images/uploads/foto-20261116162801-17.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza.",
+      "isAcervoCover": false
+    },
+    {
+      "id": 1794846351544,
+      "title": "18",
+      "category": "natal",
+      "categoryName": "Natal",
+      "aspect": "portrait",
+      "image": "assets/images/uploads/foto-20261116162801-18.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza.",
+      "isAcervoCover": false
+    },
+    {
+      "id": 1794846345871,
+      "title": "19",
+      "category": "natal",
+      "categoryName": "Natal",
+      "aspect": "portrait",
+      "image": "assets/images/uploads/foto-20261116162801-19.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza.",
+      "isAcervoCover": false
+    },
+    {
+      "id": 1794846350341,
+      "title": "20",
+      "category": "natal",
+      "categoryName": "Natal",
+      "aspect": "portrait",
+      "image": "assets/images/uploads/foto-20261116162801-20.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza.",
+      "isAcervoCover": false
+    },
+    {
+      "id": 1794846350057,
+      "title": "21",
+      "category": "natal",
+      "categoryName": "Natal",
+      "aspect": "landscape",
+      "image": "assets/images/uploads/foto-20261116162801-21.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza.",
+      "isAcervoCover": false
+    },
+    {
+      "id": 1794846344859,
+      "title": "22",
+      "category": "natal",
+      "categoryName": "Natal",
+      "aspect": "landscape",
+      "image": "assets/images/uploads/foto-20261116162801-22.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza.",
+      "isAcervoCover": false
+    },
+    {
+      "id": 1794846348382,
+      "title": "23",
+      "category": "natal",
+      "categoryName": "Natal",
+      "aspect": "landscape",
+      "image": "assets/images/uploads/foto-20261116162801-23.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza.",
+      "isAcervoCover": true
+    },
+    {
+      "id": 1794846346373,
+      "title": "24",
+      "category": "natal",
+      "categoryName": "Natal",
+      "aspect": "landscape",
+      "image": "assets/images/uploads/foto-20261116162801-24.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza.",
+      "isAcervoCover": false
+    },
     {
       "id": 10,
       "title": "Coração a Quatro Mãos",
@@ -763,6 +1051,10 @@ const SITE_DATA = {
     {
       "id": "pets",
       "name": "Pets"
+    },
+    {
+      "id": "natal",
+      "name": "Natal"
     }
   ],
   "googleReviews": {
