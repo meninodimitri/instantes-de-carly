@@ -5,7 +5,7 @@
  */
 
 const SITE_DATA = {
-  "cmsVersion": "2026-11-16T15:14:07.055Z",
+  "cmsVersion": "2026-11-16T16:20:21.840Z",
   "brand": {
     "name": "Instantes de Carly",
     "founder": "Carliane Carvalho (Carly)",
@@ -50,7 +50,7 @@ const SITE_DATA = {
       "primaryPhotoFocal": "center 25%",
       "secondaryPhoto": "assets/images/real/IMG_6438.jpg",
       "secondaryPhotoFocal": "center 45%",
-      "captionLeft": "FIG. 01 — A ESPERA DE AIMÊ",
+      "captionLeft": "FIG. 01 — A ESPERA DE  UM BEBÊ",
       "captionRight": "PRAIA DE IRACEMA",
       "pillars": [
         {
@@ -173,7 +173,7 @@ const SITE_DATA = {
       "tag": "Contato",
       "titleLine1": "Qual história você",
       "titleHighlight": "quer guardar?",
-      "lead": "Me conte um pouco sobre o momento que você deseja registrar. Conversamos pelo WhatsApp para planejar horário da luz, local e cada detalhe no seu ritmo.",
+      "lead": "Me conte um pouco sobre o momento que você deseja registrar. Conversamos pelo WhatsApp para planejar horário, local e cada detalhe no seu ritmo.",
       "noteTitle": "Nota sobre locação e horário:",
       "noteText": "Se você ainda não tem data ou lugar definidos, fique tranquilo(a). Sugerimos juntos os melhores cantos de Fortaleza (Ponte dos Ingleses, praias, parques ou em casa) de acordo com a luz dourada da tarde.",
       "formKicker": "PRÉ-AGENDAMENTO ONLINE",
@@ -351,6 +351,195 @@ const SITE_DATA = {
   ],
   "portfolio": [
     {
+      "id": 10,
+      "title": "Coração a Quatro Mãos",
+      "category": "gestantes",
+      "categoryName": "Gestantes",
+      "aspect": "portrait",
+      "image": "assets/images/real/IMG_6438.jpg",
+      "objectPosition": "center 25%",
+      "location": "Praia de Iracema",
+      "caption": "Pequenos detalhes contam grandes histórias: o encontro das mãos que já acolhem quem está chegando.",
+      "isAcervoCover": true
+    },
+    {
+      "id": 8,
+      "title": "Mikely & o Mar de Fortaleza",
+      "category": "gestantes",
+      "categoryName": "Gestantes",
+      "aspect": "portrait",
+      "image": "assets/images/real/IMG_6409.jpg",
+      "objectPosition": "center 25%",
+      "location": "Praia de Iracema",
+      "caption": "A serenidade de sentir a vida florescer banhada pela luz da manhã e pelo som das ondas.",
+      "isAcervoCover": false
+    },
+    {
+      "id": 3,
+      "title": "A Espera de uma bebê",
+      "category": "gestantes",
+      "categoryName": "Gestantes",
+      "aspect": "portrait",
+      "image": "assets/images/real/IMG_6297.jpg",
+      "objectPosition": "center 25%",
+      "location": "Beira-Mar, Fortaleza",
+      "caption": "Antes mesmo de conhecer o rosto, a voz e o jeitinho, já existe uma história inteira sendo construída no amor.",
+      "isAcervoCover": false
+    },
+    {
+      "id": 9,
+      "title": "Ensaio individual ",
+      "category": "retratos",
+      "categoryName": "Retratos",
+      "aspect": "portrait",
+      "image": "assets/images/real/IMG_2046.jpg",
+      "objectPosition": "center 51%",
+      "location": "Ponte dos Ingleses",
+      "caption": "A arquitetura histórica da orla emoldurando a expressão autêntica e serena.",
+      "isAcervoCover": true
+    },
+    {
+      "id": 1794845678727,
+      "title": "",
+      "category": "retratos",
+      "categoryName": "Retratos",
+      "aspect": "portrait",
+      "image": "assets/images/uploads/foto-20261116162021-01.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza.",
+      "isAcervoCover": false
+    },
+    {
+      "id": 1794845679876,
+      "title": "",
+      "category": "retratos",
+      "categoryName": "Retratos",
+      "aspect": "portrait",
+      "image": "assets/images/uploads/foto-20261116162021-02.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "",
+      "isAcervoCover": false
+    },
+    {
+      "id": 1794845686798,
+      "title": "",
+      "category": "retratos",
+      "categoryName": "Retratos",
+      "aspect": "portrait",
+      "image": "assets/images/uploads/foto-20261116162021-03.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "",
+      "isAcervoCover": false
+    },
+    {
+      "id": 1794845680050,
+      "title": "",
+      "category": "retratos",
+      "categoryName": "Retratos",
+      "aspect": "portrait",
+      "image": "assets/images/uploads/foto-20261116162021-04.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "",
+      "isAcervoCover": false
+    },
+    {
+      "id": 1794845684056,
+      "title": "",
+      "category": "retratos",
+      "categoryName": "Retratos",
+      "aspect": "portrait",
+      "image": "assets/images/uploads/foto-20261116162021-05.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "",
+      "isAcervoCover": false
+    },
+    {
+      "id": 13,
+      "title": "Chá de Fraldas",
+      "category": "festas",
+      "categoryName": "Festas & Celebrações",
+      "aspect": "portrait",
+      "image": "assets/images/real/23-IMG_7341.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "Que nunca falte aconchego e ternura nessa doce espera. Cada detalhe preparado com amor pela família.",
+      "isAcervoCover": true
+    },
+    {
+      "id": 1794845111210,
+      "title": "Chá de Fraldas",
+      "category": "festas",
+      "categoryName": "Festas & Casamentos",
+      "aspect": "landscape",
+      "image": "assets/images/uploads/foto-20261116162021-06.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza."
+    },
+    {
+      "id": 1794845115526,
+      "title": "Chá de Fraldas",
+      "category": "festas",
+      "categoryName": "Festas & Casamentos",
+      "aspect": "portrait",
+      "image": "assets/images/uploads/foto-20261116162021-07.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza."
+    },
+    {
+      "id": 1794845109838,
+      "title": "Chá de Fraldas",
+      "category": "festas",
+      "categoryName": "Festas & Casamentos",
+      "aspect": "portrait",
+      "image": "assets/images/uploads/foto-20261116162021-08.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza."
+    },
+    {
+      "id": 1794844648591,
+      "title": "Votos, Fé & Alianças",
+      "category": "festas",
+      "categoryName": "Festas & Casamentos",
+      "aspect": "portrait",
+      "image": "assets/images/uploads/foto-20261116162021-09.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza.",
+      "isAcervoCover": false
+    },
+    {
+      "id": 1794844645910,
+      "title": "Votos, Fé & Alianças",
+      "category": "festas",
+      "categoryName": "Festas & Casamentos",
+      "aspect": "portrait",
+      "image": "assets/images/uploads/foto-20261116162021-10.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza.",
+      "isAcervoCover": false
+    },
+    {
+      "id": 1794844645963,
+      "title": "Votos, Fé & Alianças",
+      "category": "festas",
+      "categoryName": "Festas & Casamentos",
+      "aspect": "portrait",
+      "image": "assets/images/uploads/foto-20261116162021-11.jpg",
+      "objectPosition": "center 25%",
+      "location": "Fortaleza, Ceará",
+      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza.",
+      "isAcervoCover": false
+    },
+    {
       "id": 1,
       "title": "Abraço na Golden Hour",
       "category": "casais",
@@ -364,7 +553,7 @@ const SITE_DATA = {
     },
     {
       "id": 2,
-      "title": "Pôr do Sol no Píer",
+      "title": "Pôr do Sol na Ponte dos Ingleses",
       "category": "15anos",
       "categoryName": "15 Anos",
       "aspect": "landscape",
@@ -375,15 +564,16 @@ const SITE_DATA = {
       "isAcervoCover": true
     },
     {
-      "id": 3,
-      "title": "A Espera de Aimê",
+      "id": 1794845921759,
+      "title": "",
       "category": "gestantes",
-      "categoryName": "Gestantes",
-      "aspect": "portrait",
-      "image": "assets/images/real/IMG_6297.jpg",
+      "categoryName": "Gestantes & Maternidade",
+      "aspect": "landscape",
+      "image": "assets/images/uploads/foto-20261116162021-12.jpg",
       "objectPosition": "center 25%",
-      "location": "Beira-Mar, Fortaleza",
-      "caption": "Antes mesmo de conhecer o rosto, a voz e o jeitinho, já existe uma história inteira sendo construída no amor."
+      "location": "Fortaleza, Ceará",
+      "caption": "",
+      "isAcervoCover": false
     },
     {
       "id": 4,
@@ -434,41 +624,32 @@ const SITE_DATA = {
       "isAcervoCover": true
     },
     {
-      "id": 8,
-      "title": "Mikely & o Mar de Fortaleza",
+      "id": 1794845917214,
+      "title": "",
       "category": "gestantes",
-      "categoryName": "Gestantes",
+      "categoryName": "Gestantes & Maternidade",
       "aspect": "portrait",
-      "image": "assets/images/real/IMG_6409.jpg",
+      "image": "assets/images/uploads/foto-20261116162021-13.jpg",
       "objectPosition": "center 25%",
-      "location": "Praia de Iracema",
-      "caption": "A serenidade de sentir a vida florescer banhada pela luz da manhã e pelo som das ondas."
+      "location": "Fortaleza, Ceará",
+      "caption": "",
+      "isAcervoCover": false
     },
     {
-      "id": 9,
-      "title": "Sob os Arcos do Píer",
-      "category": "retratos",
-      "categoryName": "Retratos",
-      "aspect": "portrait",
-      "image": "assets/images/real/IMG_2046.jpg",
-      "objectPosition": "center 51%",
-      "location": "Ponte dos Ingleses",
-      "caption": "A arquitetura histórica da orla emoldurando a expressão autêntica e serena."
-    },
-    {
-      "id": 10,
-      "title": "Coração a Quatro Mãos",
+      "id": 1794845916107,
+      "title": "",
       "category": "gestantes",
-      "categoryName": "Gestantes",
+      "categoryName": "Gestantes & Maternidade",
       "aspect": "portrait",
-      "image": "assets/images/real/IMG_6438.jpg",
+      "image": "assets/images/uploads/foto-20261116162021-14.jpg",
       "objectPosition": "center 25%",
-      "location": "Praia de Iracema",
-      "caption": "Pequenos detalhes contam grandes histórias: o encontro das mãos que já acolhem quem está chegando."
+      "location": "Fortaleza, Ceará",
+      "caption": "",
+      "isAcervoCover": false
     },
     {
       "id": 11,
-      "title": "Tarde Dourada a Dois",
+      "title": "Tarde a Dois",
       "category": "casais",
       "categoryName": "Casais",
       "aspect": "landscape",
@@ -480,25 +661,27 @@ const SITE_DATA = {
     },
     {
       "id": 12,
-      "title": "Luz & Autenticidade",
+      "title": "",
       "category": "retratos",
       "categoryName": "Retratos",
       "aspect": "landscape",
       "image": "assets/images/real/IMG_1943.jpg",
       "objectPosition": "center 25%",
       "location": "Ponte dos Ingleses",
-      "caption": "Registros sinceros de quem somos, banhados pelo azul do mar de Fortaleza."
+      "caption": "",
+      "isAcervoCover": false
     },
     {
-      "id": 13,
-      "title": "Chá de Fraldas da Ysla",
+      "id": 1794844648397,
+      "title": "Votos, Fé & Alianças",
       "category": "festas",
-      "categoryName": "Festas & Celebrações",
+      "categoryName": "Festas & Casamentos",
       "aspect": "portrait",
-      "image": "assets/images/real/23-IMG_7341.jpg",
+      "image": "assets/images/uploads/foto-20261116162021-15.jpg",
       "objectPosition": "center 25%",
       "location": "Fortaleza, Ceará",
-      "caption": "Que nunca falte aconchego e ternura nessa doce espera. Cada detalhe preparado com amor pela família."
+      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza.",
+      "isAcervoCover": false
     },
     {
       "id": 14,
@@ -509,7 +692,8 @@ const SITE_DATA = {
       "image": "assets/images/real/IMG_3216.jpg",
       "objectPosition": "center 25%",
       "location": "Cerimônia Intimista",
-      "caption": "As mãos que se unem, o terço entrelaçado às flores e a promessa silenciosa guardada em imagem."
+      "caption": "As mãos que se unem, o terço entrelaçado às flores e a promessa silenciosa guardada em imagem.",
+      "isAcervoCover": false
     },
     {
       "id": 15,
@@ -532,11 +716,12 @@ const SITE_DATA = {
       "image": "assets/images/real/IMG_2979.jpg",
       "objectPosition": "center 25%",
       "location": "Casamento Intimista",
-      "caption": "O riso espontâneo que transborda no meio da cerimônia — quando a felicidade é compartilhada."
+      "caption": "O riso espontâneo que transborda no meio da cerimônia — quando a felicidade é compartilhada.",
+      "isAcervoCover": false
     },
     {
       "id": 17,
-      "title": "Afeto Sem Palavras",
+      "title": "Patinhas em Foco",
       "category": "pets",
       "categoryName": "Pets & Família",
       "aspect": "landscape",
@@ -738,7 +923,7 @@ const SITE_DATA = {
     "pattern": "tiled",
     "opacity": 0.85,
     "scale": 0.15,
-    "updatedAt": 1794842047054
+    "updatedAt": 1794846021839
   },
   "clientPaymentConfig": {
     "enableMercadoPago": true,
