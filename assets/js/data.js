@@ -5,7 +5,7 @@
  */
 
 const SITE_DATA = {
-  "cmsVersion": "2026-11-16T16:41:25.227Z",
+  "cmsVersion": "2026-11-16T16:43:10.648Z",
   "brand": {
     "name": "Instantes de Carly",
     "founder": "Carliane Carvalho (Carly)",
@@ -186,6 +186,16 @@ const SITE_DATA = {
     }
   },
   "heroSlides": [
+    {
+      "id": "08",
+      "image": "assets/images/uploads/foto-20261116162801-12.jpg",
+      "category": "Ensaio de Natal — Noel Camping",
+      "shortLabel": "Ensaio de Natal — Noel Camping",
+      "title": "Ensaio de Natal — Noel Camping",
+      "location": "Fortaleza, Ceará",
+      "quote": "“Registros conduzidos com calma, escuta e luz natural.”",
+      "objectPosition": "center 35%"
+    },
     {
       "id": "01",
       "image": "assets/images/real/IMG_1186.jpg",
@@ -1203,7 +1213,7 @@ const SITE_DATA = {
       "showOnlySelected": true,
       "coverKicker": "GALERIA OFICIAL EM ALTA RESOLUÇÃO",
       "coverAuthor": "Carliane Carvalho",
-      "updatedAt": 1794847191405,
+      "updatedAt": 1794847285227,
       "createdAt": "2026-11-15T23:22:47.762Z"
     }
   ],
