@@ -5,7 +5,7 @@
  */
 
 const SITE_DATA = {
-  "cmsVersion": "2026-11-16T16:43:10.648Z",
+  "cmsVersion": "2026-11-16T16:44:39.186Z",
   "brand": {
     "name": "Instantes de Carly",
     "founder": "Carliane Carvalho (Carly)",
@@ -1213,7 +1213,7 @@ const SITE_DATA = {
       "showOnlySelected": true,
       "coverKicker": "GALERIA OFICIAL EM ALTA RESOLUÇÃO",
       "coverAuthor": "Carliane Carvalho",
-      "updatedAt": 1794847285227,
+      "updatedAt": 1794847390648,
       "createdAt": "2026-11-15T23:22:47.762Z"
     }
   ],
