@@ -5,7 +5,7 @@
  */
 
 const SITE_DATA = {
-  "cmsVersion": "2026-11-16T16:37:39.657Z",
+  "cmsVersion": "2026-11-16T16:39:51.405Z",
   "brand": {
     "name": "Instantes de Carly",
     "founder": "Carliane Carvalho (Carly)",
@@ -640,7 +640,7 @@ const SITE_DATA = {
     },
     {
       "id": 10,
-      "title": "Coração a Quatro Mãos",
+      "title": "Amor Maior",
       "category": "gestantes",
       "categoryName": "Gestantes",
       "aspect": "portrait",
@@ -652,7 +652,7 @@ const SITE_DATA = {
     },
     {
       "id": 8,
-      "title": "Mikely & o Mar de Fortaleza",
+      "title": "",
       "category": "gestantes",
       "categoryName": "Gestantes",
       "aspect": "portrait",
@@ -664,7 +664,7 @@ const SITE_DATA = {
     },
     {
       "id": 3,
-      "title": "A Espera de uma bebê",
+      "title": "",
       "category": "gestantes",
       "categoryName": "Gestantes",
       "aspect": "portrait",
@@ -1203,7 +1203,7 @@ const SITE_DATA = {
       "showOnlySelected": true,
       "coverKicker": "GALERIA OFICIAL EM ALTA RESOLUÇÃO",
       "coverAuthor": "Carliane Carvalho",
-      "updatedAt": 1794785179336,
+      "updatedAt": 1794847059657,
       "createdAt": "2026-11-15T23:22:47.762Z"
     }
   ],
