@@ -5,7 +5,7 @@
  */
 
 const SITE_DATA = {
-  "cmsVersion": "2026-11-16T16:39:51.405Z",
+  "cmsVersion": "2026-11-16T16:41:25.227Z",
   "brand": {
     "name": "Instantes de Carly",
     "founder": "Carliane Carvalho (Carly)",
@@ -43,7 +43,7 @@ const SITE_DATA = {
       "pullquote": "“Acredito que as experiências que vivemos merecem ser reconhecidas com respeito, tempo e acolhimento.”",
       "paragraphs": [
         "O Instantes de Carly nasceu do encontro entre a prática fotográfica e o meu olhar como estudante de Psicologia em Fortaleza.",
-        "As fotografias não fazem o tempo voltar e não pretendem substituir as experiências vividas. Entretanto, funcionam como pistas preciosas de memória — pequenos portais táteis para recuperar lembranças, compartilhar histórias e revisitar quem dividia a vida conosco.",
+        "As fotografias não fazem o tempo voltar e não pretendem substituir as experiências vividas. Entretanto, funcionam como pistas preciosas de memória, pequenos portais táteis para recuperar lembranças, compartilhar histórias e revisitar quem dividia a vida conosco.",
         "Por isso, fotografo com atenção às pessoas e às relações: valorizando não apenas o resultado da imagem, mas o conforto e a tranquilidade de viver o momento diante da câmera."
       ],
       "primaryPhoto": "assets/images/real/IMG_6297.jpg",
@@ -1203,7 +1203,7 @@ const SITE_DATA = {
       "showOnlySelected": true,
       "coverKicker": "GALERIA OFICIAL EM ALTA RESOLUÇÃO",
       "coverAuthor": "Carliane Carvalho",
-      "updatedAt": 1794847059657,
+      "updatedAt": 1794847191405,
       "createdAt": "2026-11-15T23:22:47.762Z"
     }
   ],
