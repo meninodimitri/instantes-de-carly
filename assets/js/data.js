@@ -5,7 +5,7 @@
  */
 
 const SITE_DATA = {
-  "cmsVersion": "2026-11-17T00:07:38.850Z",
+  "cmsVersion": "2026-11-17T01:18:35.299Z",
   "brand": {
     "name": "Instantes de Carly",
     "founder": "Carliane Carvalho (Carly)",
@@ -595,6 +595,231 @@ const SITE_DATA = {
   },
   "clientAlbums": [
     {
+      "id": "alb_1794877794021",
+      "slug": "amigos",
+      "clientName": "Amigos",
+      "title": "Ensaio de Natal",
+      "subtitle": "FORTALEZA, CEARÁ",
+      "phase": "delivery",
+      "status": "delivered",
+      "protectionLevel": "watermark",
+      "watermarkEnabled": false,
+      "passwordEnabled": false,
+      "password": "8125",
+      "pinEnabled": false,
+      "downloadPin": "",
+      "packageName": "Ensaio Autoral",
+      "packageIncluded": 33,
+      "extrasEnabled": false,
+      "extraPhotoPrice": 25,
+      "allowHighResDownload": true,
+      "allowWebDownload": true,
+      "welcomeMessage": "",
+      "coverSrc": "assets/images/uploads/foto-20261117011835-01.jpg",
+      "coverFocal": "50% 35%",
+      "design": {
+        "coverStyle": "esquerda",
+        "typography": "carly",
+        "colorTheme": "oliva",
+        "gridStyle": "horizontal",
+        "gridSpacing": "regular",
+        "gridSize": "large",
+        "gridNavStyle": "icons_text",
+        "coverLogoVisible": true,
+        "coverLogoColor": "auto"
+      },
+      "photos": [
+        {
+          "id": "ph_1794877921351_0",
+          "filename": "1-IMG_9614.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117011835-02.jpg"
+        },
+        {
+          "id": "ph_1794877921403_1",
+          "filename": "2-IMG_9615.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117011835-03.jpg"
+        },
+        {
+          "id": "ph_1794877921458_2",
+          "filename": "3-IMG_9617.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117011835-04.jpg"
+        },
+        {
+          "id": "ph_1794877921507_3",
+          "filename": "4-IMG_9622.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117011835-05.jpg"
+        },
+        {
+          "id": "ph_1794877921558_4",
+          "filename": "5-IMG_9623.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117011835-06.jpg"
+        },
+        {
+          "id": "ph_1794877921606_5",
+          "filename": "6-IMG_9624.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117011835-07.jpg"
+        },
+        {
+          "id": "ph_1794877921643_6",
+          "filename": "7-IMG_9630.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117011835-08.jpg"
+        },
+        {
+          "id": "ph_1794877921695_7",
+          "filename": "8-IMG_9632.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117011835-09.jpg"
+        },
+        {
+          "id": "ph_1794877921747_8",
+          "filename": "9-IMG_9634.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117011835-10.jpg"
+        },
+        {
+          "id": "ph_1794877921795_9",
+          "filename": "10-IMG_9635.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117011835-11.jpg"
+        },
+        {
+          "id": "ph_1794877921843_10",
+          "filename": "11-IMG_9641.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117011835-12.jpg"
+        },
+        {
+          "id": "ph_1794877921892_11",
+          "filename": "12-IMG_9644.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117011835-13.jpg"
+        },
+        {
+          "id": "ph_1794877921935_12",
+          "filename": "13-IMG_9651.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117011835-14.jpg"
+        },
+        {
+          "id": "ph_1794877921981_13",
+          "filename": "14-IMG_9652.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117011835-15.jpg"
+        },
+        {
+          "id": "ph_1794877922025_14",
+          "filename": "15-IMG_9654.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117011835-16.jpg"
+        },
+        {
+          "id": "ph_1794877922069_15",
+          "filename": "16-IMG_9655.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117011835-17.jpg"
+        },
+        {
+          "id": "ph_1794877922113_16",
+          "filename": "17-IMG_9656.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117011835-18.jpg"
+        },
+        {
+          "id": "ph_1794877922157_17",
+          "filename": "18-IMG_9658.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117011835-19.jpg"
+        },
+        {
+          "id": "ph_1794877922203_18",
+          "filename": "19-IMG_9660.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117011835-20.jpg"
+        },
+        {
+          "id": "ph_1794877922251_19",
+          "filename": "20-IMG_9661.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117011835-21.jpg"
+        },
+        {
+          "id": "ph_1794877922301_20",
+          "filename": "21-IMG_9663.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117011835-22.jpg"
+        },
+        {
+          "id": "ph_1794877922354_21",
+          "filename": "22-IMG_9667.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117011835-23.jpg"
+        },
+        {
+          "id": "ph_1794877922400_22",
+          "filename": "23-IMG_9668.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117011835-24.jpg"
+        },
+        {
+          "id": "ph_1794877922446_23",
+          "filename": "24-IMG_9669.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117011835-25.jpg"
+        },
+        {
+          "id": "ph_1794877922489_24",
+          "filename": "25-IMG_9672.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117011835-26.jpg"
+        },
+        {
+          "id": "ph_1794877922540_25",
+          "filename": "26-IMG_9680.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117011835-27.jpg"
+        },
+        {
+          "id": "ph_1794877922593_26",
+          "filename": "27-IMG_9683.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117011835-28.jpg"
+        },
+        {
+          "id": "ph_1794877922645_27",
+          "filename": "28-IMG_9684.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117011835-29.jpg"
+        },
+        {
+          "id": "ph_1794877922695_28",
+          "filename": "29-IMG_9685.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117011835-30.jpg"
+        },
+        {
+          "id": "ph_1794877922744_29",
+          "filename": "30-IMG_9687.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117011835-31.jpg"
+        },
+        {
+          "id": "ph_1794877922792_30",
+          "filename": "31-IMG_9688.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117011835-32.jpg"
+        },
+        {
+          "id": "ph_1794877922841_31",
+          "filename": "32-IMG_9689.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117011835-33.jpg"
+        },
+        {
+          "id": "ph_1794877922890_32",
+          "filename": "33-IMG_9690.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117011835-34.jpg"
+        },
+        {
+          "id": "ph_1794878100458_0",
+          "filename": "IMG_7397.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117011835-35.jpg"
+        }
+      ],
+      "selectedIds": [],
+      "photoComments": {},
+      "deliveryFavorites": [],
+      "selectionLocked": false,
+      "paymentOrder": null,
+      "createdAt": "2026-11-17T01:09:54.021Z",
+      "updatedAt": 1794878293223,
+      "activityLog": [
+        {
+          "at": "2026-11-17T01:09:54.021Z",
+          "type": "created",
+          "text": "Álbum criado no painel."
+        }
+      ],
+      "antiPrintEnabled": true,
+      "showOnlySelected": false,
+      "coverKicker": "",
+      "coverAuthor": "Carliane Carvalho"
+    },
+    {
       "id": "alb_1794873429245",
       "slug": "ensaio-de-natal-natthasjcha",
       "clientName": "Natthasjcha",
@@ -686,7 +911,7 @@ const SITE_DATA = {
       "selectionLocked": false,
       "paymentOrder": null,
       "createdAt": "2026-11-16T23:57:09.245Z",
-      "updatedAt": 1794874030180,
+      "updatedAt": 1794878293223,
       "activityLog": [
         {
           "at": "2026-11-16T23:57:09.245Z",
@@ -831,7 +1056,7 @@ const SITE_DATA = {
       "showOnlySelected": true,
       "coverKicker": "GALERIA OFICIAL EM ALTA RESOLUÇÃO",
       "coverAuthor": "Carliane Carvalho",
-      "updatedAt": 1794874030180,
+      "updatedAt": 1794878293223,
       "createdAt": "2026-11-15T23:22:47.762Z"
     }
   ],
