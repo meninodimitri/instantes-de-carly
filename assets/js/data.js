@@ -5,7 +5,7 @@
  */
 
 const SITE_DATA = {
-  "cmsVersion": "2026-11-16T16:46:57.443Z",
+  "cmsVersion": "2026-11-17T00:07:38.850Z",
   "brand": {
     "name": "Instantes de Carly",
     "founder": "Carliane Carvalho (Carly)",
@@ -43,14 +43,14 @@ const SITE_DATA = {
       "pullquote": "“Acredito que as experiências que vivemos merecem ser reconhecidas com respeito, tempo e acolhimento.”",
       "paragraphs": [
         "O Instantes de Carly nasceu do encontro entre a prática fotográfica e o meu olhar como estudante de Psicologia em Fortaleza.",
-        "As fotografias não fazem o tempo voltar e não pretendem substituir as experiências vividas. Entretanto, funcionam como pistas preciosas de memória, pequenos portais táteis para recuperar lembranças, compartilhar histórias e revisitar quem dividia a vida conosco.",
+        "As fotografias não fazem o tempo voltar e não pretendem substituir as experiências vividas. Entretanto, funcionam como pistas preciosas de memória — pequenos portais táteis para recuperar lembranças, compartilhar histórias e revisitar quem dividia a vida conosco.",
         "Por isso, fotografo com atenção às pessoas e às relações: valorizando não apenas o resultado da imagem, mas o conforto e a tranquilidade de viver o momento diante da câmera."
       ],
       "primaryPhoto": "assets/images/real/IMG_6297.jpg",
       "primaryPhotoFocal": "center 25%",
       "secondaryPhoto": "assets/images/real/IMG_6438.jpg",
       "secondaryPhotoFocal": "center 45%",
-      "captionLeft": "FIG. 01 — A ESPERA DE  UM BEBÊ",
+      "captionLeft": "FIG. 01 — A ESPERA DE AIMÊ",
       "captionRight": "PRAIA DE IRACEMA",
       "pillars": [
         {
@@ -173,7 +173,7 @@ const SITE_DATA = {
       "tag": "Contato",
       "titleLine1": "Qual história você",
       "titleHighlight": "quer guardar?",
-      "lead": "Me conte um pouco sobre o momento que você deseja registrar. Conversamos pelo WhatsApp para planejar horário, local e cada detalhe no seu ritmo.",
+      "lead": "Me conte um pouco sobre o momento que você deseja registrar. Conversamos pelo WhatsApp para planejar horário da luz, local e cada detalhe no seu ritmo.",
       "noteTitle": "Nota sobre locação e horário:",
       "noteText": "Se você ainda não tem data ou lugar definidos, fique tranquilo(a). Sugerimos juntos os melhores cantos de Fortaleza (Ponte dos Ingleses, praias, parques ou em casa) de acordo com a luz dourada da tarde.",
       "formKicker": "PRÉ-AGENDAMENTO ONLINE",
@@ -186,16 +186,6 @@ const SITE_DATA = {
     }
   },
   "heroSlides": [
-    {
-      "id": "08",
-      "image": "assets/images/uploads/foto-20261116162801-12.jpg",
-      "category": "Ensaio de Natal — Noel Camping",
-      "shortLabel": "Ensaio de Natal — Noel Camping",
-      "title": "Ensaio de Natal — Noel Camping",
-      "location": "Fortaleza, Ceará",
-      "quote": "“Registros conduzidos com calma, escuta e luz natural.”",
-      "objectPosition": "center 35%"
-    },
     {
       "id": "01",
       "image": "assets/images/real/IMG_1186.jpg",
@@ -361,483 +351,6 @@ const SITE_DATA = {
   ],
   "portfolio": [
     {
-      "id": 1794846346807,
-      "title": "",
-      "category": "natal",
-      "categoryName": "Natal",
-      "aspect": "landscape",
-      "image": "assets/images/uploads/foto-20261116162801-06.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "O amor, o carinho e a presença dos pais são fundamentais na construção de quem uma criança se tornará. \nPela psicologia, sabemos que esses vínculos ajudam a desenvolver a identidade, a segurança emocional e a autoestima.\nSão pequenos gestos que deixam marcas para a vida inteira.",
-      "isAcervoCover": false
-    },
-    {
-      "id": 1794846349366,
-      "title": "Ensaio de Natal — Noel Camping",
-      "category": "natal",
-      "categoryName": "Natal",
-      "aspect": "landscape",
-      "image": "assets/images/uploads/foto-20261116162801-01.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "",
-      "isAcervoCover": false
-    },
-    {
-      "id": 1794846346455,
-      "title": "",
-      "category": "natal",
-      "categoryName": "Natal",
-      "aspect": "portrait",
-      "image": "assets/images/uploads/foto-20261116162801-04.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "",
-      "isAcervoCover": false
-    },
-    {
-      "id": 1794846346832,
-      "title": "",
-      "category": "natal",
-      "categoryName": "Natal",
-      "aspect": "landscape",
-      "image": "assets/images/uploads/foto-20261116162801-02.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "",
-      "isAcervoCover": false
-    },
-    {
-      "id": 1794846350506,
-      "title": "",
-      "category": "natal",
-      "categoryName": "Natal",
-      "aspect": "portrait",
-      "image": "assets/images/uploads/foto-20261116162801-08.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "",
-      "isAcervoCover": false
-    },
-    {
-      "id": 1794846347764,
-      "title": "",
-      "category": "natal",
-      "categoryName": "Natal",
-      "aspect": "portrait",
-      "image": "assets/images/uploads/foto-20261116162801-03.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "",
-      "isAcervoCover": false
-    },
-    {
-      "id": 1794846350463,
-      "title": "",
-      "category": "natal",
-      "categoryName": "Natal",
-      "aspect": "portrait",
-      "image": "assets/images/uploads/foto-20261116162801-05.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "",
-      "isAcervoCover": false
-    },
-    {
-      "id": 1794846344564,
-      "title": "",
-      "category": "natal",
-      "categoryName": "Natal",
-      "aspect": "landscape",
-      "image": "assets/images/uploads/foto-20261116162801-07.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "",
-      "isAcervoCover": false
-    },
-    {
-      "id": 1794846341828,
-      "title": "",
-      "category": "natal",
-      "categoryName": "Natal",
-      "aspect": "portrait",
-      "image": "assets/images/uploads/foto-20261116162801-09.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "",
-      "isAcervoCover": false
-    },
-    {
-      "id": 1794846349440,
-      "title": "",
-      "category": "natal",
-      "categoryName": "Natal",
-      "aspect": "portrait",
-      "image": "assets/images/uploads/foto-20261116162801-10.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "",
-      "isAcervoCover": false
-    },
-    {
-      "id": 1794846349874,
-      "title": "",
-      "category": "natal",
-      "categoryName": "Natal",
-      "aspect": "landscape",
-      "image": "assets/images/uploads/foto-20261116162801-11.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "",
-      "isAcervoCover": false
-    },
-    {
-      "id": 1794846342275,
-      "title": "Ensaio de Natal — Noel Camping",
-      "category": "natal",
-      "categoryName": "Natal",
-      "aspect": "landscape",
-      "image": "assets/images/uploads/foto-20261116162801-12.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "O amor, o carinho e a presença dos pais são fundamentais na construção de quem uma criança se tornará. \nPela psicologia, sabemos que esses vínculos ajudam a desenvolver a identidade, a segurança emocional e a autoestima.\nSão pequenos gestos que deixam marcas para a vida inteira.",
-      "isAcervoCover": true
-    },
-    {
-      "id": 1794846342276,
-      "title": "",
-      "category": "natal",
-      "categoryName": "Natal",
-      "aspect": "landscape",
-      "image": "assets/images/uploads/foto-20261116162801-13.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "",
-      "isAcervoCover": false
-    },
-    {
-      "id": 1794846345653,
-      "title": "",
-      "category": "natal",
-      "categoryName": "Natal",
-      "aspect": "portrait",
-      "image": "assets/images/uploads/foto-20261116162801-14.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "",
-      "isAcervoCover": false
-    },
-    {
-      "id": 1794846351544,
-      "title": "",
-      "category": "natal",
-      "categoryName": "Natal",
-      "aspect": "portrait",
-      "image": "assets/images/uploads/foto-20261116162801-18.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "",
-      "isAcervoCover": false
-    },
-    {
-      "id": 1794846348056,
-      "title": "",
-      "category": "natal",
-      "categoryName": "Natal",
-      "aspect": "portrait",
-      "image": "assets/images/uploads/foto-20261116162801-15.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "",
-      "isAcervoCover": false
-    },
-    {
-      "id": 1794846347782,
-      "title": "",
-      "category": "natal",
-      "categoryName": "Natal",
-      "aspect": "landscape",
-      "image": "assets/images/uploads/foto-20261116162801-16.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "",
-      "isAcervoCover": false
-    },
-    {
-      "id": 1794846342786,
-      "title": "",
-      "category": "natal",
-      "categoryName": "Natal",
-      "aspect": "landscape",
-      "image": "assets/images/uploads/foto-20261116162801-17.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "",
-      "isAcervoCover": false
-    },
-    {
-      "id": 1794846345871,
-      "title": "",
-      "category": "natal",
-      "categoryName": "Natal",
-      "aspect": "portrait",
-      "image": "assets/images/uploads/foto-20261116162801-19.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "",
-      "isAcervoCover": false
-    },
-    {
-      "id": 1794846350341,
-      "title": "",
-      "category": "natal",
-      "categoryName": "Natal",
-      "aspect": "portrait",
-      "image": "assets/images/uploads/foto-20261116162801-20.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "",
-      "isAcervoCover": false
-    },
-    {
-      "id": 1794846350057,
-      "title": "",
-      "category": "natal",
-      "categoryName": "Natal",
-      "aspect": "landscape",
-      "image": "assets/images/uploads/foto-20261116162801-21.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "",
-      "isAcervoCover": false
-    },
-    {
-      "id": 1794846344859,
-      "title": "",
-      "category": "natal",
-      "categoryName": "Natal",
-      "aspect": "landscape",
-      "image": "assets/images/uploads/foto-20261116162801-22.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "",
-      "isAcervoCover": false
-    },
-    {
-      "id": 1794846348382,
-      "title": "",
-      "category": "natal",
-      "categoryName": "Natal",
-      "aspect": "landscape",
-      "image": "assets/images/uploads/foto-20261116162801-23.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "",
-      "isAcervoCover": false
-    },
-    {
-      "id": 1794846346373,
-      "title": "",
-      "category": "natal",
-      "categoryName": "Natal",
-      "aspect": "landscape",
-      "image": "assets/images/uploads/foto-20261116162801-24.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "",
-      "isAcervoCover": false
-    },
-    {
-      "id": 10,
-      "title": "Amor Maior",
-      "category": "gestantes",
-      "categoryName": "Gestantes",
-      "aspect": "portrait",
-      "image": "assets/images/real/IMG_6438.jpg",
-      "objectPosition": "center 25%",
-      "location": "Praia de Iracema",
-      "caption": "Pequenos detalhes contam grandes histórias: o encontro das mãos que já acolhem quem está chegando.",
-      "isAcervoCover": true
-    },
-    {
-      "id": 8,
-      "title": "",
-      "category": "gestantes",
-      "categoryName": "Gestantes",
-      "aspect": "portrait",
-      "image": "assets/images/real/IMG_6409.jpg",
-      "objectPosition": "center 25%",
-      "location": "Praia de Iracema",
-      "caption": "A serenidade de sentir a vida florescer banhada pela luz da manhã e pelo som das ondas.",
-      "isAcervoCover": false
-    },
-    {
-      "id": 3,
-      "title": "",
-      "category": "gestantes",
-      "categoryName": "Gestantes",
-      "aspect": "portrait",
-      "image": "assets/images/real/IMG_6297.jpg",
-      "objectPosition": "center 25%",
-      "location": "Beira-Mar, Fortaleza",
-      "caption": "Antes mesmo de conhecer o rosto, a voz e o jeitinho, já existe uma história inteira sendo construída no amor.",
-      "isAcervoCover": false
-    },
-    {
-      "id": 9,
-      "title": "Ensaio individual ",
-      "category": "retratos",
-      "categoryName": "Retratos",
-      "aspect": "portrait",
-      "image": "assets/images/real/IMG_2046.jpg",
-      "objectPosition": "center 51%",
-      "location": "Ponte dos Ingleses",
-      "caption": "A arquitetura histórica da orla emoldurando a expressão autêntica e serena.",
-      "isAcervoCover": true
-    },
-    {
-      "id": 1794845678727,
-      "title": "",
-      "category": "retratos",
-      "categoryName": "Retratos",
-      "aspect": "portrait",
-      "image": "assets/images/uploads/foto-20261116162021-01.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza.",
-      "isAcervoCover": false
-    },
-    {
-      "id": 1794845679876,
-      "title": "",
-      "category": "retratos",
-      "categoryName": "Retratos",
-      "aspect": "portrait",
-      "image": "assets/images/uploads/foto-20261116162021-02.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "",
-      "isAcervoCover": false
-    },
-    {
-      "id": 1794845686798,
-      "title": "",
-      "category": "retratos",
-      "categoryName": "Retratos",
-      "aspect": "portrait",
-      "image": "assets/images/uploads/foto-20261116162021-03.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "",
-      "isAcervoCover": false
-    },
-    {
-      "id": 1794845680050,
-      "title": "",
-      "category": "retratos",
-      "categoryName": "Retratos",
-      "aspect": "portrait",
-      "image": "assets/images/uploads/foto-20261116162021-04.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "",
-      "isAcervoCover": false
-    },
-    {
-      "id": 1794845684056,
-      "title": "",
-      "category": "retratos",
-      "categoryName": "Retratos",
-      "aspect": "portrait",
-      "image": "assets/images/uploads/foto-20261116162021-05.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "",
-      "isAcervoCover": false
-    },
-    {
-      "id": 13,
-      "title": "Chá de Fraldas",
-      "category": "festas",
-      "categoryName": "Festas & Celebrações",
-      "aspect": "portrait",
-      "image": "assets/images/real/23-IMG_7341.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "Que nunca falte aconchego e ternura nessa doce espera. Cada detalhe preparado com amor pela família.",
-      "isAcervoCover": true
-    },
-    {
-      "id": 1794845111210,
-      "title": "Chá de Fraldas",
-      "category": "festas",
-      "categoryName": "Festas & Casamentos",
-      "aspect": "landscape",
-      "image": "assets/images/uploads/foto-20261116162021-06.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza."
-    },
-    {
-      "id": 1794845115526,
-      "title": "Chá de Fraldas",
-      "category": "festas",
-      "categoryName": "Festas & Casamentos",
-      "aspect": "portrait",
-      "image": "assets/images/uploads/foto-20261116162021-07.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza."
-    },
-    {
-      "id": 1794845109838,
-      "title": "Chá de Fraldas",
-      "category": "festas",
-      "categoryName": "Festas & Casamentos",
-      "aspect": "portrait",
-      "image": "assets/images/uploads/foto-20261116162021-08.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza."
-    },
-    {
-      "id": 1794844648591,
-      "title": "Votos, Fé & Alianças",
-      "category": "festas",
-      "categoryName": "Festas & Casamentos",
-      "aspect": "portrait",
-      "image": "assets/images/uploads/foto-20261116162021-09.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza.",
-      "isAcervoCover": false
-    },
-    {
-      "id": 1794844645910,
-      "title": "Votos, Fé & Alianças",
-      "category": "festas",
-      "categoryName": "Festas & Casamentos",
-      "aspect": "portrait",
-      "image": "assets/images/uploads/foto-20261116162021-10.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza.",
-      "isAcervoCover": false
-    },
-    {
-      "id": 1794844645963,
-      "title": "Votos, Fé & Alianças",
-      "category": "festas",
-      "categoryName": "Festas & Casamentos",
-      "aspect": "portrait",
-      "image": "assets/images/uploads/foto-20261116162021-11.jpg",
-      "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza.",
-      "isAcervoCover": false
-    },
-    {
       "id": 1,
       "title": "Abraço na Golden Hour",
       "category": "casais",
@@ -851,7 +364,7 @@ const SITE_DATA = {
     },
     {
       "id": 2,
-      "title": "Pôr do Sol na Ponte dos Ingleses",
+      "title": "Pôr do Sol no Píer",
       "category": "15anos",
       "categoryName": "15 Anos",
       "aspect": "landscape",
@@ -862,16 +375,15 @@ const SITE_DATA = {
       "isAcervoCover": true
     },
     {
-      "id": 1794845921759,
-      "title": "",
+      "id": 3,
+      "title": "A Espera de Aimê",
       "category": "gestantes",
-      "categoryName": "Gestantes & Maternidade",
-      "aspect": "landscape",
-      "image": "assets/images/uploads/foto-20261116162021-12.jpg",
+      "categoryName": "Gestantes",
+      "aspect": "portrait",
+      "image": "assets/images/real/IMG_6297.jpg",
       "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "",
-      "isAcervoCover": false
+      "location": "Beira-Mar, Fortaleza",
+      "caption": "Antes mesmo de conhecer o rosto, a voz e o jeitinho, já existe uma história inteira sendo construída no amor."
     },
     {
       "id": 4,
@@ -922,32 +434,41 @@ const SITE_DATA = {
       "isAcervoCover": true
     },
     {
-      "id": 1794845917214,
-      "title": "",
+      "id": 8,
+      "title": "Mikely & o Mar de Fortaleza",
       "category": "gestantes",
-      "categoryName": "Gestantes & Maternidade",
+      "categoryName": "Gestantes",
       "aspect": "portrait",
-      "image": "assets/images/uploads/foto-20261116162021-13.jpg",
+      "image": "assets/images/real/IMG_6409.jpg",
       "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "",
-      "isAcervoCover": false
+      "location": "Praia de Iracema",
+      "caption": "A serenidade de sentir a vida florescer banhada pela luz da manhã e pelo som das ondas."
     },
     {
-      "id": 1794845916107,
-      "title": "",
-      "category": "gestantes",
-      "categoryName": "Gestantes & Maternidade",
+      "id": 9,
+      "title": "Sob os Arcos do Píer",
+      "category": "retratos",
+      "categoryName": "Retratos",
       "aspect": "portrait",
-      "image": "assets/images/uploads/foto-20261116162021-14.jpg",
+      "image": "assets/images/real/IMG_2046.jpg",
+      "objectPosition": "center 51%",
+      "location": "Ponte dos Ingleses",
+      "caption": "A arquitetura histórica da orla emoldurando a expressão autêntica e serena."
+    },
+    {
+      "id": 10,
+      "title": "Coração a Quatro Mãos",
+      "category": "gestantes",
+      "categoryName": "Gestantes",
+      "aspect": "portrait",
+      "image": "assets/images/real/IMG_6438.jpg",
       "objectPosition": "center 25%",
-      "location": "Fortaleza, Ceará",
-      "caption": "",
-      "isAcervoCover": false
+      "location": "Praia de Iracema",
+      "caption": "Pequenos detalhes contam grandes histórias: o encontro das mãos que já acolhem quem está chegando."
     },
     {
       "id": 11,
-      "title": "Tarde a Dois",
+      "title": "Tarde Dourada a Dois",
       "category": "casais",
       "categoryName": "Casais",
       "aspect": "landscape",
@@ -959,27 +480,25 @@ const SITE_DATA = {
     },
     {
       "id": 12,
-      "title": "",
+      "title": "Luz & Autenticidade",
       "category": "retratos",
       "categoryName": "Retratos",
       "aspect": "landscape",
       "image": "assets/images/real/IMG_1943.jpg",
       "objectPosition": "center 25%",
       "location": "Ponte dos Ingleses",
-      "caption": "",
-      "isAcervoCover": false
+      "caption": "Registros sinceros de quem somos, banhados pelo azul do mar de Fortaleza."
     },
     {
-      "id": 1794844648397,
-      "title": "Votos, Fé & Alianças",
+      "id": 13,
+      "title": "Chá de Fraldas da Ysla",
       "category": "festas",
-      "categoryName": "Festas & Casamentos",
+      "categoryName": "Festas & Celebrações",
       "aspect": "portrait",
-      "image": "assets/images/uploads/foto-20261116162021-15.jpg",
+      "image": "assets/images/real/23-IMG_7341.jpg",
       "objectPosition": "center 25%",
       "location": "Fortaleza, Ceará",
-      "caption": "Registros conduzidos com calma, escuta e luz natural em Fortaleza.",
-      "isAcervoCover": false
+      "caption": "Que nunca falte aconchego e ternura nessa doce espera. Cada detalhe preparado com amor pela família."
     },
     {
       "id": 14,
@@ -990,8 +509,7 @@ const SITE_DATA = {
       "image": "assets/images/real/IMG_3216.jpg",
       "objectPosition": "center 25%",
       "location": "Cerimônia Intimista",
-      "caption": "As mãos que se unem, o terço entrelaçado às flores e a promessa silenciosa guardada em imagem.",
-      "isAcervoCover": false
+      "caption": "As mãos que se unem, o terço entrelaçado às flores e a promessa silenciosa guardada em imagem."
     },
     {
       "id": 15,
@@ -1014,12 +532,11 @@ const SITE_DATA = {
       "image": "assets/images/real/IMG_2979.jpg",
       "objectPosition": "center 25%",
       "location": "Casamento Intimista",
-      "caption": "O riso espontâneo que transborda no meio da cerimônia — quando a felicidade é compartilhada.",
-      "isAcervoCover": false
+      "caption": "O riso espontâneo que transborda no meio da cerimônia — quando a felicidade é compartilhada."
     },
     {
       "id": 17,
-      "title": "Patinhas em Foco",
+      "title": "Afeto Sem Palavras",
       "category": "pets",
       "categoryName": "Pets & Família",
       "aspect": "landscape",
@@ -1033,10 +550,6 @@ const SITE_DATA = {
     {
       "id": "todos",
       "name": "Acervo Completo"
-    },
-    {
-      "id": "natal",
-      "name": "Natal"
     },
     {
       "id": "gestantes",
@@ -1081,6 +594,111 @@ const SITE_DATA = {
     "reviews": []
   },
   "clientAlbums": [
+    {
+      "id": "alb_1794873429245",
+      "slug": "ensaio-de-natal-natthasjcha",
+      "clientName": "Natthasjcha",
+      "title": "Ensaio de Natal — Natthasjcha",
+      "subtitle": "FORTALEZA, CEARÁ",
+      "phase": "delivery",
+      "status": "delivered",
+      "protectionLevel": "watermark",
+      "watermarkEnabled": false,
+      "passwordEnabled": false,
+      "password": "4031",
+      "pinEnabled": false,
+      "downloadPin": "",
+      "packageName": "Ensaio Autoral",
+      "packageIncluded": 10,
+      "extrasEnabled": false,
+      "extraPhotoPrice": 25,
+      "allowHighResDownload": true,
+      "allowWebDownload": true,
+      "welcomeMessage": "Olá,  Natthascha! Aproveite com carinho seus momentos eternizados.",
+      "coverSrc": "assets/images/uploads/foto-20261117000738-01.jpg",
+      "coverFocal": "50% 63%",
+      "design": {
+        "coverStyle": "esquerda",
+        "typography": "serif",
+        "colorTheme": "amarelinho",
+        "gridStyle": "horizontal",
+        "gridSpacing": "regular",
+        "gridSize": "large",
+        "gridNavStyle": "icons_text",
+        "coverLogoVisible": true,
+        "coverLogoColor": "auto"
+      },
+      "photos": [
+        {
+          "id": "ph_1794873602742_0",
+          "filename": "1-IMG_9692.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117000738-02.jpg"
+        },
+        {
+          "id": "ph_1794873602789_1",
+          "filename": "2-IMG_9693.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117000738-03.jpg"
+        },
+        {
+          "id": "ph_1794873602833_2",
+          "filename": "3-IMG_9695.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117000738-04.jpg"
+        },
+        {
+          "id": "ph_1794873602879_3",
+          "filename": "4-IMG_9698.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117000738-05.jpg"
+        },
+        {
+          "id": "ph_1794873602918_4",
+          "filename": "5-IMG_9699.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117000738-06.jpg"
+        },
+        {
+          "id": "ph_1794873602965_5",
+          "filename": "6-IMG_9700.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117000738-07.jpg"
+        },
+        {
+          "id": "ph_1794873603010_6",
+          "filename": "7-IMG_9701.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117000738-08.jpg"
+        },
+        {
+          "id": "ph_1794873603067_7",
+          "filename": "8-IMG_9702.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117000738-09.jpg"
+        },
+        {
+          "id": "ph_1794873603109_8",
+          "filename": "9-IMG_9704.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117000738-10.jpg"
+        },
+        {
+          "id": "ph_1794873603153_9",
+          "filename": "10-IMG_9705.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261117000738-11.jpg"
+        }
+      ],
+      "selectedIds": [],
+      "photoComments": {},
+      "deliveryFavorites": [],
+      "selectionLocked": false,
+      "paymentOrder": null,
+      "createdAt": "2026-11-16T23:57:09.245Z",
+      "updatedAt": 1794874030180,
+      "activityLog": [
+        {
+          "at": "2026-11-16T23:57:09.245Z",
+          "type": "created",
+          "text": "Álbum criado no painel."
+        }
+      ],
+      "antiPrintEnabled": true,
+      "showOnlySelected": false,
+      "coverKicker": "",
+      "coverAuthor": "Carliane Carvalho"
+    },
     {
       "id": "alb_1794784967762",
       "slug": "pqpqpqpqpqpqpq",
@@ -1213,7 +831,7 @@ const SITE_DATA = {
       "showOnlySelected": true,
       "coverKicker": "GALERIA OFICIAL EM ALTA RESOLUÇÃO",
       "coverAuthor": "Carliane Carvalho",
-      "updatedAt": 1794847479186,
+      "updatedAt": 1794874030180,
       "createdAt": "2026-11-15T23:22:47.762Z"
     }
   ],
