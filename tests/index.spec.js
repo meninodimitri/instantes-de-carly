@@ -107,6 +107,18 @@ test.describe('1. Site Principal (index.html)', () => {
     expect(maskedValue).toContain('-');
   });
 
+  test('Avaliações Google: exibe 22 avaliações e os relatos mais recentes', async ({ page }) => {
+    await page.goto(`${BASE_URL}/index.html`);
+    await page.locator('#avaliacoes').scrollIntoViewIfNeeded();
+    await page.waitForTimeout(400);
+
+    await expect(page.locator('#g-badge-count-label')).toContainText('22');
+    await expect(page.locator('#google-sync-badge')).toContainText('22');
+    const track = page.locator('#reviews-track');
+    await expect(track).toContainText('Ed Guimarães');
+    await expect(track).toContainText('Paulo Victor Serafim');
+  });
+
   test('Stress Responsivo: Zero overflow horizontal em múltiplos viewports', async ({ page }) => {
     const viewports = [
       { width: 320, height: 600, name: 'iPhone SE' },

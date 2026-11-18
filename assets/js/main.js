@@ -18,6 +18,14 @@ function escapeHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
+function scrollPageSmoothlyTo(targetEl, offset = 0) {
+  if (!targetEl) return;
+  const rect = targetEl.getBoundingClientRect();
+  const scrollMargin = parseFloat(getComputedStyle(targetEl).scrollMarginTop) || 0;
+  const top = Math.max(0, window.scrollY + rect.top - (offset || scrollMargin));
+  window.scrollTo({ top, behavior: 'smooth' });
+}
+
 /* ==========================================================================
    0. INTEGRAÇÃO COM PAINEL ADMIN (PREVIEW EM TEMPO REAL + RASCUNHO LOCAL)
    ========================================================================== */
@@ -89,8 +97,8 @@ function parsePublishedDataJs(jsText) {
   const startIdx = jsText.indexOf(startMarker);
   if (startIdx === -1) return null;
   const afterStart = jsText.slice(startIdx + startMarker.length);
-  const endMarker = '\nif (typeof module';
-  const endIdx = afterStart.lastIndexOf(endMarker);
+  const endMatch = afterStart.match(/\r?\nif\s*\(\s*typeof\s+(?:window|module)\b/);
+  const endIdx = endMatch ? endMatch.index : -1;
   let rawJson = (endIdx !== -1 ? afterStart.slice(0, endIdx) : afterStart).trim();
   if (rawJson.endsWith(';')) rawJson = rawJson.slice(0, -1).trim();
   try {
@@ -157,10 +165,10 @@ function initCmsPreviewBridge() {
     } else if (msg.type === 'CMS_SCROLL_TO' && msg.selector) {
       const target = document.querySelector(msg.selector);
       if (target) {
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        scrollPageSmoothlyTo(target);
       }
     } else if (msg.type === 'CMS_HERO_SELECT_SLIDE' && typeof msg.slideIndex === 'number') {
-      document.getElementById('inicio')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       if (heroCinemaController) {
         heroCinemaController.selectSlide(msg.slideIndex);
       }
@@ -459,8 +467,23 @@ function hydrateSiteContent() {
     const gr = SITE_DATA.googleReviews;
     const badgeLink = document.querySelector('.google-rating-badge-card');
     const reviewBtn = document.querySelector('.google-rating-actions a');
+    const scoreEl = document.getElementById('g-badge-score-val');
+    const countEl = document.getElementById('g-badge-count-label');
+    const syncBadge = document.getElementById('google-sync-badge');
+    const ratingStr = String(gr.rating || '5.0');
+    const totalNum = Math.max(
+      Number(gr.totalReviews) || 0,
+      Array.isArray(gr.reviews) ? gr.reviews.length : 0
+    ) || 22;
+
     if (badgeLink && gr.googleProfileUrl) badgeLink.href = gr.googleProfileUrl;
+    if (badgeLink) badgeLink.setAttribute('aria-label', `Nota ${ratingStr} no Google com ${totalNum} avaliações verificadas`);
     if (reviewBtn && gr.googleReviewFormUrl) reviewBtn.href = gr.googleReviewFormUrl;
+    if (scoreEl) scoreEl.textContent = ratingStr;
+    if (countEl) countEl.textContent = `Ler nossas ${totalNum} avaliações ↗`;
+    if (syncBadge && !syncBadge.dataset.liveSynced) {
+      syncBadge.textContent = `GOOGLE MEU NEGÓCIO • ${ratingStr} ★ (${totalNum} AVALIAÇÕES)`;
+    }
   }
 
   // 07. Contato & Rodapé
@@ -1266,7 +1289,7 @@ function updateLightboxContent() {
       if (typeof window.selectCustomOption === 'function') {
         window.selectCustomOption(photo.category);
       }
-      document.getElementById('contato')?.scrollIntoView({ behavior: 'smooth' });
+      scrollPageSmoothlyTo(document.getElementById('contato'));
     };
   }
 }
@@ -1359,8 +1382,43 @@ function initReviewsCarousel() {
   } catch (e) {}
 
   const allReviews = [...(SITE_DATA.googleReviews.reviews || [])];
+  let liveApiReviewsCache = [];
   let currentIndex = 0;
   let lastFetchedWidgetId = '';
+
+  function normalizeReviewKey(rev) {
+    const author = String(rev?.author || '').trim().toLowerCase();
+    const snippet = cleanGoogleReviewText(rev?.text || '').toLowerCase().replace(/\s+/g, ' ').slice(0, 32);
+    return `${author}::${snippet}`;
+  }
+
+  function mergeGoogleReviews(liveList, savedList) {
+    const merged = [];
+    const seenIds = new Set();
+    const seenKeys = new Set();
+
+    const addItem = (item) => {
+      if (!item || (!item.author && !item.text)) return;
+      const idStr = item.id ? String(item.id).trim() : '';
+      const key = normalizeReviewKey(item);
+      if (idStr && seenIds.has(idStr)) return;
+      if (key !== '::' && seenKeys.has(key)) return;
+      if (idStr) seenIds.add(idStr);
+      if (key !== '::') seenKeys.add(key);
+      merged.push(item);
+    };
+
+    const savedArr = Array.isArray(savedList) ? savedList : [];
+    const liveArr = Array.isArray(liveList) ? liveList : [];
+
+    savedArr.forEach((r) => {
+      if (r && r.isManual) addItem(r);
+    });
+    liveArr.forEach(addItem);
+    savedArr.forEach(addItem);
+
+    return merged;
+  }
 
   function getCardsPerView() {
     if (window.innerWidth <= 680) return 1;
@@ -1551,20 +1609,12 @@ function initReviewsCarousel() {
     try {
       if (featurableId) {
         lastFetchedWidgetId = featurableId;
-        const res = await fetch(`https://featurable.com/api/v1/widgets/${encodeURIComponent(featurableId)}`);
+        const res = await fetch(`https://featurable.com/api/v1/widgets/${encodeURIComponent(featurableId)}?t=${Date.now()}`, {
+          cache: 'no-store'
+        });
         if (res.ok) {
           const data = await res.json();
           if (data && data.success && Array.isArray(data.reviews) && data.reviews.length > 0) {
-            const totalCount = data.widget?.gbpLocationSummary?.reviewsCount || data.totalReviewCount || Math.max(16, data.reviews.length);
-            const avgRating = Number(data.widget?.gbpLocationSummary?.rating || data.averageRating || 5).toFixed(1);
-
-            const scoreEl = document.getElementById('g-badge-score-val');
-            const countEl = document.getElementById('g-badge-count-label');
-            const syncBadge = document.getElementById('google-sync-badge');
-            if (scoreEl) scoreEl.textContent = avgRating;
-            if (countEl) countEl.textContent = `Ler nossas ${totalCount} avaliações ↗`;
-            if (syncBadge) syncBadge.textContent = `🟢 SINCRONIZADO AO VIVO VIA API • GOOGLE ${avgRating} ★ (${totalCount} AVALIAÇÕES)`;
-
             const liveMapped = data.reviews.map((r, idx) => {
               const authorName = r.author?.name || r.reviewer?.displayName || 'Cliente Google';
               return {
@@ -1573,8 +1623,8 @@ function initReviewsCarousel() {
                 avatarUrl: r.author?.avatarUrl || r.reviewer?.profilePhotoUrl || '',
                 reviewCount: 'Avaliação verificada',
                 context: 'Sincronizado via Google Meu Negócio',
-                date: r.relativePublishTimeDescription || r.createTime || 'Recentemente no Google',
-                isNew: idx === 0,
+                date: r.createTime || r.relativePublishTimeDescription || 'Recentemente no Google',
+                isNew: idx < 4,
                 stars: r.rating || r.starRating || 5,
                 text: r.text?.text || r.originalText?.text || r.comment || 'Excelente experiência fotográfica!',
                 avatarBg: avatarPalette[idx % avatarPalette.length],
@@ -1582,7 +1632,30 @@ function initReviewsCarousel() {
                 initials: authorName.substring(0, 1).toUpperCase()
               };
             });
-            allReviews.splice(0, allReviews.length, ...liveMapped);
+
+            liveApiReviewsCache = liveMapped;
+            const merged = mergeGoogleReviews(liveMapped, SITE_DATA.googleReviews?.reviews || []);
+            allReviews.splice(0, allReviews.length, ...merged);
+
+            const totalCount = Math.max(
+              Number(cfg.totalReviews) || 0,
+              Number(data.widget?.gbpLocationSummary?.reviewsCount || data.totalReviewCount) || 0,
+              merged.length
+            );
+            const avgRating = Number(data.widget?.gbpLocationSummary?.rating || data.averageRating || cfg.rating || 5).toFixed(1);
+
+            const scoreEl = document.getElementById('g-badge-score-val');
+            const countEl = document.getElementById('g-badge-count-label');
+            const syncBadge = document.getElementById('google-sync-badge');
+            const badgeLink = document.querySelector('.google-rating-badge-card');
+            if (scoreEl) scoreEl.textContent = avgRating;
+            if (countEl) countEl.textContent = `Ler nossas ${totalCount} avaliações ↗`;
+            if (badgeLink) badgeLink.setAttribute('aria-label', `Nota ${avgRating} no Google com ${totalCount} avaliações verificadas`);
+            if (syncBadge) {
+              syncBadge.dataset.liveSynced = '1';
+              syncBadge.textContent = `🟢 SINCRONIZADO AO VIVO VIA API • GOOGLE ${avgRating} ★ (${totalCount} AVALIAÇÕES)`;
+            }
+
             renderCards();
             return;
           }
@@ -1591,7 +1664,7 @@ function initReviewsCarousel() {
 
       if (placesKey && placeId) {
         const endpoint = `https://places.googleapis.com/v1/places/${encodeURIComponent(placeId)}?fields=rating,userRatingCount,reviews&languageCode=pt-BR&key=${encodeURIComponent(placesKey)}`;
-        const res = await fetch(endpoint);
+        const res = await fetch(endpoint, { cache: 'no-store' });
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data.reviews) && data.reviews.length > 0) {
@@ -1611,7 +1684,9 @@ function initReviewsCarousel() {
                 initials: authorName.substring(0, 1).toUpperCase()
               };
             });
-            allReviews.splice(0, allReviews.length, ...liveMapped);
+            liveApiReviewsCache = liveMapped;
+            const merged = mergeGoogleReviews(liveMapped, SITE_DATA.googleReviews?.reviews || []);
+            allReviews.splice(0, allReviews.length, ...merged);
             renderCards();
           }
         }
@@ -1625,10 +1700,17 @@ function initReviewsCarousel() {
   fetchLiveGoogleReviews();
 
   reviewsController = {
-    refreshMeta() {
+    refreshMeta(forceFetch = false) {
+      const saved = Array.isArray(SITE_DATA.googleReviews?.reviews) ? SITE_DATA.googleReviews.reviews : [];
+      const isPreview = new URLSearchParams(window.location.search).get('cmsPreview') === '1';
+      if (isPreview && saved.length > 0 && !forceFetch) {
+        allReviews.splice(0, allReviews.length, ...saved);
+      } else if (saved.length > 0 || liveApiReviewsCache.length > 0) {
+        allReviews.splice(0, allReviews.length, ...mergeGoogleReviews(liveApiReviewsCache, saved));
+      }
       renderCards();
       const newWidgetId = SITE_DATA.googleReviews?.featurableWidgetId || '';
-      if (newWidgetId && newWidgetId !== lastFetchedWidgetId) {
+      if (forceFetch || (newWidgetId && newWidgetId !== lastFetchedWidgetId)) {
         fetchLiveGoogleReviews();
       }
     }

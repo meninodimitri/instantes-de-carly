@@ -58,6 +58,58 @@ function formatBytes(bytes) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function getEditorScrollPane() {
+  return document.querySelector('.cms-editor-pane');
+}
+
+function resetOuterShellScroll() {
+  if (typeof window !== 'undefined' && (window.scrollX !== 0 || window.scrollY !== 0)) {
+    window.scrollTo(0, 0);
+  }
+  if (document.documentElement) {
+    document.documentElement.scrollTop = 0;
+    document.documentElement.scrollLeft = 0;
+  }
+  if (document.body) {
+    document.body.scrollTop = 0;
+    document.body.scrollLeft = 0;
+  }
+  ['cms-app', 'cms-workspace', 'cms-preview-pane', 'preview-stage'].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el && (el.scrollTop !== 0 || el.scrollLeft !== 0)) {
+      el.scrollTop = 0;
+      el.scrollLeft = 0;
+    }
+  });
+}
+
+if (typeof window !== 'undefined') {
+  window.resetOuterShellScroll = resetOuterShellScroll;
+}
+
+function adjustMovedCardScroll(prevTop, findNewCard) {
+  const editorPane = getEditorScrollPane();
+  if (editorPane && typeof findNewCard === 'function') {
+    const newCard = findNewCard();
+    if (newCard) {
+      const delta = newCard.getBoundingClientRect().top - prevTop;
+      if (Math.abs(delta) > 1) {
+        editorPane.scrollTop = Math.max(0, editorPane.scrollTop + delta);
+      }
+    }
+  }
+  resetOuterShellScroll();
+}
+
+function bindOuterShellScrollLock() {
+  window.addEventListener('scroll', resetOuterShellScroll, { passive: true });
+  ['cms-app', 'cms-workspace', 'cms-preview-pane', 'preview-stage'].forEach((id) => {
+    const el = document.getElementById(id);
+    el?.addEventListener('scroll', resetOuterShellScroll, { passive: true });
+  });
+  resetOuterShellScroll();
+}
+
 function showToast(message, type = 'info', durationMs = 4200) {
   const container = document.getElementById('cms-toast-container');
   if (!container) return;
@@ -544,11 +596,17 @@ function isEffectiveAcervoCover(photo, portfolio) {
 }
 
 function renderPortfolioAdmin() {
+  const editorPane = getEditorScrollPane();
+  const prevScrollTop = editorPane ? editorPane.scrollTop : 0;
+
   populateUploadCategorySelect();
   renderAdminPortfolioFilterPills();
 
   const listEl = document.getElementById('portfolio-cards-list');
-  if (!listEl) return;
+  if (!listEl) {
+    resetOuterShellScroll();
+    return;
+  }
 
   const editableCats = (cmsData.categories || []).filter((c) => c.id !== 'todos');
   const query = adminPortfolioSearch.trim().toLowerCase();
@@ -593,6 +651,8 @@ function renderPortfolioAdmin() {
           Nenhuma capa encontrada na Vitrine do Acervo com este termo de busca.
         </div>
       `;
+      if (editorPane) editorPane.scrollTop = prevScrollTop;
+      resetOuterShellScroll();
       return;
     }
 
@@ -703,6 +763,8 @@ function renderPortfolioAdmin() {
     }).join('');
 
     bindVitrineCardsEvents(listEl);
+    if (editorPane) editorPane.scrollTop = prevScrollTop;
+    resetOuterShellScroll();
     return;
   }
 
@@ -725,6 +787,8 @@ function renderPortfolioAdmin() {
         Nenhuma fotografia encontrada neste filtro. Envie novas fotos na área acima!
       </div>
     `;
+    if (editorPane) editorPane.scrollTop = prevScrollTop;
+    resetOuterShellScroll();
     return;
   }
 
@@ -827,6 +891,8 @@ function renderPortfolioAdmin() {
   }).join('');
 
   bindGeneralPortfolioEvents(listEl, isTodas);
+  if (editorPane) editorPane.scrollTop = prevScrollTop;
+  resetOuterShellScroll();
 }
 
 function bindVitrineCardsEvents(listEl) {
@@ -941,26 +1007,32 @@ function bindVitrineCardsEvents(listEl) {
     });
 
     // Reordenar Capas na Vitrine (Subir / Descer)
-    const handleMoveUp = () => {
+    const handleMoveUp = (e) => {
       const idxInCats = cmsData.categories.findIndex((c) => c.id === catId);
       // Índice 0 é 'todos'; o primeiro da vitrine é índice 1
       if (idxInCats <= 1) return;
+      const prevTop = card.getBoundingClientRect().top;
+      e?.currentTarget?.blur?.();
       const tmp = cmsData.categories[idxInCats - 1];
       cmsData.categories[idxInCats - 1] = cmsData.categories[idxInCats];
       cmsData.categories[idxInCats] = tmp;
       markDirtyAndSync(true);
       renderPortfolioAdmin();
+      adjustMovedCardScroll(prevTop, () => Array.from(listEl.children).find((el) => el.getAttribute('data-cat-id') === catId));
       showToast('Ordem da vitrine atualizada!', 'success');
     };
 
-    const handleMoveDown = () => {
+    const handleMoveDown = (e) => {
       const idxInCats = cmsData.categories.findIndex((c) => c.id === catId);
       if (idxInCats === -1 || idxInCats >= cmsData.categories.length - 1) return;
+      const prevTop = card.getBoundingClientRect().top;
+      e?.currentTarget?.blur?.();
       const tmp = cmsData.categories[idxInCats + 1];
       cmsData.categories[idxInCats + 1] = cmsData.categories[idxInCats];
       cmsData.categories[idxInCats] = tmp;
       markDirtyAndSync(true);
       renderPortfolioAdmin();
+      adjustMovedCardScroll(prevTop, () => Array.from(listEl.children).find((el) => el.getAttribute('data-cat-id') === catId));
       showToast('Ordem da vitrine atualizada!', 'success');
     };
 
@@ -1108,7 +1180,9 @@ function bindGeneralPortfolioEvents(listEl, isTodas) {
     });
 
     // Subir / Descer / Excluir
-    card.querySelector('.js-port-up')?.addEventListener('click', () => {
+    card.querySelector('.js-port-up')?.addEventListener('click', (e) => {
+      const prevTop = card.getBoundingClientRect().top;
+      e.currentTarget?.blur?.();
       if (isTodas) {
         if (idx <= 0) return;
         const tmp = cmsData.portfolio[idx - 1];
@@ -1116,6 +1190,7 @@ function bindGeneralPortfolioEvents(listEl, isTodas) {
         cmsData.portfolio[idx] = tmp;
         markDirtyAndSync(true);
         renderPortfolioAdmin();
+        adjustMovedCardScroll(prevTop, () => Array.from(listEl.children).find((el) => el.getAttribute('data-card-key') === cardKey));
       } else {
         const catPhotos = (cmsData.portfolio || []).filter((p) => p.category === item.category);
         const catItemIdx = catPhotos.indexOf(item);
@@ -1128,11 +1203,14 @@ function bindGeneralPortfolioEvents(listEl, isTodas) {
           cmsData.portfolio[realB] = item;
           markDirtyAndSync(true);
           renderPortfolioAdmin();
+          adjustMovedCardScroll(prevTop, () => Array.from(listEl.children).find((el) => el.getAttribute('data-card-key') === cardKey));
         }
       }
     });
 
-    card.querySelector('.js-port-down')?.addEventListener('click', () => {
+    card.querySelector('.js-port-down')?.addEventListener('click', (e) => {
+      const prevTop = card.getBoundingClientRect().top;
+      e.currentTarget?.blur?.();
       if (isTodas) {
         if (idx >= cmsData.portfolio.length - 1) return;
         const tmp = cmsData.portfolio[idx + 1];
@@ -1140,6 +1218,7 @@ function bindGeneralPortfolioEvents(listEl, isTodas) {
         cmsData.portfolio[idx] = tmp;
         markDirtyAndSync(true);
         renderPortfolioAdmin();
+        adjustMovedCardScroll(prevTop, () => Array.from(listEl.children).find((el) => el.getAttribute('data-card-key') === cardKey));
       } else {
         const catPhotos = (cmsData.portfolio || []).filter((p) => p.category === item.category);
         const catItemIdx = catPhotos.indexOf(item);
@@ -1152,6 +1231,7 @@ function bindGeneralPortfolioEvents(listEl, isTodas) {
           cmsData.portfolio[realB] = item;
           markDirtyAndSync(true);
           renderPortfolioAdmin();
+          adjustMovedCardScroll(prevTop, () => Array.from(listEl.children).find((el) => el.getAttribute('data-card-key') === cardKey));
         }
       }
     });
@@ -1258,8 +1338,14 @@ function initPortfolioUploadZone() {
    7. ABA 2: CAPA DO SITE (HERO FULL-BLEED)
    ========================================================================== */
 function renderHeroAdmin() {
+  const editorPane = getEditorScrollPane();
+  const prevScrollTop = editorPane ? editorPane.scrollTop : 0;
+
   const listEl = document.getElementById('hero-cards-list');
-  if (!listEl) return;
+  if (!listEl) {
+    resetOuterShellScroll();
+    return;
+  }
 
   const slides = cmsData.heroSlides || [];
 
@@ -1422,22 +1508,28 @@ function renderHeroAdmin() {
       });
     });
 
-    card.querySelector('.js-hero-up')?.addEventListener('click', () => {
+    card.querySelector('.js-hero-up')?.addEventListener('click', (e) => {
       if (idx <= 0) return;
+      const prevTop = card.getBoundingClientRect().top;
+      e.currentTarget?.blur?.();
       const tmp = cmsData.heroSlides[idx - 1];
       cmsData.heroSlides[idx - 1] = cmsData.heroSlides[idx];
       cmsData.heroSlides[idx] = tmp;
       markDirtyAndSync(true);
       renderHeroAdmin();
+      adjustMovedCardScroll(prevTop, () => Array.from(listEl.children).find((el) => el.getAttribute('data-hero-key') === heroKey));
     });
 
-    card.querySelector('.js-hero-down')?.addEventListener('click', () => {
+    card.querySelector('.js-hero-down')?.addEventListener('click', (e) => {
       if (idx >= cmsData.heroSlides.length - 1) return;
+      const prevTop = card.getBoundingClientRect().top;
+      e.currentTarget?.blur?.();
       const tmp = cmsData.heroSlides[idx + 1];
       cmsData.heroSlides[idx + 1] = cmsData.heroSlides[idx];
       cmsData.heroSlides[idx] = tmp;
       markDirtyAndSync(true);
       renderHeroAdmin();
+      adjustMovedCardScroll(prevTop, () => Array.from(listEl.children).find((el) => el.getAttribute('data-hero-key') === heroKey));
     });
 
     card.querySelector('.js-hero-delete')?.addEventListener('click', () => {
@@ -1448,6 +1540,9 @@ function renderHeroAdmin() {
       renderHeroAdmin();
     });
   });
+
+  if (editorPane) editorPane.scrollTop = prevScrollTop;
+  resetOuterShellScroll();
 }
 
 function initHeroTopActions() {
@@ -1504,8 +1599,14 @@ function initHeroTopActions() {
    8. ABA 3: CATEGORIAS & FILTROS DO PORTFÓLIO
    ========================================================================== */
 function renderCategoriesAdmin() {
+  const editorPane = getEditorScrollPane();
+  const prevScrollTop = editorPane ? editorPane.scrollTop : 0;
+
   const listEl = document.getElementById('categories-list');
-  if (!listEl) return;
+  if (!listEl) {
+    resetOuterShellScroll();
+    return;
+  }
 
   const cats = cmsData.categories || [];
 
@@ -1516,7 +1617,7 @@ function renderCategoriesAdmin() {
       : (cmsData.portfolio || []).filter((p) => p.category === cat.id).length;
 
     return `
-      <div class="category-row-card" data-cat-idx="${idx}">
+      <div class="category-row-card" data-cat-idx="${idx}" data-cat-id="${escapeAttr(cat.id)}">
         <div style="flex: 1; min-width: 220px;">
           <input type="text" class="cms-input js-cat-name-input" value="${escapeAttr(cat.name)}" />
           <span class="field-hint">Código interno: <code>${escapeAttr(cat.id)}</code> • <strong>${photoCount}</strong> ${photoCount === 1 ? 'foto vinculada' : 'fotos vinculadas'}</span>
@@ -1549,22 +1650,28 @@ function renderCategoriesAdmin() {
       markDirtyAndSync(false);
     });
 
-    row.querySelector('.js-cat-up')?.addEventListener('click', () => {
+    row.querySelector('.js-cat-up')?.addEventListener('click', (e) => {
       if (idx <= 1) return;
+      const prevTop = row.getBoundingClientRect().top;
+      e.currentTarget?.blur?.();
       const tmp = cmsData.categories[idx - 1];
       cmsData.categories[idx - 1] = cmsData.categories[idx];
       cmsData.categories[idx] = tmp;
       markDirtyAndSync(true);
       renderCategoriesAdmin();
+      adjustMovedCardScroll(prevTop, () => Array.from(listEl.children).find((el) => el.getAttribute('data-cat-id') === cat.id));
     });
 
-    row.querySelector('.js-cat-down')?.addEventListener('click', () => {
+    row.querySelector('.js-cat-down')?.addEventListener('click', (e) => {
       if (idx >= cmsData.categories.length - 1) return;
+      const prevTop = row.getBoundingClientRect().top;
+      e.currentTarget?.blur?.();
       const tmp = cmsData.categories[idx + 1];
       cmsData.categories[idx + 1] = cmsData.categories[idx];
       cmsData.categories[idx] = tmp;
       markDirtyAndSync(true);
       renderCategoriesAdmin();
+      adjustMovedCardScroll(prevTop, () => Array.from(listEl.children).find((el) => el.getAttribute('data-cat-id') === cat.id));
     });
 
     row.querySelector('.js-cat-delete')?.addEventListener('click', () => {
@@ -1593,6 +1700,9 @@ function renderCategoriesAdmin() {
       showToast('Categoria removida.', 'info');
     });
   });
+
+  if (editorPane) editorPane.scrollTop = prevScrollTop;
+  resetOuterShellScroll();
 }
 
 function initCategoryAddAction() {
@@ -1625,8 +1735,14 @@ function initCategoryAddAction() {
    9. ABA 4: EXPERIÊNCIAS & PREÇOS
    ========================================================================== */
 function renderPackagesAdmin() {
+  const editorPane = getEditorScrollPane();
+  const prevScrollTop = editorPane ? editorPane.scrollTop : 0;
+
   const listEl = document.getElementById('packages-cards-list');
-  if (!listEl) return;
+  if (!listEl) {
+    resetOuterShellScroll();
+    return;
+  }
 
   const pkgs = cmsData.packages || [];
 
@@ -1792,24 +1908,30 @@ function renderPackagesAdmin() {
       markDirtyAndSync(false);
     });
 
-    card.querySelector('.js-pkg-up')?.addEventListener('click', () => {
+    card.querySelector('.js-pkg-up')?.addEventListener('click', (e) => {
       if (idx <= 0) return;
+      const prevTop = card.getBoundingClientRect().top;
+      e.currentTarget?.blur?.();
       const tmp = cmsData.packages[idx - 1];
       cmsData.packages[idx - 1] = cmsData.packages[idx];
       cmsData.packages[idx] = tmp;
       cmsData.packages.forEach((p, i) => { p.index = romans[i] || String(i + 1); });
       markDirtyAndSync(true);
       renderPackagesAdmin();
+      adjustMovedCardScroll(prevTop, () => Array.from(listEl.children).find((el) => el.getAttribute('data-pkg-key') === pkgKey));
     });
 
-    card.querySelector('.js-pkg-down')?.addEventListener('click', () => {
+    card.querySelector('.js-pkg-down')?.addEventListener('click', (e) => {
       if (idx >= cmsData.packages.length - 1) return;
+      const prevTop = card.getBoundingClientRect().top;
+      e.currentTarget?.blur?.();
       const tmp = cmsData.packages[idx + 1];
       cmsData.packages[idx + 1] = cmsData.packages[idx];
       cmsData.packages[idx] = tmp;
       cmsData.packages.forEach((p, i) => { p.index = romans[i] || String(i + 1); });
       markDirtyAndSync(true);
       renderPackagesAdmin();
+      adjustMovedCardScroll(prevTop, () => Array.from(listEl.children).find((el) => el.getAttribute('data-pkg-key') === pkgKey));
     });
 
     card.querySelector('.js-pkg-delete')?.addEventListener('click', () => {
@@ -1820,6 +1942,9 @@ function renderPackagesAdmin() {
       renderPackagesAdmin();
     });
   });
+
+  if (editorPane) editorPane.scrollTop = prevScrollTop;
+  resetOuterShellScroll();
 }
 
 function initPackageAddAction() {
@@ -2234,6 +2359,13 @@ function renderSectionsAdmin() {
 
   if (activeSubTab === 'sec-sobre') {
     const sb = s.sobre;
+    if (!Array.isArray(sb.pillars) || sb.pillars.length === 0) {
+      sb.pillars = JSON.parse(JSON.stringify(FACTORY_DATA.sections?.sobre?.pillars || [
+        { title: '“Pessoas antes das poses”', description: 'Respeito ao conforto, às inseguranças e à espontaneidade de cada pessoa.' },
+        { title: '“Olhar com atenção”', description: 'A sensibilidade da escuta humana unida à luz natural e à brisa de Fortaleza.' },
+        { title: '“Qual história guardar?”', description: 'O ponto de partida para transformar o momento presente em memória viva.' }
+      ]));
+    }
     container.innerHTML = `
       <div class="cms-section-card">
         <div class="cms-section-card-head">
@@ -2275,8 +2407,33 @@ function renderSectionsAdmin() {
         </div>
 
         <div class="field-group">
+          <label class="field-label">Título da Nota Ética</label>
+          <input type="text" id="f-sb-ethics-title" class="cms-input" value="${escapeAttr(sb.ethicsTitle || 'Compromisso de Transparência & Ética:')}" />
+        </div>
+
+        <div class="field-group">
           <label class="field-label">Nota de Compromisso Ético (Psicologia)</label>
           <textarea id="f-sb-ethics" class="cms-textarea" style="min-height: 70px;">${escapeAttr(sb.ethicsText)}</textarea>
+        </div>
+      </div>
+
+      <div class="cms-section-card">
+        <div class="cms-section-card-head">
+          <h3 class="cms-section-card-title">Os 3 Pilares do Manifesto (Cartões de Destaque)</h3>
+        </div>
+        <div class="field-grid-3">
+          ${(sb.pillars || []).map((pil, idx) => `
+            <div style="background: var(--cms-bg); border: 1px solid var(--cms-border); padding: 12px; border-radius: 8px;">
+              <div class="field-group">
+                <label class="field-label">Cartão ${idx + 1} — Título</label>
+                <input type="text" class="cms-input js-sb-pil-title" data-idx="${idx}" value="${escapeAttr(pil.title || '')}" />
+              </div>
+              <div class="field-group">
+                <label class="field-label">Descrição</label>
+                <textarea class="cms-textarea js-sb-pil-desc" data-idx="${idx}" style="min-height: 72px;">${escapeAttr(pil.description || '')}</textarea>
+              </div>
+            </div>
+          `).join('')}
         </div>
       </div>
     `;
@@ -2292,17 +2449,39 @@ function renderSectionsAdmin() {
       sb.paragraphs = e.target.value.split(/\n\s*\n/).map((t) => t.trim()).filter(Boolean);
       markDirtyAndSync();
     });
+    container.querySelector('#f-sb-ethics-title')?.addEventListener('input', (e) => { sb.ethicsTitle = e.target.value; markDirtyAndSync(); });
     container.querySelector('#f-sb-ethics')?.addEventListener('input', (e) => { sb.ethicsText = e.target.value; markDirtyAndSync(); });
+
+    container.querySelectorAll('.js-sb-pil-title').forEach((inp) => {
+      inp.addEventListener('input', (e) => {
+        const i = parseInt(inp.getAttribute('data-idx'), 10);
+        if (sb.pillars[i]) sb.pillars[i].title = e.target.value;
+        markDirtyAndSync();
+      });
+    });
+    container.querySelectorAll('.js-sb-pil-desc').forEach((inp) => {
+      inp.addEventListener('input', (e) => {
+        const i = parseInt(inp.getAttribute('data-idx'), 10);
+        if (sb.pillars[i]) sb.pillars[i].description = e.target.value;
+        markDirtyAndSync();
+      });
+    });
     return;
   }
 
   if (activeSubTab === 'sec-avaliacoes') {
     const av = s.avaliacoes;
-    const gr = cmsData.googleReviews;
+    const gr = cmsData.googleReviews || (cmsData.googleReviews = {});
+    if (!Array.isArray(gr.reviews)) gr.reviews = [];
+    const reviewsList = gr.reviews;
+
     container.innerHTML = `
       <div class="cms-section-card">
         <div class="cms-section-card-head">
           <h3 class="cms-section-card-title">06. Avaliações Automáticas do Google Meu Negócio</h3>
+          <button type="button" id="btn-sync-google-reviews" class="cms-btn cms-btn-primary cms-btn-sm">
+            🔄 Sincronizar Avaliações do Google Agora
+          </button>
         </div>
         <div class="field-grid">
           <div class="field-group">
@@ -2326,16 +2505,89 @@ function renderSectionsAdmin() {
           </div>
         </div>
 
+        <div class="field-grid">
+          <div class="field-group">
+            <label class="field-label">Nota Média Exibida</label>
+            <input type="text" id="f-gr-rating" class="cms-input" value="${escapeAttr(gr.rating || '5.0')}" placeholder="5.0" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Total de Avaliações no Google</label>
+            <input type="number" id="f-gr-total" class="cms-input" min="0" value="${escapeAttr(gr.totalReviews ?? reviewsList.length)}" />
+          </div>
+        </div>
+
         <div class="field-group">
           <label class="field-label">Link Direto para Cliente Deixar Avaliação no Google</label>
           <input type="url" id="f-gr-write" class="cms-input" value="${escapeAttr(gr.googleReviewFormUrl || '')}" />
+        </div>
+
+        <div class="field-grid">
+          <div class="field-group">
+            <label class="field-label">Cartão Final — Título do Convite</label>
+            <input type="text" id="f-av-inv-title" class="cms-input" value="${escapeAttr(av.inviteTitle || '')}" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Cartão Final — Texto do Convite</label>
+            <textarea id="f-av-inv-text" class="cms-textarea" style="min-height: 60px;">${escapeAttr(av.inviteText || '')}</textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="cms-section-card">
+        <div class="cms-section-card-head">
+          <h3 class="cms-section-card-title">Depoimentos Exibidos no Mural (${reviewsList.length})</h3>
+          <button type="button" id="btn-add-manual-review" class="cms-btn cms-btn-outline cms-btn-sm">
+            + Adicionar Avaliação Manual
+          </button>
+        </div>
+        <p class="field-hint" style="margin-bottom: 12px;">
+          Novas avaliações no Google são buscadas automaticamente ao vivo no site e também ao clicar em sincronizar acima. Caso queira destacar uma avaliação imediatamente, adicione ou edite abaixo e publique.
+        </p>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          ${reviewsList.length === 0 ? `
+            <div style="padding: 16px; border: 1px dashed var(--cms-border); border-radius: 8px; text-align: center; color: var(--cms-text-muted); font-size: 0.84rem;">
+              Nenhuma avaliação salva em cache ainda. Clique em "🔄 Sincronizar Avaliações do Google Agora".
+            </div>
+          ` : reviewsList.map((rev, idx) => `
+            <div style="background: var(--cms-bg); border: 1px solid var(--cms-border); padding: 12px; border-radius: 8px;" data-rev-idx="${idx}">
+              <div class="field-grid-3" style="align-items: end;">
+                <div class="field-group">
+                  <label class="field-label">Cliente</label>
+                  <input type="text" class="cms-input js-rev-author" data-idx="${idx}" value="${escapeAttr(rev.author || '')}" />
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Data / Tempo Relativo</label>
+                  <input type="text" class="cms-input js-rev-date" data-idx="${idx}" value="${escapeAttr(rev.date || '')}" />
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Estrelas (1 a 5)</label>
+                  <div style="display: flex; gap: 8px; align-items: center;">
+                    <input type="number" min="1" max="5" class="cms-input js-rev-stars" data-idx="${idx}" value="${escapeAttr(rev.stars || 5)}" />
+                    <button type="button" class="cms-btn cms-btn-danger cms-btn-sm js-rev-delete" data-idx="${idx}" title="Remover avaliação">Excluir</button>
+                  </div>
+                </div>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Depoimento</label>
+                <textarea class="cms-textarea js-rev-text" data-idx="${idx}" style="min-height: 58px;">${escapeAttr(rev.text || '')}</textarea>
+              </div>
+            </div>
+          `).join('')}
         </div>
       </div>
     `;
 
     container.querySelector('#f-av-t1')?.addEventListener('input', (e) => { av.titleLine1 = e.target.value; markDirtyAndSync(); });
     container.querySelector('#f-av-t2')?.addEventListener('input', (e) => { av.titleHighlight = e.target.value; markDirtyAndSync(); });
+    container.querySelector('#f-av-inv-title')?.addEventListener('input', (e) => { av.inviteTitle = e.target.value; markDirtyAndSync(); });
+    container.querySelector('#f-av-inv-text')?.addEventListener('input', (e) => { av.inviteText = e.target.value; markDirtyAndSync(); });
     container.querySelector('#f-gr-feat')?.addEventListener('input', (e) => { gr.featurableWidgetId = e.target.value.trim(); markDirtyAndSync(); });
+    container.querySelector('#f-gr-rating')?.addEventListener('input', (e) => { gr.rating = e.target.value.trim() || '5.0'; markDirtyAndSync(); });
+    container.querySelector('#f-gr-total')?.addEventListener('input', (e) => {
+      const n = parseInt(e.target.value, 10);
+      gr.totalReviews = Number.isFinite(n) && n >= 0 ? n : reviewsList.length;
+      markDirtyAndSync();
+    });
     container.querySelector('#f-gr-place')?.addEventListener('input', (e) => {
       const pid = e.target.value.trim();
       gr.googlePlaceId = pid;
@@ -2353,6 +2605,100 @@ function renderSectionsAdmin() {
       gr.googleReviewFormUrl = url;
       b.googleReviewsUrl = url;
       markDirtyAndSync();
+    });
+
+    container.querySelector('#btn-sync-google-reviews')?.addEventListener('click', async (e) => {
+      const syncBtn = e.currentTarget;
+      syncBtn.disabled = true;
+      const origTxt = syncBtn.textContent;
+      syncBtn.textContent = 'Sincronizando...';
+      try {
+        const res = await syncLiveGoogleReviewsIntoCms({ silent: false });
+        if (res.ok) {
+          const pane = getEditorScrollPane();
+          const prev = pane ? pane.scrollTop : 0;
+          markDirtyAndSync(true);
+          renderSectionsAdmin();
+          if (pane) pane.scrollTop = prev;
+          resetOuterShellScroll();
+        }
+      } finally {
+        syncBtn.disabled = false;
+        syncBtn.textContent = origTxt;
+      }
+    });
+
+    container.querySelector('#btn-add-manual-review')?.addEventListener('click', () => {
+      const palette = ['#5F9E34', '#3B7293', '#B58324', '#00897B', '#5C6BC0', '#8E24AA'];
+      const pane = getEditorScrollPane();
+      const prev = pane ? pane.scrollTop : 0;
+      gr.reviews.unshift({
+        id: `manual-${Date.now()}`,
+        author: 'Novo(a) Cliente',
+        avatarUrl: '',
+        reviewCount: 'Avaliação verificada',
+        context: 'Google Meu Negócio',
+        date: new Date().toISOString(),
+        isNew: true,
+        isManual: true,
+        stars: 5,
+        text: 'Experiência incrível do começo ao fim!',
+        avatarBg: palette[gr.reviews.length % palette.length],
+        avatarColor: '#FFFFFF',
+        initials: 'N'
+      });
+      gr.totalReviews = Math.max(Number(gr.totalReviews) || 0, gr.reviews.length);
+      markDirtyAndSync(true);
+      renderSectionsAdmin();
+      if (pane) pane.scrollTop = prev;
+      resetOuterShellScroll();
+      showToast('Nova avaliação adicionada ao mural.', 'success');
+    });
+
+    container.querySelectorAll('.js-rev-author').forEach((inp) => {
+      inp.addEventListener('input', () => {
+        const i = parseInt(inp.getAttribute('data-idx'), 10);
+        if (gr.reviews[i]) {
+          gr.reviews[i].author = inp.value;
+          gr.reviews[i].initials = (inp.value || 'C').trim().substring(0, 1).toUpperCase();
+        }
+        markDirtyAndSync();
+      });
+    });
+    container.querySelectorAll('.js-rev-date').forEach((inp) => {
+      inp.addEventListener('input', () => {
+        const i = parseInt(inp.getAttribute('data-idx'), 10);
+        if (gr.reviews[i]) gr.reviews[i].date = inp.value;
+        markDirtyAndSync();
+      });
+    });
+    container.querySelectorAll('.js-rev-stars').forEach((inp) => {
+      inp.addEventListener('input', () => {
+        const i = parseInt(inp.getAttribute('data-idx'), 10);
+        const sVal = Math.min(5, Math.max(1, parseInt(inp.value, 10) || 5));
+        if (gr.reviews[i]) gr.reviews[i].stars = sVal;
+        markDirtyAndSync();
+      });
+    });
+    container.querySelectorAll('.js-rev-text').forEach((inp) => {
+      inp.addEventListener('input', () => {
+        const i = parseInt(inp.getAttribute('data-idx'), 10);
+        if (gr.reviews[i]) gr.reviews[i].text = inp.value;
+        markDirtyAndSync();
+      });
+    });
+    container.querySelectorAll('.js-rev-delete').forEach((btnDel) => {
+      btnDel.addEventListener('click', () => {
+        const i = parseInt(btnDel.getAttribute('data-idx'), 10);
+        const pane = getEditorScrollPane();
+        const prev = pane ? pane.scrollTop : 0;
+        gr.reviews.splice(i, 1);
+        markDirtyAndSync(true);
+        renderSectionsAdmin();
+        if (pane) pane.scrollTop = prev;
+        resetOuterShellScroll();
+        showToast('Avaliação removida do mural.', 'info');
+      });
     });
     return;
   }
@@ -2397,6 +2743,17 @@ function renderSectionsAdmin() {
           <textarea id="f-ct-lead" class="cms-textarea" style="min-height: 62px;">${escapeAttr(ct.lead)}</textarea>
         </div>
 
+        <div class="field-grid">
+          <div class="field-group">
+            <label class="field-label">Título da Nota de Locação</label>
+            <input type="text" id="f-ct-ntitle" class="cms-input" value="${escapeAttr(ct.noteTitle || '')}" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Sobretítulo do Formulário (Kicker)</label>
+            <input type="text" id="f-ct-fkicker" class="cms-input" value="${escapeAttr(ct.formKicker || '')}" />
+          </div>
+        </div>
+
         <div class="field-group">
           <label class="field-label">Nota Sobre Locação e Horário</label>
           <textarea id="f-ct-note" class="cms-textarea" style="min-height: 68px;">${escapeAttr(ct.noteText)}</textarea>
@@ -2406,6 +2763,22 @@ function renderSectionsAdmin() {
           <div class="field-group">
             <label class="field-label">Título do Cartão de Pré-Agendamento</label>
             <input type="text" id="f-ct-ft" class="cms-input" value="${escapeAttr(ct.formTitle)}" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Texto do Botão de Envio (WhatsApp)</label>
+            <input type="text" id="f-ct-fbtn" class="cms-input" value="${escapeAttr(ct.submitBtnText || '')}" />
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Subtítulo do Cartão de Pré-Agendamento</label>
+          <textarea id="f-ct-fsub" class="cms-textarea" style="min-height: 54px;">${escapeAttr(ct.formSubtitle || '')}</textarea>
+        </div>
+
+        <div class="field-grid">
+          <div class="field-group">
+            <label class="field-label">Frase Poética do Rodapé</label>
+            <input type="text" id="f-ct-fquote" class="cms-input" value="${escapeAttr(ct.footerQuote || '')}" />
           </div>
           <div class="field-group">
             <label class="field-label">Equipamento Exibido no Rodapé</label>
@@ -2441,8 +2814,13 @@ function renderSectionsAdmin() {
     container.querySelector('#f-ct-t1')?.addEventListener('input', (e) => { ct.titleLine1 = e.target.value; markDirtyAndSync(); });
     container.querySelector('#f-ct-t2')?.addEventListener('input', (e) => { ct.titleHighlight = e.target.value; markDirtyAndSync(); });
     container.querySelector('#f-ct-lead')?.addEventListener('input', (e) => { ct.lead = e.target.value; markDirtyAndSync(); });
+    container.querySelector('#f-ct-ntitle')?.addEventListener('input', (e) => { ct.noteTitle = e.target.value; markDirtyAndSync(); });
+    container.querySelector('#f-ct-fkicker')?.addEventListener('input', (e) => { ct.formKicker = e.target.value; markDirtyAndSync(); });
     container.querySelector('#f-ct-note')?.addEventListener('input', (e) => { ct.noteText = e.target.value; markDirtyAndSync(); });
     container.querySelector('#f-ct-ft')?.addEventListener('input', (e) => { ct.formTitle = e.target.value; markDirtyAndSync(); });
+    container.querySelector('#f-ct-fbtn')?.addEventListener('input', (e) => { ct.submitBtnText = e.target.value; markDirtyAndSync(); });
+    container.querySelector('#f-ct-fsub')?.addEventListener('input', (e) => { ct.formSubtitle = e.target.value; markDirtyAndSync(); });
+    container.querySelector('#f-ct-fquote')?.addEventListener('input', (e) => { ct.footerQuote = e.target.value; markDirtyAndSync(); });
     container.querySelector('#f-ct-eq')?.addEventListener('input', (e) => { ct.equipmentText = e.target.value; markDirtyAndSync(); });
     container.querySelector('#f-ct-fdesc')?.addEventListener('input', (e) => { ct.footerDescription = e.target.value; markDirtyAndSync(); });
   }
@@ -2633,6 +3011,96 @@ async function publishToGitHubAtomic(ghCfg) {
   return { uploadedPhotos: pendingBlobs.length, cleanPayload };
 }
 
+function cleanSyncedGoogleReviewText(rawText) {
+  if (!rawText) return '';
+  return String(rawText)
+    .replace(/\s*\(Translated by Google\)[\s\S]*$/i, '')
+    .replace(/\s*\(Traduzido pelo Google\)[\s\S]*$/i, '')
+    .trim();
+}
+
+async function syncLiveGoogleReviewsIntoCms({ silent = false, timeoutMs = 4500 } = {}) {
+  const gr = cmsData.googleReviews || (cmsData.googleReviews = {});
+  const featurableId = String(gr.featurableWidgetId || '').trim();
+  if (!featurableId) {
+    if (!silent) showToast('Informe o Featurable Widget ID antes de sincronizar.', 'error');
+    return { ok: false };
+  }
+
+  const avatarPalette = ['#5F9E34', '#3B7293', '#B58324', '#00897B', '#5C6BC0', '#8E24AA'];
+  const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  const timer = controller ? setTimeout(() => controller.abort(), timeoutMs) : null;
+
+  try {
+    const res = await fetch(`https://featurable.com/api/v1/widgets/${encodeURIComponent(featurableId)}?t=${Date.now()}`, {
+      cache: 'no-store',
+      signal: controller ? controller.signal : undefined
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (!data || !data.success || !Array.isArray(data.reviews)) {
+      throw new Error('Resposta inesperada da API de avaliações.');
+    }
+
+    const mapped = data.reviews.map((r, idx) => {
+      const authorName = r.author?.name || r.reviewer?.displayName || 'Cliente Google';
+      const cleanedText = cleanSyncedGoogleReviewText(
+        r.text?.text || r.originalText?.text || r.comment || 'Excelente experiência fotográfica!'
+      );
+      return {
+        id: r.reviewId || `live-ft-${idx}`,
+        author: authorName,
+        avatarUrl: r.author?.avatarUrl || r.reviewer?.profilePhotoUrl || '',
+        reviewCount: 'Avaliação verificada',
+        context: 'Sincronizado via Google Meu Negócio',
+        date: r.createTime || r.relativePublishTimeDescription || 'Recentemente no Google',
+        isNew: idx < 4,
+        stars: r.rating || r.starRating || 5,
+        text: cleanedText,
+        avatarBg: avatarPalette[idx % avatarPalette.length],
+        avatarColor: '#FFFFFF',
+        initials: authorName.substring(0, 1).toUpperCase()
+      };
+    });
+
+    const existing = Array.isArray(gr.reviews) ? gr.reviews : [];
+    const seenIds = new Set();
+    const seenKeys = new Set();
+    const merged = [];
+    const addUnique = (rev) => {
+      if (!rev || (!rev.author && !rev.text)) return;
+      const idStr = rev.id ? String(rev.id).trim() : '';
+      const key = `${String(rev.author || '').trim().toLowerCase()}::${cleanSyncedGoogleReviewText(rev.text || '').toLowerCase().replace(/\s+/g, ' ').slice(0, 32)}`;
+      if (idStr && seenIds.has(idStr)) return;
+      if (key !== '::' && seenKeys.has(key)) return;
+      if (idStr) seenIds.add(idStr);
+      if (key !== '::') seenKeys.add(key);
+      merged.push(rev);
+    };
+
+    existing.forEach((r) => { if (r && r.isManual) addUnique(r); });
+    mapped.forEach(addUnique);
+    existing.forEach(addUnique);
+
+    gr.reviews = merged;
+    const totalFromApi = Number(data.widget?.gbpLocationSummary?.reviewsCount || data.totalReviewCount) || 0;
+    gr.totalReviews = Math.max(Number(gr.totalReviews) || 0, totalFromApi, merged.length);
+    gr.rating = Number(data.widget?.gbpLocationSummary?.rating || data.averageRating || gr.rating || 5).toFixed(1);
+
+    if (!silent) {
+      showToast(`${merged.length} avaliações sincronizadas do Google (Total no perfil: ${gr.totalReviews})!`, 'success');
+    }
+    return { ok: true, count: merged.length, totalReviews: gr.totalReviews };
+  } catch (err) {
+    if (!silent) {
+      showToast(`Não foi possível consultar a API agora: ${err.message}`, 'error');
+    }
+    return { ok: false, error: err.message };
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
 function broadcastPublishedSiteData(payload) {
   if (typeof BroadcastChannel === 'undefined') return;
   try {
@@ -2651,6 +3119,14 @@ async function handleMainPublishClick() {
   if (btn) btn.disabled = true;
 
   try {
+    // Atualiza silenciosamente avaliações recentes do Google antes de publicar em produção (timeout curto)
+    const preGhCfg = getSavedGitHubConfig();
+    if (preGhCfg || !isLocalhost) {
+      try {
+        await syncLiveGoogleReviewsIntoCms({ silent: true, timeoutMs: 3000 });
+      } catch (_) {}
+    }
+
     // Sincroniza álbuns e configurações globais de clientes com o payload oficial do site antes de publicar
     try {
       const albState = (typeof albumsState !== 'undefined' && albumsState) 
@@ -2968,21 +3444,42 @@ function renderAllPanels() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // Carrega rascunho de trabalho ou versão local salva se existir
+  // Carrega rascunho de trabalho ou versão local salva somente se for igual ou mais recente que o servidor
   const draftSnap = await readCmsSnapshot('draft_working');
   const pubSnap = await readCmsSnapshot('local_published');
+  const serverVersionMs = Date.parse(FACTORY_DATA.cmsVersion || '') || 0;
+  const getSnapTimeMs = (snap) => {
+    if (!snap || !snap.data) return 0;
+    return Math.max(Date.parse(snap.data.cmsVersion || '') || 0, Date.parse(snap.updatedAt || '') || 0);
+  };
 
-  if (draftSnap && draftSnap.data) {
+  if (draftSnap && draftSnap.data && getSnapTimeMs(draftSnap) >= serverVersionMs) {
     cmsData = draftSnap.data;
-  } else if (pubSnap && pubSnap.data) {
+  } else if (pubSnap && pubSnap.data && getSnapTimeMs(pubSnap) >= serverVersionMs) {
     cmsData = pubSnap.data;
   }
 
-  // Garante compatibilidade com novos campos de sections
+  // Garante compatibilidade com novos campos de sections e avaliações
   if (!cmsData.sections) {
     cmsData.sections = JSON.parse(JSON.stringify(FACTORY_DATA.sections));
+  } else {
+    Object.keys(FACTORY_DATA.sections || {}).forEach((secKey) => {
+      if (!cmsData.sections[secKey]) {
+        cmsData.sections[secKey] = JSON.parse(JSON.stringify(FACTORY_DATA.sections[secKey]));
+      }
+    });
+    if (cmsData.sections.sobre && (!Array.isArray(cmsData.sections.sobre.pillars) || !cmsData.sections.sobre.pillars.length)) {
+      cmsData.sections.sobre.pillars = JSON.parse(JSON.stringify(FACTORY_DATA.sections.sobre.pillars || []));
+    }
+  }
+  if (!cmsData.googleReviews) {
+    cmsData.googleReviews = JSON.parse(JSON.stringify(FACTORY_DATA.googleReviews));
+  } else if ((!Array.isArray(cmsData.googleReviews.reviews) || cmsData.googleReviews.reviews.length === 0) && Array.isArray(FACTORY_DATA.googleReviews?.reviews)) {
+    cmsData.googleReviews.reviews = JSON.parse(JSON.stringify(FACTORY_DATA.googleReviews.reviews));
+    cmsData.googleReviews.totalReviews = Math.max(Number(cmsData.googleReviews.totalReviews) || 0, Number(FACTORY_DATA.googleReviews.totalReviews) || 0);
   }
 
+  bindOuterShellScrollLock();
   initAuthGate();
   initTabsAndPreviewModes();
   initPortfolioUploadZone();

@@ -204,4 +204,96 @@ test.describe('2. Painel Administrativo Visual (admin.html)', () => {
     expect(focalStyle).toBe('center 75%');
   });
 
+  test('Textos & Seções: editar os 3 pilares de Sobre Carly e sincronizar Avaliações Google', async ({ page }) => {
+    await page.locator('button.sidebar-tab[data-tab="sections"]').click();
+    await page.waitForTimeout(200);
+
+    // 1. Sub-aba 05. Sobre Carly: os 3 pilares e título ético são editáveis e refletem no preview
+    await page.locator('#sections-subtabs [data-subtab="sec-sobre"]').click();
+    await page.waitForTimeout(250);
+
+    const pilTitles = page.locator('.js-sb-pil-title');
+    const pilDescs = page.locator('.js-sb-pil-desc');
+    await expect(pilTitles).toHaveCount(3);
+    await expect(pilDescs).toHaveCount(3);
+
+    await pilTitles.first().fill('“Pessoas no centro de tudo”');
+    await pilDescs.first().fill('Direção acolhedora respeitando seu ritmo natural.');
+    await page.waitForTimeout(300);
+
+    const iframe = page.frameLocator('#cms-preview-iframe');
+    await expect(iframe.locator('.about-pillar-item h4').first()).toContainText('Pessoas no centro de tudo');
+    await expect(iframe.locator('.about-pillar-item p').first()).toContainText('Direção acolhedora respeitando seu ritmo natural.');
+
+    // 2. Sub-aba 06. Avaliações Google: botão de sincronizar, totais e adição manual
+    await page.locator('#sections-subtabs [data-subtab="sec-avaliacoes"]').click();
+    await page.waitForTimeout(250);
+
+    await expect(page.locator('#btn-sync-google-reviews')).toBeVisible();
+    await expect(page.locator('#f-gr-total')).toHaveValue('22');
+
+    await page.locator('#btn-add-manual-review').click();
+    await page.waitForTimeout(200);
+    await page.locator('.js-rev-author').first().fill('Cliente Teste E2E');
+    await page.locator('.js-rev-text').first().fill('Avaliação adicionada pelo painel admin!');
+    await page.waitForTimeout(300);
+
+    await expect(iframe.locator('#reviews-track')).toContainText('Cliente Teste E2E');
+  });
+
+  test('Resolução 2K (2560x1440): scroll e reordenação de fotos mantém topbar fixa sem travar fundo', async ({ page }) => {
+    await page.setViewportSize({ width: 2560, height: 1440 });
+    await page.locator('button.sidebar-tab[data-tab="portfolio"]').click();
+    await page.waitForTimeout(300);
+
+    await page.locator('.admin-cat-pill[data-filter-cat="todas"]').click();
+    await page.waitForTimeout(300);
+
+    const cards = page.locator('#portfolio-cards-list .photo-editor-card-v3');
+    await expect(cards).toHaveCount(17);
+
+    // Abre gavetas de várias fotos inferiores para criar lista longa e simular scroll em 2K
+    for (const idx of [8, 9, 10, 11]) {
+      await cards.nth(idx).locator('.js-toggle-port-drawer').click();
+    }
+
+    // Rola o painel editor até a 10ª foto
+    await page.evaluate(() => {
+      const pane = document.querySelector('.cms-editor-pane');
+      if (pane) pane.scrollTop = pane.scrollHeight * 0.65;
+    });
+    await page.waitForTimeout(200);
+
+    const tenthCardDownBtn = cards.nth(9).locator('.js-port-down');
+    await tenthCardDownBtn.click();
+    await page.waitForTimeout(350);
+
+    // Verifica que a topbar permanece no topo (y === 0) e nenhum container externo rolou
+    const shellMetrics = await page.evaluate(() => {
+      const topbar = document.querySelector('.cms-topbar');
+      const app = document.getElementById('cms-app');
+      const ws = document.getElementById('cms-workspace');
+      const pane = document.querySelector('.cms-editor-pane');
+      return {
+        winY: window.scrollY,
+        docTop: document.documentElement.scrollTop,
+        bodyTop: document.body.scrollTop,
+        appTop: app ? app.scrollTop : -1,
+        wsTop: ws ? ws.scrollTop : -1,
+        topbarY: topbar ? Math.round(topbar.getBoundingClientRect().y) : -1,
+        paneHeight: pane ? pane.clientHeight : 0,
+        paneScrollHeight: pane ? pane.scrollHeight : 0
+      };
+    });
+
+    expect(shellMetrics.winY).toBe(0);
+    expect(shellMetrics.docTop).toBe(0);
+    expect(shellMetrics.bodyTop).toBe(0);
+    expect(shellMetrics.appTop).toBe(0);
+    expect(shellMetrics.wsTop).toBe(0);
+    expect(shellMetrics.topbarY).toBe(0);
+    expect(shellMetrics.paneHeight).toBeGreaterThan(800);
+    await expect(page.locator('#portfolio-cards-list .photo-editor-card-v3').first()).toBeVisible();
+  });
+
 });

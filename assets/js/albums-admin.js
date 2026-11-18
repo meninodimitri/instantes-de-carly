@@ -1210,7 +1210,7 @@
     const panel = document.getElementById('panel-albums');
     if (!panel || !albumsState) return;
 
-    const scrollContainer = panel.closest('.cms-editor') || panel.parentElement;
+    const scrollContainer = panel.closest('.cms-editor-pane, .cms-editor') || panel.parentElement;
     const prevScrollTop = scrollContainer ? scrollContainer.scrollTop : 0;
 
     updateSidebarBadge();
@@ -1256,6 +1256,12 @@
         renderAlbumsAdminPanel();
       });
       syncPreviewIframeForAlbums();
+      if (scrollContainer && prevScrollTop > 0) {
+        scrollContainer.scrollTop = prevScrollTop;
+      }
+      if (typeof window.resetOuterShellScroll === 'function') {
+        window.resetOuterShellScroll();
+      }
       return;
     }
 
@@ -1397,6 +1403,9 @@
     }
     if (scrollContainer && prevScrollTop > 0) {
       scrollContainer.scrollTop = prevScrollTop;
+    }
+    if (typeof window.resetOuterShellScroll === 'function') {
+      window.resetOuterShellScroll();
     }
   }
 

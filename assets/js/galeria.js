@@ -32,6 +32,19 @@
   // Cache em memória da sessão para os bundles protegidos (primarySrc + revealSrc)
   const runtimeProofMap = new Map();
 
+  function scrollPageSmoothlyTo(targetEl, block = 'start') {
+    if (!targetEl) return;
+    const rect = targetEl.getBoundingClientRect();
+    let top = window.scrollY + rect.top;
+    if (block === 'center') {
+      top = top - (window.innerHeight / 2) + (rect.height / 2);
+    } else {
+      const scrollMargin = parseFloat(getComputedStyle(targetEl).scrollMarginTop) || 0;
+      top -= scrollMargin;
+    }
+    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+  }
+
   const els = {
     portalView: document.getElementById('portal-view'),
     portalForm: document.getElementById('portal-code-form'),
@@ -628,7 +641,7 @@
     if (hadCheckoutOpen || !wasAlreadyPaid || params.get('payment') === 'success') {
       showToast(`Pagamento de ${formatBRL(album.paymentOrder.totalAmount)} confirmado! Seleção enviada para edição.`, 6500);
       setTimeout(() => {
-        els.lockedWrap?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        scrollPageSmoothlyTo(els.lockedWrap, 'center');
       }, 120);
     }
   }
@@ -1524,7 +1537,7 @@
     renderMasonryWall(currentAlbum);
     showToast('Pagamento aprovado. Seleção liberada para edição.', 6500);
     setTimeout(() => {
-      els.lockedWrap?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      scrollPageSmoothlyTo(els.lockedWrap, 'center');
     }, 120);
 
     // Sincroniza em nuvem
@@ -1750,7 +1763,7 @@
     const scrollDownToGallery = () => {
       const target = els.topbar || document.getElementById('main-stage') || els.grid;
       if (target) {
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        scrollPageSmoothlyTo(target, 'start');
       } else {
         window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
       }
@@ -1966,7 +1979,7 @@
       if (!event.data) return;
       if (event.data.type === 'SCROLL_TO_SECTION') {
         if (event.data.section === 'grid' || event.data.section === 'topbar') {
-          document.getElementById('gallery-topbar')?.scrollIntoView({ behavior: 'smooth' });
+          scrollPageSmoothlyTo(document.getElementById('gallery-topbar'), 'start');
         } else if (event.data.section === 'cover') {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }

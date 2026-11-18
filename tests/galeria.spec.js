@@ -183,7 +183,7 @@ test.describe('3. Área Privada do Cliente (galeria.html)', () => {
     await page.route('**/assets/js/data.js*', async route => {
       const resp = await route.fetch();
       let body = await resp.text();
-      body += `\n;(function(){ if (window.SITE_DATA && Array.isArray(window.SITE_DATA.clientAlbums)) { window.SITE_DATA.clientAlbums.forEach((a, i) => { if (i === 0) a.slug = 'teste-definitivo'; a.phase = 'proofing'; a.selectionLocked = false; a.selectedIds = []; a.photoComments = {}; a.status = 'awaiting_selection'; a.paymentOrder = null; a.showOnlySelected = false; a.packageIncluded = 5; a.extraPhotoPrice = 1; }); } })();\n`;
+      body += `\n;(function(){ if (window.SITE_DATA && Array.isArray(window.SITE_DATA.clientAlbums)) { window.SITE_DATA.clientAlbums.forEach((a, i) => { if (i === 0) a.slug = 'teste-definitivo'; a.phase = 'proofing'; a.selectionLocked = false; a.selectedIds = []; a.photoComments = {}; a.status = 'awaiting_selection'; a.paymentOrder = null; a.showOnlySelected = false; a.packageIncluded = 5; a.extraPhotoPrice = 1; a.extrasEnabled = true; }); } })();\n`;
       await route.fulfill({ response: resp, body });
     });
 
@@ -212,7 +212,7 @@ test.describe('3. Área Privada do Cliente (galeria.html)', () => {
     await page.route('**/assets/js/data.js*', async route => {
       const resp = await route.fetch();
       let body = await resp.text();
-      body += `\n;(function(){ if (window.SITE_DATA && Array.isArray(window.SITE_DATA.clientAlbums)) { window.SITE_DATA.clientAlbums.forEach((a, i) => { if (i === 0) a.slug = 'teste-definitivo'; a.phase = 'proofing'; a.selectionLocked = false; a.selectedIds = []; a.photoComments = {}; a.status = 'awaiting_selection'; a.paymentOrder = null; a.showOnlySelected = false; a.packageIncluded = 5; a.extraPhotoPrice = 1; }); } })();\n`;
+      body += `\n;(function(){ if (window.SITE_DATA && Array.isArray(window.SITE_DATA.clientAlbums)) { window.SITE_DATA.clientAlbums.forEach((a, i) => { if (i === 0) a.slug = 'teste-definitivo'; a.phase = 'proofing'; a.selectionLocked = false; a.selectedIds = []; a.photoComments = {}; a.status = 'awaiting_selection'; a.paymentOrder = null; a.showOnlySelected = false; a.packageIncluded = 5; a.extraPhotoPrice = 1; a.extrasEnabled = true; }); } })();\n`;
       await route.fulfill({ response: resp, body });
     });
 
