@@ -9,6 +9,8 @@
 
 const FACTORY_DATA = JSON.parse(JSON.stringify(SITE_DATA));
 let cmsData = JSON.parse(JSON.stringify(SITE_DATA));
+let loadedBaseCmsVersion = FACTORY_DATA.cmsVersion || '';
+const dirtyScopes = new Set();
 
 let isDirty = false;
 let activeTab = 'portfolio';
@@ -313,8 +315,10 @@ function sendToPreviewIframe(messageObj) {
   }
 }
 
-function markDirtyAndSync(immediate = false) {
+function markDirtyAndSync(immediate = false, scope = null) {
   isDirty = true;
+  const effectiveScope = scope || activeTab;
+  if (effectiveScope) dirtyScopes.add(effectiveScope);
   updateStatusUI();
 
   if (previewDebounceTimer) clearTimeout(previewDebounceTimer);
@@ -1002,7 +1006,7 @@ function bindVitrineCardsEvents(listEl) {
         quote: `“${photo.caption || 'Memórias reais registradas com calma e afeto.'}”`,
         objectPosition: photo.objectPosition || 'center 35%'
       });
-      markDirtyAndSync(true);
+      markDirtyAndSync(true, 'hero');
       showToast(`"${photo.title || 'Foto'}" adicionada à Capa do Site!`, 'success');
     });
 
@@ -1016,7 +1020,7 @@ function bindVitrineCardsEvents(listEl) {
       const tmp = cmsData.categories[idxInCats - 1];
       cmsData.categories[idxInCats - 1] = cmsData.categories[idxInCats];
       cmsData.categories[idxInCats] = tmp;
-      markDirtyAndSync(true);
+      markDirtyAndSync(true, 'categories');
       renderPortfolioAdmin();
       adjustMovedCardScroll(prevTop, () => Array.from(listEl.children).find((el) => el.getAttribute('data-cat-id') === catId));
       showToast('Ordem da vitrine atualizada!', 'success');
@@ -1030,7 +1034,7 @@ function bindVitrineCardsEvents(listEl) {
       const tmp = cmsData.categories[idxInCats + 1];
       cmsData.categories[idxInCats + 1] = cmsData.categories[idxInCats];
       cmsData.categories[idxInCats] = tmp;
-      markDirtyAndSync(true);
+      markDirtyAndSync(true, 'categories');
       renderPortfolioAdmin();
       adjustMovedCardScroll(prevTop, () => Array.from(listEl.children).find((el) => el.getAttribute('data-cat-id') === catId));
       showToast('Ordem da vitrine atualizada!', 'success');
@@ -1156,7 +1160,7 @@ function bindGeneralPortfolioEvents(listEl, isTodas) {
         quote: `“${item.caption || 'Memórias reais registradas com calma e afeto.'}”`,
         objectPosition: item.objectPosition || 'center 35%'
       });
-      markDirtyAndSync(true);
+      markDirtyAndSync(true, 'hero');
       showToast(`"${item.title}" adicionada à Capa do Site!`, 'success');
     });
 
@@ -2872,6 +2876,40 @@ if (typeof module !== 'undefined' && module.exports) {
 `;
 }
 
+function parseRemoteDataJsText(jsText) {
+  if (!jsText || typeof jsText !== 'string') return null;
+  const startMarker = 'const SITE_DATA =';
+  const startIdx = jsText.indexOf(startMarker);
+  if (startIdx === -1) return null;
+  const afterStart = jsText.slice(startIdx + startMarker.length);
+  const endMatch = afterStart.match(/\r?\nif\s*\(\s*typeof\s+(?:window|module)\b/);
+  const endIdx = endMatch ? endMatch.index : -1;
+  let rawJson = (endIdx !== -1 ? afterStart.slice(0, endIdx) : afterStart).trim();
+  if (rawJson.endsWith(';')) rawJson = rawJson.slice(0, -1).trim();
+  try {
+    return JSON.parse(rawJson);
+  } catch (_) {
+    return null;
+  }
+}
+
+async function fetchRemoteSiteDataAtCommit(repo, commitSha, token) {
+  try {
+    const res = await fetch(`https://api.github.com/repos/${repo}/contents/assets/js/data.js?ref=${encodeURIComponent(commitSha)}`, {
+      headers: {
+        Accept: 'application/vnd.github.raw',
+        Authorization: `Bearer ${token}`
+      },
+      cache: 'no-store'
+    });
+    if (!res.ok) return null;
+    const rawText = await res.text();
+    return parseRemoteDataJsText(rawText);
+  } catch (_) {
+    return null;
+  }
+}
+
 async function publishToGitHubAtomic(ghCfg) {
   const { repo, branch, token } = ghCfg;
   const headers = {
@@ -2925,6 +2963,64 @@ async function publishToGitHubAtomic(ghCfg) {
   if (!commitRes.ok) throw new Error('Falha ao obter árvore atual do repositório.');
   const commitData = await commitRes.json();
   const baseTreeSha = commitData.tree.sha;
+
+  // 2.5 Proteger publicações concorrentes/antigas: se origin/main avançou após o carregamento deste painel,
+  // preserva automaticamente seções, portfólio, capa, categorias e álbuns remotos não alterados nesta sessão.
+  const remoteData = await fetchRemoteSiteDataAtCommit(repo, latestCommitSha, token);
+  const remoteVerMs = Date.parse(remoteData?.cmsVersion || '') || 0;
+  const baseVerMs = Date.parse(loadedBaseCmsVersion || '') || 0;
+  if (remoteData && remoteVerMs > baseVerMs) {
+    if (!dirtyScopes.has('portfolio') && Array.isArray(remoteData.portfolio)) {
+      cleanPayload.portfolio = remoteData.portfolio;
+    }
+    if (!dirtyScopes.has('categories') && Array.isArray(remoteData.categories)) {
+      cleanPayload.categories = remoteData.categories;
+    }
+    if (!dirtyScopes.has('hero') && Array.isArray(remoteData.heroSlides)) {
+      cleanPayload.heroSlides = remoteData.heroSlides;
+    }
+    if (!dirtyScopes.has('packages') && Array.isArray(remoteData.packages)) {
+      cleanPayload.packages = remoteData.packages;
+    }
+    if (!dirtyScopes.has('sections') && remoteData.sections) {
+      cleanPayload.sections = remoteData.sections;
+    }
+    if (!dirtyScopes.has('sections') && !dirtyScopes.has('brand') && remoteData.brand) {
+      cleanPayload.brand = remoteData.brand;
+    }
+    if (Array.isArray(remoteData.clientAlbums)) {
+      let deletedIdsSet = new Set();
+      try {
+        if (window.AlbumsStore && typeof window.AlbumsStore.loadState === 'function') {
+          const st = await window.AlbumsStore.loadState();
+          deletedIdsSet = new Set((st?.deletedAlbumIds || []).map((id) => String(id)));
+        }
+      } catch (_) {}
+
+      const localById = new Map();
+      (cleanPayload.clientAlbums || []).forEach((a) => {
+        if (a && a.id) localById.set(String(a.id), a);
+      });
+      const mergedAlbums = [...(cleanPayload.clientAlbums || [])];
+      remoteData.clientAlbums.forEach((remAlb) => {
+        if (!remAlb || !remAlb.id) return;
+        const idStr = String(remAlb.id);
+        if (deletedIdsSet.has(idStr)) return;
+        if (!localById.has(idStr)) {
+          mergedAlbums.push(remAlb);
+        } else {
+          const locAlb = localById.get(idStr);
+          const remUpd = Number(remAlb.updatedAt) || 0;
+          const locUpd = Number(locAlb.updatedAt) || 0;
+          if (!dirtyScopes.has('albums') && remUpd >= locUpd) {
+            const idx = mergedAlbums.indexOf(locAlb);
+            if (idx !== -1) mergedAlbums[idx] = remAlb;
+          }
+        }
+      });
+      cleanPayload.clientAlbums = mergedAlbums;
+    }
+  }
 
   const treeEntries = [];
 
@@ -3135,6 +3231,9 @@ async function handleMainPublishClick() {
       if (albState) {
         if (Array.isArray(albState.albums)) {
           cmsData.clientAlbums = albState.albums;
+          if (activeTab === 'albums' || (Number(albState.updatedAt) || 0) > (Date.parse(loadedBaseCmsVersion || '') || 0)) {
+            dirtyScopes.add('albums');
+          }
         }
         if (albState.watermarkConfig) {
           cmsData.clientWatermarkConfig = albState.watermarkConfig;
@@ -3176,10 +3275,14 @@ async function handleMainPublishClick() {
         }
       }
       isDirty = false;
+      loadedBaseCmsVersion = cmsData.cmsVersion || loadedBaseCmsVersion;
+      dirtyScopes.clear();
       updateStatusUI();
       showToast('Publicado com sucesso! O site oficial e as galerias estarão atualizados em ~15 segundos.', 'success', 6000);
     } else {
       isDirty = false;
+      loadedBaseCmsVersion = cmsData.cmsVersion || loadedBaseCmsVersion;
+      dirtyScopes.clear();
       updateStatusUI();
       showToast('Alterações salvas e aplicadas no seu site local (localhost)! Quando estiver em produção, conecte o GitHub na aba Publicação.', 'success', 5200);
     }
@@ -3444,19 +3547,25 @@ function renderAllPanels() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // Carrega rascunho de trabalho ou versão local salva somente se for igual ou mais recente que o servidor
+  // Carrega rascunho de trabalho ou versão local salva somente se for da mesma versão (ou mais recente) que o servidor
   const draftSnap = await readCmsSnapshot('draft_working');
   const pubSnap = await readCmsSnapshot('local_published');
   const serverVersionMs = Date.parse(FACTORY_DATA.cmsVersion || '') || 0;
+  const getSnapDataVerMs = (snap) => {
+    if (!snap || !snap.data) return 0;
+    return Date.parse(snap.data.cmsVersion || '') || 0;
+  };
   const getSnapTimeMs = (snap) => {
     if (!snap || !snap.data) return 0;
-    return Math.max(Date.parse(snap.data.cmsVersion || '') || 0, Date.parse(snap.updatedAt || '') || 0);
+    return Math.max(getSnapDataVerMs(snap), Date.parse(snap.updatedAt || '') || 0);
   };
 
-  if (draftSnap && draftSnap.data && getSnapTimeMs(draftSnap) >= serverVersionMs) {
+  if (draftSnap && draftSnap.data && getSnapDataVerMs(draftSnap) >= serverVersionMs && getSnapTimeMs(draftSnap) >= serverVersionMs) {
     cmsData = draftSnap.data;
-  } else if (pubSnap && pubSnap.data && getSnapTimeMs(pubSnap) >= serverVersionMs) {
+    loadedBaseCmsVersion = cmsData.cmsVersion || loadedBaseCmsVersion;
+  } else if (pubSnap && pubSnap.data && getSnapDataVerMs(pubSnap) >= serverVersionMs && getSnapTimeMs(pubSnap) >= serverVersionMs) {
     cmsData = pubSnap.data;
+    loadedBaseCmsVersion = cmsData.cmsVersion || loadedBaseCmsVersion;
   }
 
   // Garante compatibilidade com novos campos de sections e avaliações

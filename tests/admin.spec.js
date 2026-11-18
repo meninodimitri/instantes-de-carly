@@ -135,7 +135,14 @@ test.describe('2. Painel Administrativo Visual (admin.html)', () => {
     await expect(workspace).not.toHaveClass(/force-mobile-preview/);
   });
 
-  test('Portfólio: Vitrine do Acervo (7 capas) vs Todas as Fotos (17) e reordenação', async ({ page }) => {
+  test('Portfólio: Vitrine do Acervo vs Todas as Fotos e reordenação', async ({ page }) => {
+    const expectedTotal = await page.evaluate(() => (window.SITE_DATA?.portfolio || []).length);
+    const expectedVitrine = await page.evaluate(() => {
+      const cats = (window.SITE_DATA?.categories || []).filter((c) => c.id !== 'todos');
+      const items = window.SITE_DATA?.portfolio || [];
+      return cats.filter((c) => items.some((p) => p.category === c.id)).length;
+    });
+
     // Garante que está na aba Portfólio
     const tabPortfolio = page.locator('button.sidebar-tab[data-tab="portfolio"]');
     await tabPortfolio.click();
@@ -144,13 +151,14 @@ test.describe('2. Painel Administrativo Visual (admin.html)', () => {
     const pillVitrine = page.locator('.admin-cat-pill[data-filter-cat="vitrine"]');
     const pillTodas = page.locator('.admin-cat-pill[data-filter-cat="todas"]');
 
-    // 1. Vitrine é a aba inicial ativa com 7 capas
+    // 1. Vitrine é a aba inicial ativa com 1 capa por categoria ativa
     await expect(pillVitrine).toBeVisible();
     await expect(pillVitrine).toHaveClass(/active/);
     await expect(pillVitrine).toContainText('Vitrine do Acervo');
 
     const vitrineCards = page.locator('#portfolio-cards-list .is-vitrine-card');
-    await expect(vitrineCards).toHaveCount(7);
+    await expect(vitrineCards).toHaveCount(expectedVitrine);
+    expect(expectedVitrine).toBeGreaterThanOrEqual(8);
 
     // O primeiro card tem botão de subir desabilitado e descer habilitado
     const firstUpBtn = vitrineCards.first().locator('.js-vitrine-up').first();
@@ -164,11 +172,12 @@ test.describe('2. Painel Administrativo Visual (admin.html)', () => {
     await expect(pillVitrine).not.toHaveClass(/active/);
 
     const allCards = page.locator('#portfolio-cards-list .photo-editor-card-v3');
-    await expect(allCards).toHaveCount(17);
+    await expect(allCards).toHaveCount(expectedTotal);
+    expect(expectedTotal).toBeGreaterThanOrEqual(56);
 
     // 3. Volta para Vitrine e testa reordenação da primeira capa
     await pillVitrine.click();
-    await expect(vitrineCards).toHaveCount(7);
+    await expect(vitrineCards).toHaveCount(expectedVitrine);
 
     // Verifica que a ordem no Preview do site espelha 1:1 a ordem dos cartões do Admin
     const iframe = page.frameLocator('#cms-preview-iframe');
@@ -242,6 +251,7 @@ test.describe('2. Painel Administrativo Visual (admin.html)', () => {
   });
 
   test('Resolução 2K (2560x1440): scroll e reordenação de fotos mantém topbar fixa sem travar fundo', async ({ page }) => {
+    const expectedTotal = await page.evaluate(() => (window.SITE_DATA?.portfolio || []).length);
     await page.setViewportSize({ width: 2560, height: 1440 });
     await page.locator('button.sidebar-tab[data-tab="portfolio"]').click();
     await page.waitForTimeout(300);
@@ -250,7 +260,7 @@ test.describe('2. Painel Administrativo Visual (admin.html)', () => {
     await page.waitForTimeout(300);
 
     const cards = page.locator('#portfolio-cards-list .photo-editor-card-v3');
-    await expect(cards).toHaveCount(17);
+    await expect(cards).toHaveCount(expectedTotal);
 
     // Abre gavetas de várias fotos inferiores para criar lista longa e simular scroll em 2K
     for (const idx of [8, 9, 10, 11]) {
