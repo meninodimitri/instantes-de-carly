@@ -5,7 +5,7 @@
  */
 
 const SITE_DATA = {
-  "cmsVersion": "2026-11-18T13:17:28.321Z",
+  "cmsVersion": "2026-11-20T22:35:55.786Z",
   "brand": {
     "name": "Instantes de Carly",
     "founder": "Carliane Carvalho (Carly)",
@@ -1265,6 +1265,961 @@ const SITE_DATA = {
   },
   "clientAlbums": [
     {
+      "id": "alb_1795213635849",
+      "slug": "fabricia",
+      "clientName": "Fabricia",
+      "title": "Ensaio de Natal Camping",
+      "subtitle": "FORTALEZA, CEARÁ",
+      "phase": "proofing",
+      "status": "awaiting_selection",
+      "protectionLevel": "watermark",
+      "watermarkEnabled": true,
+      "passwordEnabled": false,
+      "password": "1788",
+      "pinEnabled": false,
+      "downloadPin": "",
+      "packageName": "Ensaio Autoral",
+      "packageIncluded": 12,
+      "extrasEnabled": true,
+      "extraPhotoPrice": 10,
+      "allowHighResDownload": true,
+      "allowWebDownload": true,
+      "welcomeMessage": "Olá, Fabricia! Escolha com carinho suas fotografias favoritas.",
+      "coverSrc": "assets/images/uploads/foto-20261120223557-01.jpg",
+      "coverFocal": "34% 54%",
+      "design": {
+        "coverStyle": "listra",
+        "typography": "carly",
+        "colorTheme": "amarelinho",
+        "gridStyle": "vertical",
+        "gridSpacing": "large",
+        "gridSize": "large",
+        "gridNavStyle": "icons_text",
+        "coverLogoVisible": true,
+        "coverLogoColor": "auto"
+      },
+      "photos": [
+        {
+          "id": "ph_1795213697462_0",
+          "filename": "IMG_9196.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-02.jpg"
+        },
+        {
+          "id": "ph_1795213697533_1",
+          "filename": "IMG_9197.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-03.jpg"
+        },
+        {
+          "id": "ph_1795213697619_2",
+          "filename": "IMG_9199.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-04.jpg"
+        },
+        {
+          "id": "ph_1795213697694_3",
+          "filename": "IMG_9200.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-05.jpg"
+        },
+        {
+          "id": "ph_1795213697754_4",
+          "filename": "IMG_9201.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-06.jpg"
+        },
+        {
+          "id": "ph_1795213697829_5",
+          "filename": "IMG_9203.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-07.jpg"
+        },
+        {
+          "id": "ph_1795213697915_6",
+          "filename": "IMG_9205.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-08.jpg"
+        },
+        {
+          "id": "ph_1795213697984_7",
+          "filename": "IMG_9206.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-09.jpg"
+        },
+        {
+          "id": "ph_1795213698060_8",
+          "filename": "IMG_9209.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-10.jpg"
+        },
+        {
+          "id": "ph_1795213698138_9",
+          "filename": "IMG_9210.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-11.jpg"
+        },
+        {
+          "id": "ph_1795213698213_10",
+          "filename": "IMG_9211.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-12.jpg"
+        },
+        {
+          "id": "ph_1795213698284_11",
+          "filename": "IMG_9212.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-13.jpg"
+        },
+        {
+          "id": "ph_1795213698355_12",
+          "filename": "IMG_9213.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-14.jpg"
+        },
+        {
+          "id": "ph_1795213698432_13",
+          "filename": "IMG_9215.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-15.jpg"
+        },
+        {
+          "id": "ph_1795213698521_14",
+          "filename": "IMG_9220.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-16.jpg"
+        },
+        {
+          "id": "ph_1795213698591_15",
+          "filename": "IMG_9221.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-17.jpg"
+        },
+        {
+          "id": "ph_1795213698660_16",
+          "filename": "IMG_9223.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-18.jpg"
+        },
+        {
+          "id": "ph_1795213698725_17",
+          "filename": "IMG_9225.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-19.jpg"
+        },
+        {
+          "id": "ph_1795213698795_18",
+          "filename": "IMG_9226.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-20.jpg"
+        },
+        {
+          "id": "ph_1795213698872_19",
+          "filename": "IMG_9229.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-21.jpg"
+        },
+        {
+          "id": "ph_1795213698950_20",
+          "filename": "IMG_9232.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-22.jpg"
+        },
+        {
+          "id": "ph_1795213699009_21",
+          "filename": "IMG_9233.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-23.jpg"
+        },
+        {
+          "id": "ph_1795213699074_22",
+          "filename": "IMG_9234.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-24.jpg"
+        },
+        {
+          "id": "ph_1795213699132_23",
+          "filename": "IMG_9235.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-25.jpg"
+        },
+        {
+          "id": "ph_1795213699200_24",
+          "filename": "IMG_9238.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-26.jpg"
+        },
+        {
+          "id": "ph_1795213699259_25",
+          "filename": "IMG_9239.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-27.jpg"
+        },
+        {
+          "id": "ph_1795213699331_26",
+          "filename": "IMG_9242.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-28.jpg"
+        },
+        {
+          "id": "ph_1795213699421_27",
+          "filename": "IMG_9245.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-29.jpg"
+        },
+        {
+          "id": "ph_1795213699507_28",
+          "filename": "IMG_9246.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-30.jpg"
+        },
+        {
+          "id": "ph_1795213699575_29",
+          "filename": "IMG_9248.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-31.jpg"
+        },
+        {
+          "id": "ph_1795213699630_30",
+          "filename": "IMG_9249.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-32.jpg"
+        },
+        {
+          "id": "ph_1795213699690_31",
+          "filename": "IMG_9252.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-33.jpg"
+        },
+        {
+          "id": "ph_1795213699752_32",
+          "filename": "IMG_9253.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-34.jpg"
+        },
+        {
+          "id": "ph_1795213699816_33",
+          "filename": "IMG_9255.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-35.jpg"
+        },
+        {
+          "id": "ph_1795213699874_34",
+          "filename": "IMG_9257.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-36.jpg"
+        },
+        {
+          "id": "ph_1795213699935_35",
+          "filename": "IMG_9259.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-37.jpg"
+        },
+        {
+          "id": "ph_1795213700006_36",
+          "filename": "IMG_9260.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-38.jpg"
+        },
+        {
+          "id": "ph_1795213700070_37",
+          "filename": "IMG_9262.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-39.jpg"
+        },
+        {
+          "id": "ph_1795213700132_38",
+          "filename": "IMG_9264.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-40.jpg"
+        },
+        {
+          "id": "ph_1795213700192_39",
+          "filename": "IMG_9265.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-41.jpg"
+        },
+        {
+          "id": "ph_1795213700257_40",
+          "filename": "IMG_9268.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-42.jpg"
+        },
+        {
+          "id": "ph_1795213700314_41",
+          "filename": "IMG_9269.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-43.jpg"
+        },
+        {
+          "id": "ph_1795213700375_42",
+          "filename": "IMG_9270.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-44.jpg"
+        },
+        {
+          "id": "ph_1795213700432_43",
+          "filename": "IMG_9271.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-45.jpg"
+        },
+        {
+          "id": "ph_1795213700486_44",
+          "filename": "IMG_9273.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-46.jpg"
+        },
+        {
+          "id": "ph_1795213700548_45",
+          "filename": "IMG_9276.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-47.jpg"
+        },
+        {
+          "id": "ph_1795213700606_46",
+          "filename": "IMG_9277.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-48.jpg"
+        },
+        {
+          "id": "ph_1795213700664_47",
+          "filename": "IMG_9279.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-49.jpg"
+        },
+        {
+          "id": "ph_1795213700722_48",
+          "filename": "IMG_9281.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-50.jpg"
+        },
+        {
+          "id": "ph_1795213700782_49",
+          "filename": "IMG_9284.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-51.jpg"
+        },
+        {
+          "id": "ph_1795213700839_50",
+          "filename": "IMG_9285.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-52.jpg"
+        },
+        {
+          "id": "ph_1795213700898_51",
+          "filename": "IMG_9289.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-53.jpg"
+        },
+        {
+          "id": "ph_1795213700957_52",
+          "filename": "IMG_9294.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-54.jpg"
+        },
+        {
+          "id": "ph_1795213701016_53",
+          "filename": "IMG_9296.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-55.jpg"
+        },
+        {
+          "id": "ph_1795213701077_54",
+          "filename": "IMG_9299.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-56.jpg"
+        },
+        {
+          "id": "ph_1795213701137_55",
+          "filename": "IMG_9301.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-57.jpg"
+        },
+        {
+          "id": "ph_1795213701189_56",
+          "filename": "IMG_9302.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-58.jpg"
+        },
+        {
+          "id": "ph_1795213701242_57",
+          "filename": "IMG_9304.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-59.jpg"
+        },
+        {
+          "id": "ph_1795213701300_58",
+          "filename": "IMG_9307.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-60.jpg"
+        },
+        {
+          "id": "ph_1795213701380_59",
+          "filename": "IMG_9308.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-61.jpg"
+        },
+        {
+          "id": "ph_1795213701454_60",
+          "filename": "IMG_9310.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-62.jpg"
+        },
+        {
+          "id": "ph_1795213701518_61",
+          "filename": "IMG_9313.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-63.jpg"
+        },
+        {
+          "id": "ph_1795213701582_62",
+          "filename": "IMG_9316.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-64.jpg"
+        },
+        {
+          "id": "ph_1795213701659_63",
+          "filename": "IMG_9318.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-65.jpg"
+        },
+        {
+          "id": "ph_1795213701724_64",
+          "filename": "IMG_9320.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-66.jpg"
+        },
+        {
+          "id": "ph_1795213701781_65",
+          "filename": "IMG_9322.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-67.jpg"
+        },
+        {
+          "id": "ph_1795213701843_66",
+          "filename": "IMG_9323.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-68.jpg"
+        },
+        {
+          "id": "ph_1795213701906_67",
+          "filename": "IMG_9324.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-69.jpg"
+        },
+        {
+          "id": "ph_1795213701968_68",
+          "filename": "IMG_9325.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-70.jpg"
+        },
+        {
+          "id": "ph_1795213702042_69",
+          "filename": "IMG_9327.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-71.jpg"
+        },
+        {
+          "id": "ph_1795213702120_70",
+          "filename": "IMG_9329.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-72.jpg"
+        },
+        {
+          "id": "ph_1795213702175_71",
+          "filename": "IMG_9331.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-73.jpg"
+        },
+        {
+          "id": "ph_1795213702238_72",
+          "filename": "IMG_9333.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-74.jpg"
+        },
+        {
+          "id": "ph_1795213702295_73",
+          "filename": "IMG_9335.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-75.jpg"
+        },
+        {
+          "id": "ph_1795213702355_74",
+          "filename": "IMG_9336.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-76.jpg"
+        },
+        {
+          "id": "ph_1795213702417_75",
+          "filename": "IMG_9339.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-77.jpg"
+        },
+        {
+          "id": "ph_1795213702477_76",
+          "filename": "IMG_9340.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-78.jpg"
+        },
+        {
+          "id": "ph_1795213702539_77",
+          "filename": "IMG_9341.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-79.jpg"
+        },
+        {
+          "id": "ph_1795213702605_78",
+          "filename": "IMG_9342.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-80.jpg"
+        },
+        {
+          "id": "ph_1795213702683_79",
+          "filename": "IMG_9343.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-81.jpg"
+        },
+        {
+          "id": "ph_1795213702758_80",
+          "filename": "IMG_9344.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-82.jpg"
+        },
+        {
+          "id": "ph_1795213702829_81",
+          "filename": "IMG_9346.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-83.jpg"
+        },
+        {
+          "id": "ph_1795213702906_82",
+          "filename": "IMG_9347.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-84.jpg"
+        },
+        {
+          "id": "ph_1795213702969_83",
+          "filename": "IMG_9349.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-85.jpg"
+        },
+        {
+          "id": "ph_1795213703038_84",
+          "filename": "IMG_9351.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-86.jpg"
+        },
+        {
+          "id": "ph_1795213703109_85",
+          "filename": "IMG_9352.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-87.jpg"
+        },
+        {
+          "id": "ph_1795213703363_86",
+          "filename": "IMG_9354.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-88.jpg"
+        },
+        {
+          "id": "ph_1795213703623_87",
+          "filename": "IMG_9356.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-89.jpg"
+        },
+        {
+          "id": "ph_1795213703796_88",
+          "filename": "IMG_9358.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-90.jpg"
+        },
+        {
+          "id": "ph_1795213703973_89",
+          "filename": "IMG_9360.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-91.jpg"
+        },
+        {
+          "id": "ph_1795213704045_90",
+          "filename": "IMG_9363.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-92.jpg"
+        },
+        {
+          "id": "ph_1795213704118_91",
+          "filename": "IMG_9365.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-93.jpg"
+        },
+        {
+          "id": "ph_1795213704201_92",
+          "filename": "IMG_9366.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-94.jpg"
+        },
+        {
+          "id": "ph_1795213704277_93",
+          "filename": "IMG_9367.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-95.jpg"
+        },
+        {
+          "id": "ph_1795213704348_94",
+          "filename": "IMG_9368.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-96.jpg"
+        },
+        {
+          "id": "ph_1795213704418_95",
+          "filename": "IMG_9369.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-97.jpg"
+        },
+        {
+          "id": "ph_1795213704516_96",
+          "filename": "IMG_9371.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-98.jpg"
+        },
+        {
+          "id": "ph_1795213704579_97",
+          "filename": "IMG_9374.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-99.jpg"
+        },
+        {
+          "id": "ph_1795213704635_98",
+          "filename": "IMG_9375.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-100.jpg"
+        },
+        {
+          "id": "ph_1795213704699_99",
+          "filename": "IMG_9379.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-101.jpg"
+        },
+        {
+          "id": "ph_1795213704797_100",
+          "filename": "IMG_9380.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-102.jpg"
+        },
+        {
+          "id": "ph_1795213704871_101",
+          "filename": "IMG_9384.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-103.jpg"
+        },
+        {
+          "id": "ph_1795213704935_102",
+          "filename": "IMG_9386.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-104.jpg"
+        },
+        {
+          "id": "ph_1795213705016_103",
+          "filename": "IMG_9388.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-105.jpg"
+        },
+        {
+          "id": "ph_1795213705100_104",
+          "filename": "IMG_9390.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-106.jpg"
+        },
+        {
+          "id": "ph_1795213705201_105",
+          "filename": "IMG_9394.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-107.jpg"
+        },
+        {
+          "id": "ph_1795213705268_106",
+          "filename": "IMG_9395.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-108.jpg"
+        },
+        {
+          "id": "ph_1795213705329_107",
+          "filename": "IMG_9398.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-109.jpg"
+        },
+        {
+          "id": "ph_1795213705407_108",
+          "filename": "IMG_9402.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-110.jpg"
+        },
+        {
+          "id": "ph_1795213705484_109",
+          "filename": "IMG_9404.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-111.jpg"
+        },
+        {
+          "id": "ph_1795213705582_110",
+          "filename": "IMG_9406.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-112.jpg"
+        },
+        {
+          "id": "ph_1795213705663_111",
+          "filename": "IMG_9408.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-113.jpg"
+        },
+        {
+          "id": "ph_1795213705765_112",
+          "filename": "IMG_9409.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-114.jpg"
+        },
+        {
+          "id": "ph_1795213705848_113",
+          "filename": "IMG_9410.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-115.jpg"
+        },
+        {
+          "id": "ph_1795213705926_114",
+          "filename": "IMG_9413.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-116.jpg"
+        },
+        {
+          "id": "ph_1795213706008_115",
+          "filename": "IMG_9415.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-117.jpg"
+        },
+        {
+          "id": "ph_1795213706085_116",
+          "filename": "IMG_9418.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-118.jpg"
+        },
+        {
+          "id": "ph_1795213706168_117",
+          "filename": "IMG_9422.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-119.jpg"
+        },
+        {
+          "id": "ph_1795213706287_118",
+          "filename": "IMG_9425.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-120.jpg"
+        },
+        {
+          "id": "ph_1795213706375_119",
+          "filename": "IMG_9427.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-121.jpg"
+        },
+        {
+          "id": "ph_1795213706469_120",
+          "filename": "IMG_9428.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-122.jpg"
+        },
+        {
+          "id": "ph_1795213706622_121",
+          "filename": "IMG_9430.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-123.jpg"
+        },
+        {
+          "id": "ph_1795213706742_122",
+          "filename": "IMG_9432.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-124.jpg"
+        },
+        {
+          "id": "ph_1795213706856_123",
+          "filename": "IMG_9434.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-125.jpg"
+        },
+        {
+          "id": "ph_1795213706925_124",
+          "filename": "IMG_9437.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-126.jpg"
+        },
+        {
+          "id": "ph_1795213706994_125",
+          "filename": "IMG_9438.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-127.jpg"
+        },
+        {
+          "id": "ph_1795213707067_126",
+          "filename": "IMG_9439.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-128.jpg"
+        },
+        {
+          "id": "ph_1795213707236_127",
+          "filename": "IMG_9444.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-129.jpg"
+        },
+        {
+          "id": "ph_1795213707380_128",
+          "filename": "IMG_9446.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-130.jpg"
+        },
+        {
+          "id": "ph_1795213707463_129",
+          "filename": "IMG_9450.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-131.jpg"
+        },
+        {
+          "id": "ph_1795213707561_130",
+          "filename": "IMG_9454.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-132.jpg"
+        },
+        {
+          "id": "ph_1795213707707_131",
+          "filename": "IMG_9455.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-133.jpg"
+        },
+        {
+          "id": "ph_1795213707772_132",
+          "filename": "IMG_9457.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-134.jpg"
+        },
+        {
+          "id": "ph_1795213707837_133",
+          "filename": "IMG_9458.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-135.jpg"
+        },
+        {
+          "id": "ph_1795213707904_134",
+          "filename": "IMG_9462.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-136.jpg"
+        },
+        {
+          "id": "ph_1795213707974_135",
+          "filename": "IMG_9464.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-137.jpg"
+        },
+        {
+          "id": "ph_1795213708045_136",
+          "filename": "IMG_9466.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-138.jpg"
+        },
+        {
+          "id": "ph_1795213708117_137",
+          "filename": "IMG_9470.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-139.jpg"
+        },
+        {
+          "id": "ph_1795213708194_138",
+          "filename": "IMG_9474.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-140.jpg"
+        },
+        {
+          "id": "ph_1795213708284_139",
+          "filename": "IMG_9476.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-141.jpg"
+        },
+        {
+          "id": "ph_1795213708382_140",
+          "filename": "IMG_9483.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-142.jpg"
+        },
+        {
+          "id": "ph_1795213708471_141",
+          "filename": "IMG_9487.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-143.jpg"
+        },
+        {
+          "id": "ph_1795213708539_142",
+          "filename": "IMG_9489.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-144.jpg"
+        },
+        {
+          "id": "ph_1795213708599_143",
+          "filename": "IMG_9491.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-145.jpg"
+        },
+        {
+          "id": "ph_1795213708667_144",
+          "filename": "IMG_9495.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-146.jpg"
+        },
+        {
+          "id": "ph_1795213708740_145",
+          "filename": "IMG_9497.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-147.jpg"
+        },
+        {
+          "id": "ph_1795213708804_146",
+          "filename": "IMG_9501.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-148.jpg"
+        },
+        {
+          "id": "ph_1795213708863_147",
+          "filename": "IMG_9502.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-149.jpg"
+        },
+        {
+          "id": "ph_1795213708914_148",
+          "filename": "IMG_9503.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-150.jpg"
+        },
+        {
+          "id": "ph_1795213708965_149",
+          "filename": "IMG_9504.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-151.jpg"
+        },
+        {
+          "id": "ph_1795213709027_150",
+          "filename": "IMG_9507.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-152.jpg"
+        },
+        {
+          "id": "ph_1795213709107_151",
+          "filename": "IMG_9509.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-153.jpg"
+        },
+        {
+          "id": "ph_1795213709212_152",
+          "filename": "IMG_9511.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-154.jpg"
+        },
+        {
+          "id": "ph_1795213709290_153",
+          "filename": "IMG_9512.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-155.jpg"
+        },
+        {
+          "id": "ph_1795213709352_154",
+          "filename": "IMG_9515.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-156.jpg"
+        },
+        {
+          "id": "ph_1795213709427_155",
+          "filename": "IMG_9519.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-157.jpg"
+        },
+        {
+          "id": "ph_1795213709510_156",
+          "filename": "IMG_9523.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-158.jpg"
+        },
+        {
+          "id": "ph_1795213709597_157",
+          "filename": "IMG_9524.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-159.jpg"
+        },
+        {
+          "id": "ph_1795213709652_158",
+          "filename": "IMG_9526.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-160.jpg"
+        },
+        {
+          "id": "ph_1795213709758_159",
+          "filename": "IMG_9541.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-161.jpg"
+        },
+        {
+          "id": "ph_1795213709827_160",
+          "filename": "IMG_9542.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-162.jpg"
+        },
+        {
+          "id": "ph_1795213709901_161",
+          "filename": "IMG_9549.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-163.jpg"
+        },
+        {
+          "id": "ph_1795213709988_162",
+          "filename": "IMG_9553.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-164.jpg"
+        },
+        {
+          "id": "ph_1795213710068_163",
+          "filename": "IMG_9556.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-165.jpg"
+        },
+        {
+          "id": "ph_1795213710131_164",
+          "filename": "IMG_9557.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-166.jpg"
+        },
+        {
+          "id": "ph_1795213710204_165",
+          "filename": "IMG_9559.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-167.jpg"
+        },
+        {
+          "id": "ph_1795213710280_166",
+          "filename": "IMG_9561.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-168.jpg"
+        },
+        {
+          "id": "ph_1795213710346_167",
+          "filename": "IMG_9563.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-169.jpg"
+        },
+        {
+          "id": "ph_1795213710414_168",
+          "filename": "IMG_9564.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-170.jpg"
+        },
+        {
+          "id": "ph_1795213710482_169",
+          "filename": "IMG_9567.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-171.jpg"
+        },
+        {
+          "id": "ph_1795213710541_170",
+          "filename": "IMG_9569.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-172.jpg"
+        },
+        {
+          "id": "ph_1795213710601_171",
+          "filename": "IMG_9571.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-173.jpg"
+        },
+        {
+          "id": "ph_1795213710658_172",
+          "filename": "IMG_9575.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-174.jpg"
+        },
+        {
+          "id": "ph_1795213710723_173",
+          "filename": "IMG_9577.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-175.jpg"
+        },
+        {
+          "id": "ph_1795213710793_174",
+          "filename": "IMG_9579.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-176.jpg"
+        },
+        {
+          "id": "ph_1795213710856_175",
+          "filename": "IMG_9580.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-177.jpg"
+        },
+        {
+          "id": "ph_1795213710977_176",
+          "filename": "IMG_9588.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-178.jpg"
+        },
+        {
+          "id": "ph_1795213711070_177",
+          "filename": "IMG_9590.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-179.jpg"
+        },
+        {
+          "id": "ph_1795213711171_178",
+          "filename": "IMG_9596.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-180.jpg"
+        },
+        {
+          "id": "ph_1795213711250_179",
+          "filename": "IMG_9597.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261120223557-181.jpg"
+        }
+      ],
+      "selectedIds": [],
+      "photoComments": {},
+      "deliveryFavorites": [],
+      "selectionLocked": false,
+      "paymentOrder": null,
+      "createdAt": "2026-11-20T22:27:15.849Z",
+      "updatedAt": 1795214067285,
+      "activityLog": [
+        {
+          "at": "2026-11-20T22:27:15.850Z",
+          "type": "created",
+          "text": "Álbum criado no painel."
+        }
+      ],
+      "antiPrintEnabled": true,
+      "showOnlySelected": false,
+      "coverKicker": "GALERIA OFICIAL EM ALTA RESOLUÇÃO",
+      "coverAuthor": "Carliane Carvalho"
+    },
+    {
       "id": "alb_1794877794021",
       "slug": "amigos",
       "clientName": "Amigos",
@@ -1476,7 +2431,7 @@ const SITE_DATA = {
       "selectionLocked": false,
       "paymentOrder": null,
       "createdAt": "2026-11-17T01:09:54.021Z",
-      "updatedAt": 1794878293223,
+      "updatedAt": 1795214067285,
       "activityLog": [
         {
           "at": "2026-11-17T01:09:54.021Z",
@@ -1581,7 +2536,7 @@ const SITE_DATA = {
       "selectionLocked": false,
       "paymentOrder": null,
       "createdAt": "2026-11-16T23:57:09.245Z",
-      "updatedAt": 1794878293223,
+      "updatedAt": 1795214067285,
       "activityLog": [
         {
           "at": "2026-11-16T23:57:09.245Z",
@@ -1726,19 +2681,19 @@ const SITE_DATA = {
       "showOnlySelected": true,
       "coverKicker": "GALERIA OFICIAL EM ALTA RESOLUÇÃO",
       "coverAuthor": "Carliane Carvalho",
-      "updatedAt": 1794878293223,
+      "updatedAt": 1795214067285,
       "createdAt": "2026-11-15T23:22:47.762Z"
     }
   ],
   "clientWatermarkConfig": {
     "enabled": true,
-    "mode": "image",
+    "mode": "text",
     "imageSrc": "assets/images/logo-light.png",
     "text": "INSTANTES DE CARLY",
     "pattern": "tiled",
     "opacity": 0.85,
-    "scale": 0.15,
-    "updatedAt": 1794846021839
+    "scale": 0.2,
+    "updatedAt": 1795213802709
   },
   "clientPaymentConfig": {
     "enableMercadoPago": true,
