@@ -5,7 +5,7 @@
  */
 
 const SITE_DATA = {
-  "cmsVersion": "2026-11-22T19:13:39.670Z",
+  "cmsVersion": "2026-11-23T22:17:15.289Z",
   "brand": {
     "name": "Instantes de Carly",
     "founder": "Carliane Carvalho (Carly)",
@@ -2206,7 +2206,7 @@ const SITE_DATA = {
       "selectionLocked": false,
       "paymentOrder": null,
       "createdAt": "2026-11-20T22:57:33.271Z",
-      "updatedAt": 1795374794653,
+      "updatedAt": 1795472208191,
       "activityLog": [
         {
           "at": "2026-11-20T22:57:33.271Z",
@@ -2431,7 +2431,7 @@ const SITE_DATA = {
       "selectionLocked": false,
       "paymentOrder": null,
       "createdAt": "2026-11-17T01:09:54.021Z",
-      "updatedAt": 1795374794653,
+      "updatedAt": 1795472208191,
       "activityLog": [
         {
           "at": "2026-11-17T01:09:54.021Z",
@@ -2536,7 +2536,7 @@ const SITE_DATA = {
       "selectionLocked": false,
       "paymentOrder": null,
       "createdAt": "2026-11-16T23:57:09.245Z",
-      "updatedAt": 1795374794653,
+      "updatedAt": 1795472208191,
       "activityLog": [
         {
           "at": "2026-11-16T23:57:09.245Z",
@@ -2681,7 +2681,7 @@ const SITE_DATA = {
       "showOnlySelected": true,
       "coverKicker": "GALERIA OFICIAL EM ALTA RESOLUÇÃO",
       "coverAuthor": "Carliane Carvalho",
-      "updatedAt": 1795374794653,
+      "updatedAt": 1795472208191,
       "createdAt": "2026-11-15T23:22:47.762Z"
     },
     {
@@ -2773,7 +2773,7 @@ const SITE_DATA = {
         "createdAt": "2026-11-22T14:58:18.232Z"
       },
       "createdAt": "2026-11-22T13:24:55.535Z",
-      "updatedAt": 1795374794653,
+      "updatedAt": 1795472208191,
       "activityLog": [
         {
           "at": "2026-11-22T14:58:18.232Z",
@@ -2795,7 +2795,7 @@ const SITE_DATA = {
       "id": "alb_1794256830543",
       "slug": "yan-gordin",
       "clientName": "Yan Gordin",
-      "title": "Ensaio — Yan Gordin",
+      "title": "Ensaio — Yan",
       "subtitle": "FORTALEZA, CEARÁ & REGIÃO METROPOLITANA",
       "phase": "proofing",
       "status": "awaiting_selection",
@@ -2899,18 +2899,18 @@ const SITE_DATA = {
       "coverAuthor": "Carliane Carvalho",
       "createdAt": "2026-11-09T20:40:30.543Z",
       "showOnlySelected": false,
-      "updatedAt": 1795374794653
+      "updatedAt": 1795472208191
     }
   ],
   "clientWatermarkConfig": {
     "enabled": true,
-    "mode": "text",
+    "mode": "image",
     "imageSrc": "assets/images/logo-light.png",
     "text": "INSTANTES DE CARLY",
     "pattern": "tiled",
     "opacity": 0.85,
-    "scale": 0.25,
-    "updatedAt": 1795354227027
+    "scale": 0.15,
+    "updatedAt": 1795472111163
   },
   "clientPaymentConfig": {
     "enableMercadoPago": true,
