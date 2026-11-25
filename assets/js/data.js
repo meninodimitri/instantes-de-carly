@@ -5,7 +5,7 @@
  */
 
 const SITE_DATA = {
-  "cmsVersion": "2026-11-23T22:17:15.289Z",
+  "cmsVersion": "2026-11-25T15:20:03.572Z",
   "brand": {
     "name": "Instantes de Carly",
     "founder": "Carliane Carvalho (Carly)",
@@ -1265,13 +1265,230 @@ const SITE_DATA = {
   },
   "clientAlbums": [
     {
+      "id": "alb_1795353895535",
+      "slug": "ponte-dos-ingleses-jouve",
+      "clientName": "Ponte dos Ingleses | Jouve",
+      "title": "Ensaio — Ponte dos Ingleses | Jouve",
+      "subtitle": "FORTALEZA, CEARÁ",
+      "phase": "delivery",
+      "status": "delivered",
+      "protectionLevel": "watermark_lowres",
+      "watermarkEnabled": false,
+      "passwordEnabled": true,
+      "password": "2026",
+      "pinEnabled": false,
+      "downloadPin": "",
+      "packageName": "Ensaio Autoral",
+      "packageIncluded": 5,
+      "extrasEnabled": false,
+      "extraPhotoPrice": 10,
+      "allowHighResDownload": true,
+      "allowWebDownload": true,
+      "welcomeMessage": "Olá Jouve! Escolha com carinho suas fotografias favoritas.",
+      "coverSrc": "assets/images/uploads/foto-20261122191339-01.jpg",
+      "coverFocal": "43% 6%",
+      "design": {
+        "coverStyle": "esquerda",
+        "typography": "carly",
+        "colorTheme": "amarelinho",
+        "gridStyle": "vertical",
+        "gridSpacing": "regular",
+        "gridSize": "regular",
+        "gridNavStyle": "icons_text",
+        "coverLogoVisible": true,
+        "coverLogoColor": "auto"
+      },
+      "photos": [
+        {
+          "id": "ph_1795374507621_1",
+          "filename": "IMG_9782.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261122191339-02.jpg"
+        },
+        {
+          "id": "ph_1795374507721_2",
+          "filename": "IMG_9784.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261122191339-03.jpg"
+        },
+        {
+          "id": "ph_1795374507837_3",
+          "filename": "IMG_9796.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261122191339-04.jpg"
+        },
+        {
+          "id": "ph_1795374508016_4",
+          "filename": "IMG_9798.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261122191339-05.jpg"
+        },
+        {
+          "id": "ph_1795374508173_5",
+          "filename": "IMG_9800.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261122191339-06.jpg"
+        },
+        {
+          "id": "ph_1795374508289_6",
+          "filename": "IMG_9806.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261122191339-07.jpg"
+        },
+        {
+          "id": "ph_1795374508431_7",
+          "filename": "IMG_9811.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261122191339-08.jpg"
+        },
+        {
+          "id": "ph_1795374738903_0",
+          "filename": "IMG_9776.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261122191339-09.jpg"
+        }
+      ],
+      "selectedIds": [],
+      "photoComments": {},
+      "deliveryFavorites": [],
+      "selectionLocked": true,
+      "paymentOrder": {
+        "id": "PIX-98055",
+        "method": "direct_pix",
+        "status": "pending_receipt",
+        "extraCount": 1,
+        "totalAmount": 10,
+        "createdAt": "2026-11-22T14:58:18.232Z"
+      },
+      "createdAt": "2026-11-22T13:24:55.535Z",
+      "updatedAt": 1795619997464,
+      "activityLog": [
+        {
+          "at": "2026-11-22T14:58:18.232Z",
+          "type": "pix_pending",
+          "text": "Seleção recebida do cliente (6 fotos) via Pix Direto (PIX-98055)."
+        },
+        {
+          "at": "2026-11-22T13:24:55.535Z",
+          "type": "created",
+          "text": "Álbum criado no painel."
+        }
+      ],
+      "antiPrintEnabled": true,
+      "showOnlySelected": false,
+      "coverKicker": "GALERIA EM ALTA RESOLUÇÃO",
+      "coverAuthor": "Carliane Carvalho"
+    },
+    {
+      "id": "alb_1794256830543",
+      "slug": "yan-gordin",
+      "clientName": "Yan Gordin",
+      "title": "Ensaio — Yan",
+      "subtitle": "FORTALEZA, CEARÁ & REGIÃO METROPOLITANA",
+      "phase": "proofing",
+      "status": "awaiting_selection",
+      "protectionLevel": "watermark_lowres",
+      "watermarkEnabled": true,
+      "passwordEnabled": true,
+      "password": "1219",
+      "pinEnabled": false,
+      "downloadPin": "",
+      "packageName": "Ensaio Autoral",
+      "packageIncluded": 5,
+      "extrasEnabled": true,
+      "extraPhotoPrice": 1,
+      "allowHighResDownload": true,
+      "allowWebDownload": true,
+      "welcomeMessage": "Olá, Yan Gordin! Escolham com carinho suas fotografias favoritas.",
+      "coverSrc": "assets/images/uploads/foto-20261109204832-01.jpg",
+      "coverFocal": "78% 44%",
+      "design": {
+        "coverStyle": "moldura",
+        "typography": "bold",
+        "colorTheme": "iracema",
+        "gridStyle": "square",
+        "gridSpacing": "regular",
+        "gridSize": "large",
+        "gridNavStyle": "icons_only",
+        "coverLogoVisible": true,
+        "coverLogoColor": "auto"
+      },
+      "photos": [
+        {
+          "id": "ph_1794256845474_0",
+          "filename": "IMG-20260904-WA0065.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261109204832-02.jpg"
+        },
+        {
+          "id": "ph_1794256845509_1",
+          "filename": "IMG-20250519-WA0035.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261109204832-03.jpg"
+        },
+        {
+          "id": "ph_1794256845577_2",
+          "filename": "IMG-20250530-WA0102.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261109204832-04.jpg"
+        },
+        {
+          "id": "ph_1794256845618_3",
+          "filename": "IMG-20250613-WA0074.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261109204832-05.jpg"
+        },
+        {
+          "id": "ph_1794256845752_4",
+          "filename": "IMG-20250613-WA0063.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261109204832-06.jpg"
+        },
+        {
+          "id": "ph_1794256845782_5",
+          "filename": "IMG-20250613-WA0079.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261109204832-07.jpg"
+        },
+        {
+          "id": "ph_1794256845869_6",
+          "filename": "IMG-20250613-WA0073.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261109204832-08.jpg"
+        },
+        {
+          "id": "ph_1794256845907_7",
+          "filename": "IMG-20250613-WA0077.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261109204832-09.jpg"
+        },
+        {
+          "id": "ph_1794256846004_8",
+          "filename": "Gemini_Generated_Image_cn2estcn2estcn2e.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261109204832-10.jpg"
+        },
+        {
+          "id": "ph_1794256846093_9",
+          "filename": "Gemini_Generated_Image_luk4ifluk4ifluk4.jpg",
+          "originalSrc": "assets/images/uploads/foto-20261109204832-11.jpg"
+        },
+        {
+          "id": "ph_1794256846123_10",
+          "filename": "WhatsApp Image 2026-09-09 at 21.12.32.jpeg",
+          "originalSrc": "assets/images/uploads/foto-20261109204832-12.jpg"
+        }
+      ],
+      "selectedIds": [],
+      "photoComments": {},
+      "deliveryFavorites": [],
+      "selectionLocked": false,
+      "paymentOrder": null,
+      "activityLog": [
+        {
+          "at": "2026-11-09T20:40:30.544Z",
+          "type": "created",
+          "text": "Álbum criado no painel."
+        }
+      ],
+      "antiPrintEnabled": true,
+      "coverKicker": "",
+      "coverAuthor": "Carliane Carvalho",
+      "createdAt": "2026-11-09T20:40:30.543Z",
+      "showOnlySelected": false,
+      "updatedAt": 1795619997464
+    },
+    {
       "id": "alb_1795215453271",
       "slug": "fabricia-silva",
       "clientName": "Fabricia Silva",
       "title": "Ensaio de Natal Camping",
       "subtitle": "FORTALEZA, CEARÁ",
-      "phase": "proofing",
-      "status": "awaiting_selection",
+      "phase": "delivery",
+      "status": "delivered",
       "protectionLevel": "watermark",
       "watermarkEnabled": true,
       "passwordEnabled": false,
@@ -1280,11 +1497,11 @@ const SITE_DATA = {
       "downloadPin": "",
       "packageName": "Ensaio Autoral",
       "packageIncluded": 12,
-      "extrasEnabled": true,
+      "extrasEnabled": false,
       "extraPhotoPrice": 10,
       "allowHighResDownload": true,
       "allowWebDownload": true,
-      "welcomeMessage": "Olá, Fabricia Silva! Escolha com carinho suas fotografias favoritas.",
+      "welcomeMessage": "Fabricia, aproveite com carinho suas fotografias.",
       "coverSrc": "assets/images/uploads/foto-20261121020434-01.jpg",
       "coverFocal": "37% 59%",
       "design": {
@@ -2206,7 +2423,7 @@ const SITE_DATA = {
       "selectionLocked": false,
       "paymentOrder": null,
       "createdAt": "2026-11-20T22:57:33.271Z",
-      "updatedAt": 1795472208191,
+      "updatedAt": 1795619997464,
       "activityLog": [
         {
           "at": "2026-11-20T22:57:33.271Z",
@@ -2431,7 +2648,7 @@ const SITE_DATA = {
       "selectionLocked": false,
       "paymentOrder": null,
       "createdAt": "2026-11-17T01:09:54.021Z",
-      "updatedAt": 1795472208191,
+      "updatedAt": 1795619997464,
       "activityLog": [
         {
           "at": "2026-11-17T01:09:54.021Z",
@@ -2536,7 +2753,7 @@ const SITE_DATA = {
       "selectionLocked": false,
       "paymentOrder": null,
       "createdAt": "2026-11-16T23:57:09.245Z",
-      "updatedAt": 1795472208191,
+      "updatedAt": 1795619997464,
       "activityLog": [
         {
           "at": "2026-11-16T23:57:09.245Z",
@@ -2548,358 +2765,6 @@ const SITE_DATA = {
       "showOnlySelected": false,
       "coverKicker": "",
       "coverAuthor": "Carliane Carvalho"
-    },
-    {
-      "id": "alb_1794784967762",
-      "slug": "pqpqpqpqpqpqpq",
-      "clientName": "pqpqpqpqpqpqpq",
-      "title": "Ensaio — pqpqpqpqpqpqpq",
-      "subtitle": "FORTALEZA, CEARÁ & REGIÃO METROPOLITANA",
-      "phase": "delivery",
-      "status": "selection_paid",
-      "protectionLevel": "watermark",
-      "watermarkEnabled": true,
-      "passwordEnabled": true,
-      "password": "6710",
-      "pinEnabled": false,
-      "downloadPin": "",
-      "packageName": "Ensaio Autoral",
-      "packageIncluded": 5,
-      "extrasEnabled": true,
-      "extraPhotoPrice": 25,
-      "allowHighResDownload": true,
-      "allowWebDownload": true,
-      "welcomeMessage": "Olá, pqpqpqpqpqpqpq! Escolham com carinho suas fotografias favoritas.",
-      "coverSrc": "assets/images/uploads/foto-20261115232706-01.jpg",
-      "coverFocal": "50% 35%",
-      "design": {
-        "coverStyle": "alegria",
-        "typography": "carly",
-        "colorTheme": "amarelinho",
-        "gridStyle": "vertical",
-        "gridSpacing": "regular",
-        "gridSize": "regular",
-        "gridNavStyle": "icons_text",
-        "coverLogoVisible": true,
-        "coverLogoColor": "auto"
-      },
-      "photos": [
-        {
-          "id": "ph_1794784972955_0",
-          "filename": "Captura de tela 2026-11-13 202235.png",
-          "originalSrc": "assets/images/uploads/foto-20261115232706-02.jpg",
-          "selected": true
-        },
-        {
-          "id": "ph_1794784972964_1",
-          "filename": "Captura de tela 2026-11-14 143312.png",
-          "originalSrc": "assets/images/uploads/foto-20261115232706-03.jpg",
-          "selected": true
-        },
-        {
-          "id": "ph_1794784972984_2",
-          "filename": "Captura de tela 2026-11-14 155641.png",
-          "originalSrc": "assets/images/uploads/foto-20261115232706-04.jpg",
-          "selected": true
-        },
-        {
-          "id": "ph_1794784973058_3",
-          "filename": "Captura de tela 2026-11-14 160209.png",
-          "originalSrc": "assets/images/uploads/foto-20261115232706-05.jpg",
-          "selected": true
-        },
-        {
-          "id": "ph_1794784973066_4",
-          "filename": "Captura de tela 2026-11-14 185546.png",
-          "originalSrc": "assets/images/uploads/foto-20261115232706-06.jpg",
-          "selected": true
-        },
-        {
-          "id": "ph_1794784973090_5",
-          "filename": "Captura de tela 2026-11-14 185943.png",
-          "originalSrc": "assets/images/uploads/foto-20261115232706-07.jpg"
-        },
-        {
-          "id": "ph_1794784973114_6",
-          "filename": "Captura de tela 2026-11-14 190015.png",
-          "originalSrc": "assets/images/uploads/foto-20261115232706-08.jpg"
-        },
-        {
-          "id": "ph_1794784973136_7",
-          "filename": "Captura de tela 2026-11-14 190021.png",
-          "originalSrc": "assets/images/uploads/foto-20261115232706-09.jpg"
-        },
-        {
-          "id": "ph_1794784973205_8",
-          "filename": "Captura de tela 2026-11-14 191734.png",
-          "originalSrc": "assets/images/uploads/foto-20261115232706-10.jpg",
-          "selected": true
-        },
-        {
-          "id": "ph_1794784973225_9",
-          "filename": "Captura de tela 2026-11-14 192922.png",
-          "originalSrc": "assets/images/uploads/foto-20261115232706-11.jpg"
-        },
-        {
-          "id": "ph_1794784973267_10",
-          "filename": "Captura de tela 2026-11-14 194051.png",
-          "originalSrc": "assets/images/uploads/foto-20261115232706-12.jpg"
-        }
-      ],
-      "selectedIds": [
-        "ph_1794784972955_0",
-        "ph_1794784972964_1",
-        "ph_1794784972984_2",
-        "ph_1794784973058_3",
-        "ph_1794784973066_4",
-        "ph_1794784973205_8"
-      ],
-      "photoComments": {},
-      "deliveryFavorites": [],
-      "selectionLocked": true,
-      "paymentOrder": {
-        "id": "PIX-36724",
-        "method": "direct_pix",
-        "status": "approved",
-        "extraCount": 1,
-        "totalAmount": 25,
-        "createdAt": "2026-11-15T23:26:03.433Z"
-      },
-      "activityLog": [
-        {
-          "at": "2026-11-15T23:25:36.865Z",
-          "type": "pix_pending",
-          "text": "Seleção recebida do cliente (6 fotos) via Pix Direto (PIX-36724)."
-        },
-        {
-          "at": "2026-11-15T23:22:47.762Z",
-          "type": "created",
-          "text": "Álbum criado no painel."
-        }
-      ],
-      "antiPrintEnabled": true,
-      "showOnlySelected": true,
-      "coverKicker": "GALERIA OFICIAL EM ALTA RESOLUÇÃO",
-      "coverAuthor": "Carliane Carvalho",
-      "updatedAt": 1795472208191,
-      "createdAt": "2026-11-15T23:22:47.762Z"
-    },
-    {
-      "id": "alb_1795353895535",
-      "slug": "ponte-dos-ingleses-jouve",
-      "clientName": "Ponte dos Ingleses | Jouve",
-      "title": "Ensaio — Ponte dos Ingleses | Jouve",
-      "subtitle": "FORTALEZA, CEARÁ",
-      "phase": "delivery",
-      "status": "delivered",
-      "protectionLevel": "watermark_lowres",
-      "watermarkEnabled": false,
-      "passwordEnabled": true,
-      "password": "2026",
-      "pinEnabled": false,
-      "downloadPin": "",
-      "packageName": "Ensaio Autoral",
-      "packageIncluded": 5,
-      "extrasEnabled": false,
-      "extraPhotoPrice": 10,
-      "allowHighResDownload": true,
-      "allowWebDownload": true,
-      "welcomeMessage": "Olá Jouve! Escolha com carinho suas fotografias favoritas.",
-      "coverSrc": "assets/images/uploads/foto-20261122191339-01.jpg",
-      "coverFocal": "43% 6%",
-      "design": {
-        "coverStyle": "esquerda",
-        "typography": "carly",
-        "colorTheme": "amarelinho",
-        "gridStyle": "vertical",
-        "gridSpacing": "regular",
-        "gridSize": "regular",
-        "gridNavStyle": "icons_text",
-        "coverLogoVisible": true,
-        "coverLogoColor": "auto"
-      },
-      "photos": [
-        {
-          "id": "ph_1795374507621_1",
-          "filename": "IMG_9782.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261122191339-02.jpg"
-        },
-        {
-          "id": "ph_1795374507721_2",
-          "filename": "IMG_9784.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261122191339-03.jpg"
-        },
-        {
-          "id": "ph_1795374507837_3",
-          "filename": "IMG_9796.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261122191339-04.jpg"
-        },
-        {
-          "id": "ph_1795374508016_4",
-          "filename": "IMG_9798.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261122191339-05.jpg"
-        },
-        {
-          "id": "ph_1795374508173_5",
-          "filename": "IMG_9800.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261122191339-06.jpg"
-        },
-        {
-          "id": "ph_1795374508289_6",
-          "filename": "IMG_9806.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261122191339-07.jpg"
-        },
-        {
-          "id": "ph_1795374508431_7",
-          "filename": "IMG_9811.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261122191339-08.jpg"
-        },
-        {
-          "id": "ph_1795374738903_0",
-          "filename": "IMG_9776.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261122191339-09.jpg"
-        }
-      ],
-      "selectedIds": [],
-      "photoComments": {},
-      "deliveryFavorites": [],
-      "selectionLocked": true,
-      "paymentOrder": {
-        "id": "PIX-98055",
-        "method": "direct_pix",
-        "status": "pending_receipt",
-        "extraCount": 1,
-        "totalAmount": 10,
-        "createdAt": "2026-11-22T14:58:18.232Z"
-      },
-      "createdAt": "2026-11-22T13:24:55.535Z",
-      "updatedAt": 1795472208191,
-      "activityLog": [
-        {
-          "at": "2026-11-22T14:58:18.232Z",
-          "type": "pix_pending",
-          "text": "Seleção recebida do cliente (6 fotos) via Pix Direto (PIX-98055)."
-        },
-        {
-          "at": "2026-11-22T13:24:55.535Z",
-          "type": "created",
-          "text": "Álbum criado no painel."
-        }
-      ],
-      "antiPrintEnabled": true,
-      "showOnlySelected": false,
-      "coverKicker": "GALERIA EM ALTA RESOLUÇÃO",
-      "coverAuthor": "Carliane Carvalho"
-    },
-    {
-      "id": "alb_1794256830543",
-      "slug": "yan-gordin",
-      "clientName": "Yan Gordin",
-      "title": "Ensaio — Yan",
-      "subtitle": "FORTALEZA, CEARÁ & REGIÃO METROPOLITANA",
-      "phase": "proofing",
-      "status": "awaiting_selection",
-      "protectionLevel": "watermark_lowres",
-      "watermarkEnabled": true,
-      "passwordEnabled": true,
-      "password": "1219",
-      "pinEnabled": false,
-      "downloadPin": "",
-      "packageName": "Ensaio Autoral",
-      "packageIncluded": 5,
-      "extrasEnabled": true,
-      "extraPhotoPrice": 1,
-      "allowHighResDownload": true,
-      "allowWebDownload": true,
-      "welcomeMessage": "Olá, Yan Gordin! Escolham com carinho suas fotografias favoritas.",
-      "coverSrc": "assets/images/uploads/foto-20261109204832-01.jpg",
-      "coverFocal": "78% 44%",
-      "design": {
-        "coverStyle": "moldura",
-        "typography": "bold",
-        "colorTheme": "iracema",
-        "gridStyle": "square",
-        "gridSpacing": "regular",
-        "gridSize": "large",
-        "gridNavStyle": "icons_only",
-        "coverLogoVisible": true,
-        "coverLogoColor": "auto"
-      },
-      "photos": [
-        {
-          "id": "ph_1794256845474_0",
-          "filename": "IMG-20260904-WA0065.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109204832-02.jpg"
-        },
-        {
-          "id": "ph_1794256845509_1",
-          "filename": "IMG-20250519-WA0035.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109204832-03.jpg"
-        },
-        {
-          "id": "ph_1794256845577_2",
-          "filename": "IMG-20250530-WA0102.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109204832-04.jpg"
-        },
-        {
-          "id": "ph_1794256845618_3",
-          "filename": "IMG-20250613-WA0074.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109204832-05.jpg"
-        },
-        {
-          "id": "ph_1794256845752_4",
-          "filename": "IMG-20250613-WA0063.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109204832-06.jpg"
-        },
-        {
-          "id": "ph_1794256845782_5",
-          "filename": "IMG-20250613-WA0079.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109204832-07.jpg"
-        },
-        {
-          "id": "ph_1794256845869_6",
-          "filename": "IMG-20250613-WA0073.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109204832-08.jpg"
-        },
-        {
-          "id": "ph_1794256845907_7",
-          "filename": "IMG-20250613-WA0077.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109204832-09.jpg"
-        },
-        {
-          "id": "ph_1794256846004_8",
-          "filename": "Gemini_Generated_Image_cn2estcn2estcn2e.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109204832-10.jpg"
-        },
-        {
-          "id": "ph_1794256846093_9",
-          "filename": "Gemini_Generated_Image_luk4ifluk4ifluk4.jpg",
-          "originalSrc": "assets/images/uploads/foto-20261109204832-11.jpg"
-        },
-        {
-          "id": "ph_1794256846123_10",
-          "filename": "WhatsApp Image 2026-09-09 at 21.12.32.jpeg",
-          "originalSrc": "assets/images/uploads/foto-20261109204832-12.jpg"
-        }
-      ],
-      "selectedIds": [],
-      "photoComments": {},
-      "deliveryFavorites": [],
-      "selectionLocked": false,
-      "paymentOrder": null,
-      "activityLog": [
-        {
-          "at": "2026-11-09T20:40:30.544Z",
-          "type": "created",
-          "text": "Álbum criado no painel."
-        }
-      ],
-      "antiPrintEnabled": true,
-      "coverKicker": "",
-      "coverAuthor": "Carliane Carvalho",
-      "createdAt": "2026-11-09T20:40:30.543Z",
-      "showOnlySelected": false,
-      "updatedAt": 1795472208191
     }
   ],
   "clientWatermarkConfig": {
